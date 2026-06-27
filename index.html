@@ -428,6 +428,45 @@
       border-top: 1px solid var(--border);
     }
 
+    /* ── Terminal ── */
+    .tw-section {
+      max-width: 900px; margin: 0 auto;
+      padding: 4rem clamp(1.5rem, 5vw, 2rem) 5rem;
+    }
+    .tw-terminal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .tw-titlebar {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .65rem 1rem;
+      background: #0d1117;
+      border-bottom: 1px solid var(--border);
+    }
+    .tw-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .tw-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .72rem; color: var(--muted); margin-left: .5rem;
+    }
+    .tw-body { padding: 1.2rem 1.4rem; min-height: 180px; overflow: hidden; }
+    .tw-line {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-family: 'JetBrains Mono', monospace; font-size: .83rem;
+      line-height: 1.7; margin-bottom: .2rem;
+    }
+    .tw-prompt { color: var(--accent); user-select: none; flex-shrink: 0; }
+    .tw-code { color: var(--accent2); white-space: pre-wrap; word-break: break-all; flex: 1; }
+    .tw-code.dim { color: var(--muted); }
+    .tw-active .tw-code { color: var(--text); }
+    .tw-cursor {
+      display: inline-block; width: 8px; height: 1em;
+      background: var(--accent); vertical-align: middle; margin-left: 1px;
+      animation: curblink 1s step-end infinite;
+    }
+    @keyframes curblink { 0%,100%{opacity:1} 50%{opacity:0} }
+
     /* ── Responsive ── */
     @media (max-width: 600px) {
       .nav-links { display: none; }
@@ -566,6 +605,32 @@
         </a>
       </div>
     </section>
+
+    <hr class="divider" />
+
+    <div class="tw-section">
+      <p class="section-label reveal">live_script</p>
+      <h2 class="section-title reveal reveal-delay-1">Code in motion</h2>
+      <p class="section-sub reveal reveal-delay-2">A live look at the kind of Luau I write every day.</p>
+      <div class="tw-terminal reveal reveal-delay-3">
+        <div class="tw-titlebar">
+          <span class="tw-dot" style="background:#ff5f57"></span>
+          <span class="tw-dot" style="background:#febc2e"></span>
+          <span class="tw-dot" style="background:#28c840"></span>
+          <span class="tw-title">zurai02 — Luau Script</span>
+        </div>
+        <div class="tw-body" id="tw-body">
+          <div class="tw-line">
+            <span class="tw-prompt">$</span>
+            <span class="tw-code dim">luau -- zurai02 scripting session</span>
+          </div>
+          <div class="tw-line">
+            <span class="tw-prompt">></span>
+            <span class="tw-code dim">require(game.ReplicatedStorage.Modules.NetBatcher)</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <footer>
       <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp; <span id="year"></span>
@@ -730,6 +795,54 @@
         showToast('lol066351 copied!');
       });
     }
+
+    /* ── Terminal typewriter ── */
+    const twLines = [
+      'local tween = CustomTween.new(part, {CFrame = goal}, 0.4, "Quad")',
+      'RemoteBatcher:Fire("combat", {action = "hit", target = id})',
+      'Profiler:Mark("RenderStep") -- 0.8ms avg',
+      'ObjectPool:Get("Projectile") -- zero alloc',
+      'StreamingEnabled = true  -- smart LOD configured',
+      'MemoryUsage: 42.3 MB  -- no leaks detected',
+      'Signal.new() -- custom signal, no BindableEvent overhead',
+      'RunService.Heartbeat:Connect(onStep) -- 0.3ms budget',
+    ];
+
+    const twBody = document.getElementById('tw-body');
+    const activeRow = document.createElement('div');
+    activeRow.className = 'tw-line tw-active';
+    const twPrompt = document.createElement('span');
+    twPrompt.className = 'tw-prompt'; twPrompt.textContent = '>';
+    const twCode = document.createElement('span');
+    twCode.className = 'tw-code';
+    const twCursor = document.createElement('span');
+    twCursor.className = 'tw-cursor';
+    activeRow.appendChild(twPrompt);
+    activeRow.appendChild(twCode);
+    activeRow.appendChild(twCursor);
+    twBody.appendChild(activeRow);
+
+    let twLi = 0, twCi = 0, twDel = false;
+    function twStep() {
+      const line = twLines[twLi];
+      if (!twDel) {
+        twCode.textContent = line.slice(0, ++twCi);
+        if (twCi >= line.length) { twDel = true; setTimeout(twStep, 2400); }
+        else setTimeout(twStep, 42);
+      } else {
+        twCode.textContent = line.slice(0, --twCi);
+        if (twCi <= 0) {
+          twDel = false;
+          const done = document.createElement('div');
+          done.className = 'tw-line';
+          done.innerHTML = '<span class="tw-prompt" style="color:var(--success)">✓</span><span class="tw-code dim">' + line + '</span>';
+          twBody.insertBefore(done, activeRow);
+          twLi = (twLi + 1) % twLines.length;
+          setTimeout(twStep, 380);
+        } else setTimeout(twStep, 20);
+      }
+    }
+    twStep();
   </script>
 
 </body>
