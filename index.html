@@ -4,25 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>zurai02 — Roblox Scripting Specialist</title>
+  <meta name="description" content="Roblox Scripting & Engine Optimization Specialist. Advanced client-side architecture, custom Luau modules, performance analysis." />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Security headers via meta -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
+  <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zurai02.github.io" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg:        #0d1117;
       --bg-card:   #161b22;
-      --bg-card2:  #1c2128;
       --border:    #30363d;
+      --border-hi: #484f58;
       --text:      #e6edf3;
       --muted:     #8b949e;
-      --accent:    #ff6b35;   /* Roblox-flavored warm orange */
+      --accent:    #ff6b35;
       --accent-hi: #ff9a6c;
-      --accent2:   #4493f8;   /* cool blue for secondary */
-      --luau:      #a78bfa;   /* luau purple */
+      --accent2:   #4493f8;
+      --luau:      #a78bfa;
       --success:   #3fb950;
-      --radius:    12px;
+      --radius:    10px;
     }
 
     html { scroll-behavior: smooth; }
@@ -34,6 +51,9 @@
       font-size: 16px;
       line-height: 1.6;
       min-height: 100vh;
+      /* subtle grid texture */
+      background-image: radial-gradient(circle at 1px 1px, #ffffff08 1px, transparent 0);
+      background-size: 32px 32px;
     }
 
     /* ── Nav ── */
@@ -41,66 +61,85 @@
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 clamp(1.5rem, 5vw, 4rem);
-      height: 60px;
-      background: rgba(13,17,23,.88);
-      backdrop-filter: blur(14px);
+      height: 58px;
+      background: rgba(13,17,23,.92);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
 
     .nav-logo {
       font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--accent);
-      text-decoration: none;
-      letter-spacing: -.01em;
+      font-weight: 600; font-size: .95rem;
+      color: var(--accent); text-decoration: none;
     }
+    .nav-logo span { color: var(--muted); animation: blink-cursor 1.1s step-end infinite; }
+    @keyframes blink-cursor { 0%,100%{opacity:1} 50%{opacity:0} }
 
-    .nav-logo span { color: var(--muted); }
-
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
     .nav-links a {
       color: var(--muted); text-decoration: none;
-      font-size: .875rem; font-weight: 500; transition: color .2s;
+      font-size: .85rem; font-weight: 500;
+      transition: color .15s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; left: 0; bottom: -2px;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width .2s;
     }
     .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
 
     /* ── Hero ── */
     .hero {
-      max-width: 900px;
-      margin: 0 auto;
+      max-width: 900px; margin: 0 auto;
       padding: clamp(5rem, 12vw, 8rem) clamp(1.5rem, 5vw, 2rem) clamp(4rem, 8vw, 6rem);
+      position: relative;
+    }
+
+    /* glow orb behind hero */
+    .hero::before {
+      content: '';
+      position: absolute; top: 4rem; left: -10rem;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,107,53,.07) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .status {
-      display: inline-flex; align-items: center; gap: .5rem;
-      font-size: .78rem; color: var(--success); font-weight: 600;
-      margin-bottom: 1.5rem; letter-spacing: .04em; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .75rem; color: var(--success); font-weight: 600;
+      margin-bottom: 1.5rem; letter-spacing: .06em; text-transform: uppercase;
+      background: rgba(63,185,80,.08);
+      border: 1px solid rgba(63,185,80,.2);
+      padding: .3rem .75rem; border-radius: 20px;
     }
     .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 7px; height: 7px; border-radius: 50%;
       background: var(--success);
       animation: blink 2s ease-in-out infinite;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
     .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: .55rem;
+      display: flex; align-items: center; gap: .55rem; flex-wrap: wrap;
       font-family: 'JetBrains Mono', monospace;
-      font-size: .8rem; font-weight: 600; color: var(--muted);
-      margin-bottom: 1.25rem; letter-spacing: .02em;
+      font-size: .78rem; font-weight: 600; color: var(--muted);
+      margin-bottom: 1.1rem;
     }
-    .hero-eyebrow .tag-lang {
-      background: rgba(167,139,250,.12);
-      border: 1px solid rgba(167,139,250,.3);
+    .tag-lang {
+      background: rgba(167,139,250,.1);
+      border: 1px solid rgba(167,139,250,.25);
       color: var(--luau);
-      padding: .15rem .5rem; border-radius: 5px; font-size: .72rem;
+      padding: .15rem .5rem; border-radius: 5px; font-size: .7rem;
     }
 
     .hero h1 {
-      font-size: clamp(2.6rem, 6.5vw, 4.5rem);
-      font-weight: 900; line-height: 1.08;
-      letter-spacing: -.035em; margin-bottom: .5rem;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900; line-height: 1.06;
+      letter-spacing: -.04em; margin-bottom: .5rem;
     }
 
     .hero h1 .handle {
@@ -109,193 +148,200 @@
     }
     .hero h1 .handle::after {
       content: '';
-      position: absolute; left: 0; bottom: -5px;
+      position: absolute; left: 0; bottom: -4px;
       width: 100%; height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-hi));
+      background: linear-gradient(90deg, var(--accent), var(--accent-hi), transparent);
       border-radius: 2px;
-      animation: underline-in 1.2s cubic-bezier(.22,1,.36,1) both;
+      animation: underline-in 1s cubic-bezier(.22,1,.36,1) .2s both;
     }
     @keyframes underline-in {
-      from { transform: scaleX(0); opacity: 0; }
-      to   { transform: scaleX(1); opacity: 1; }
+      from { transform: scaleX(0); transform-origin: left; opacity: 0; }
+      to   { transform: scaleX(1); transform-origin: left; opacity: 1; }
     }
 
     .hero-sub {
-      font-size: clamp(1rem, 2.2vw, 1.15rem);
-      color: var(--muted); max-width: 580px;
-      margin: 1.5rem 0 2.5rem; line-height: 1.8;
+      font-size: clamp(.95rem, 2vw, 1.1rem);
+      color: var(--muted); max-width: 560px;
+      margin: 1.5rem 0 2.25rem; line-height: 1.85;
     }
 
-    .hero-actions { display: flex; flex-wrap: wrap; gap: .85rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 
     .btn {
-      display: inline-flex; align-items: center; gap: .45rem;
-      padding: .65rem 1.35rem; border-radius: 8px;
-      font-size: .875rem; font-weight: 600;
-      text-decoration: none; transition: all .2s; cursor: pointer;
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .6rem 1.25rem; border-radius: 8px;
+      font-size: .85rem; font-weight: 600;
+      text-decoration: none; transition: all .18s; cursor: pointer;
       border: 1px solid transparent;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover {
-      background: var(--accent-hi);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(255,107,53,.3);
+      background: var(--accent-hi); transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,107,53,.35);
     }
     .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent-hi); transform: translateY(-1px); }
+    .btn-ghost:hover { border-color: var(--border-hi); transform: translateY(-1px); }
     .btn-discord {
-      background: rgba(88,101,242,.15);
-      color: #8ea1e1;
-      border-color: rgba(88,101,242,.3);
+      background: rgba(88,101,242,.1); color: #8ea1e1;
+      border-color: rgba(88,101,242,.25);
     }
     .btn-discord:hover {
-      background: rgba(88,101,242,.25);
-      color: #c0caff;
-      border-color: rgba(88,101,242,.6);
-      transform: translateY(-1px);
+      background: rgba(88,101,242,.2); color: #c0caff;
+      border-color: rgba(88,101,242,.5); transform: translateY(-1px);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      max-width: 900px; margin: 0 auto;
+      border: none; border-top: 1px solid var(--border);
     }
 
     /* ── Sections ── */
     section {
       max-width: 900px; margin: 0 auto;
-      padding: 4.5rem clamp(1.5rem, 5vw, 2rem);
-      border-top: 1px solid var(--border);
+      padding: 4rem clamp(1.5rem, 5vw, 2rem);
     }
 
     .section-label {
       font-family: 'JetBrains Mono', monospace;
-      font-size: .72rem; font-weight: 600;
-      letter-spacing: .12em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: .9rem;
+      font-size: .68rem; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: .75rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      max-width: 120px;
     }
 
     .section-title {
-      font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+      font-size: clamp(1.5rem, 3.2vw, 2rem);
       font-weight: 800; letter-spacing: -.025em;
-      margin-bottom: .65rem;
+      margin-bottom: .5rem; line-height: 1.2;
     }
 
     .section-sub {
-      color: var(--muted); font-size: .95rem;
-      max-width: 520px; margin-bottom: 2.25rem; line-height: 1.75;
+      color: var(--muted); font-size: .9rem;
+      max-width: 500px; margin-bottom: 2rem; line-height: 1.8;
     }
 
     /* ── Skill Cards ── */
     .skill-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
     }
 
     .skill-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem 1.6rem;
-      transition: border-color .2s, transform .2s, box-shadow .2s;
+      padding: 1.6rem 1.75rem;
+      transition: background .2s;
+      position: relative;
     }
-    .skill-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(255,107,53,.1);
+    .skill-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 2px; height: 0;
+      background: var(--accent);
+      transition: height .25s;
     }
+    .skill-card:hover { background: #1a2130; }
+    .skill-card:hover::before { height: 100%; }
 
-    .skill-card h3 {
-      font-size: .95rem; font-weight: 700; margin-bottom: .4rem;
+    .skill-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem; color: var(--accent);
+      opacity: .6; margin-bottom: .6rem; display: block;
     }
-    .skill-card p { font-size: .845rem; color: var(--muted); line-height: 1.65; }
+    .skill-card h3 {
+      font-size: .95rem; font-weight: 700; margin-bottom: .5rem;
+    }
+    .skill-card p { font-size: .84rem; color: var(--muted); line-height: 1.7; }
 
     /* ── Tech Stack ── */
-    .stack-row {
-      display: flex; flex-wrap: wrap; gap: .6rem;
-    }
+    .stack-row { display: flex; flex-wrap: wrap; gap: .5rem; }
 
     .stack-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      padding: .4rem .9rem;
+      padding: .35rem .85rem;
       border-radius: 20px;
-      font-size: .8rem; font-weight: 600;
-      border: 1px solid;
-      transition: transform .15s;
+      font-size: .78rem; font-weight: 600;
+      border: 1px solid; transition: transform .15s, box-shadow .15s;
+      font-family: 'JetBrains Mono', monospace;
     }
-    .stack-badge:hover { transform: translateY(-1px); }
+    .stack-badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
 
-    .badge-luau {
-      background: rgba(167,139,250,.1);
-      border-color: rgba(167,139,250,.3);
-      color: var(--luau);
-    }
-    .badge-roblox {
-      background: rgba(255,107,53,.1);
-      border-color: rgba(255,107,53,.3);
-      color: var(--accent-hi);
-    }
-    .badge-blue {
-      background: rgba(68,147,248,.1);
-      border-color: rgba(68,147,248,.3);
-      color: var(--accent2);
-    }
-    .badge-green {
-      background: rgba(63,185,80,.1);
-      border-color: rgba(63,185,80,.3);
-      color: var(--success);
-    }
+    .badge-luau  { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); color: var(--luau); }
+    .badge-roblox { background: rgba(255,107,53,.08); border-color: rgba(255,107,53,.25); color: var(--accent-hi); }
+    .badge-blue  { background: rgba(68,147,248,.08);  border-color: rgba(68,147,248,.25);  color: var(--accent2); }
+    .badge-green { background: rgba(63,185,80,.08);   border-color: rgba(63,185,80,.25);   color: var(--success); }
 
-    /* ── Verification block ── */
+    /* ── Verify block ── */
     .verify-block {
-      display: flex; align-items: flex-start; gap: 1rem;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-left: 3px solid var(--accent2);
       border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
+      padding: 1rem 1.4rem;
       margin-top: 2rem;
     }
-    .verify-block p { font-size: .86rem; color: var(--muted); line-height: 1.7; }
-    .verify-block strong { color: var(--text); font-weight: 600; }
-    .mono { font-family: 'JetBrains Mono', monospace; font-size: .83rem; color: var(--accent2); }
+    .verify-block p { font-size: .84rem; color: var(--muted); line-height: 1.7; }
+    .verify-block strong { color: var(--text); }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--accent2); }
 
     /* ── Links ── */
     .link-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: .85rem;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: .75rem;
     }
 
     .link-card {
-      display: flex; align-items: center; gap: .85rem;
+      display: flex; flex-direction: column; gap: .15rem;
       padding: 1.1rem 1.25rem;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      text-decoration: none; color: var(--muted);
-      font-size: .875rem; font-weight: 500;
-      transition: all .2s;
+      text-decoration: none;
+      transition: border-color .18s, transform .18s, box-shadow .18s;
+      position: relative; overflow: hidden;
+    }
+    .link-card::after {
+      content: '↗';
+      position: absolute; top: .9rem; right: 1rem;
+      font-size: .75rem; color: var(--muted);
+      opacity: 0; transition: opacity .18s, transform .18s;
+      transform: translate(-3px, 3px);
     }
     .link-card:hover {
-      border-color: var(--accent);
-      color: var(--text);
-      transform: translateY(-1px);
+      border-color: var(--border-hi);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
     }
-    .link-card .link-label { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
-    .link-card-body { display: flex; flex-direction: column; gap: .05rem; }
-    .link-card-body span:first-child { color: var(--text); font-weight: 600; font-size: .875rem; }
+    .link-card:hover::after { opacity: 1; transform: translate(0,0); }
+
+    .link-name { font-size: .875rem; font-weight: 600; color: var(--text); }
+    .link-label { font-size: .72rem; color: var(--muted); }
 
     /* ── Footer ── */
     footer {
-      text-align: center; padding: 2rem;
-      color: var(--muted); font-size: .78rem;
+      text-align: center; padding: 2.5rem 1rem;
+      color: var(--muted); font-size: .75rem;
       border-top: 1px solid var(--border);
     }
-    footer .mono { font-size: .78rem; }
 
     /* ── Responsive ── */
     @media (max-width: 600px) {
       .nav-links { display: none; }
+      .skill-grid { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .hero h1 .handle::after { animation: none; }
-      .status-dot { animation: none; }
+      .hero h1 .handle::after, .status-dot, .nav-logo span { animation: none; }
     }
   </style>
 </head>
@@ -310,7 +356,6 @@
     </ul>
   </nav>
 
-  <!-- Hero -->
   <div class="hero">
     <div class="status"><span class="status-dot"></span> Active on DevForum</div>
     <p class="hero-eyebrow">
@@ -324,15 +369,16 @@
       far as the engine allows.
     </p>
     <div class="hero-actions">
-      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" class="btn btn-primary">DevForum Portfolio →</a>
-      <a href="https://zurai02.github.io" target="_blank" class="btn btn-ghost">zurai02.github.io</a>
+      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer" class="btn btn-primary">DevForum Portfolio →</a>
+      <a href="https://zurai02.github.io" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">zurai02.github.io</a>
       <a href="#" class="btn btn-discord">Discord: lol066351</a>
     </div>
   </div>
 
-  <!-- Skills -->
+  <hr class="divider" />
+
   <section id="skills">
-    <p class="section-label">// key_skills</p>
+    <p class="section-label">key_skills</p>
     <h2 class="section-title">What I specialize in</h2>
     <p class="section-sub">
       Deep focus on the parts of Roblox development most people treat as black
@@ -340,14 +386,17 @@
     </p>
     <div class="skill-grid">
       <div class="skill-card">
+        <span class="skill-num">01</span>
         <h3>Client-Side Optimization</h3>
         <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
       </div>
       <div class="skill-card">
+        <span class="skill-num">02</span>
         <h3>Performance Analysis</h3>
         <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
       </div>
       <div class="skill-card">
+        <span class="skill-num">03</span>
         <h3>Networking</h3>
         <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
       </div>
@@ -362,9 +411,10 @@
     </div>
   </section>
 
-  <!-- Tech Stack -->
+  <hr class="divider" />
+
   <section id="stack">
-    <p class="section-label">// tech_stack</p>
+    <p class="section-label">tech_stack</p>
     <h2 class="section-title">Tools &amp; platform</h2>
     <p class="section-sub">Everything I work in day-to-day.</p>
     <div class="stack-row">
@@ -378,48 +428,38 @@
     </div>
   </section>
 
-  <!-- Links -->
+  <hr class="divider" />
+
   <section id="links">
-    <p class="section-label">// links</p>
+    <p class="section-label">links</p>
     <h2 class="section-title">Find me here</h2>
     <p class="section-sub">Portfolio, community, and contact.</p>
     <div class="link-grid">
-      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" class="link-card">
-        <div class="link-card-body">
-          <span>Scripting Portfolio</span>
-          <span class="link-label">DevForum</span>
-        </div>
+      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer" class="link-card">
+        <span class="link-name">Scripting Portfolio</span>
+        <span class="link-label">DevForum</span>
       </a>
-      <a href="https://devforum.roblox.com/u/zurai02" target="_blank" class="link-card">
-        <div class="link-card-body">
-          <span>DevForum Profile</span>
-          <span class="link-label">@zurai02</span>
-        </div>
+      <a href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer" class="link-card">
+        <span class="link-name">DevForum Profile</span>
+        <span class="link-label">@zurai02</span>
       </a>
-      <a href="https://zurai02.github.io" target="_blank" class="link-card">
-        <div class="link-card-body">
-          <span>Personal Site</span>
-          <span class="link-label">zurai02.github.io</span>
-        </div>
+      <a href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer" class="link-card">
+        <span class="link-name">Roblox Profile</span>
+        <span class="link-label">roblox.com</span>
       </a>
-      <a href="https://www.roblox.com/users/5674181802/profile" target="_blank" class="link-card">
-        <div class="link-card-body">
-          <span>Roblox Profile</span>
-          <span class="link-label">roblox.com</span>
-        </div>
+      <a href="https://zurai02.github.io" target="_blank" rel="noopener noreferrer" class="link-card">
+        <span class="link-name">Personal Site</span>
+        <span class="link-label">zurai02.github.io</span>
       </a>
       <a href="#" class="link-card">
-        <div class="link-card-body">
-          <span>Discord</span>
-          <span class="link-label">lol066351</span>
-        </div>
+        <span class="link-name">Discord</span>
+        <span class="link-label">lol066351</span>
       </a>
     </div>
   </section>
 
   <footer>
-    <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp;
-    <script>document.write(new Date().getFullYear())</script>
+    <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp; <script>document.write(new Date().getFullYear())</script>
   </footer>
 
 </body>
