@@ -359,27 +359,84 @@
     <div class="hero-actions">
       <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer" class="btn btn-primary">DevForum Portfolio →</a>
       <a href="https://zurai02.github.io" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">zurai02.github.io</a>
-      <a href="#" class="btn btn-discord" id="discord-btn" onclick="copyDiscord(event)">Discord: lol066351</a>
+      <a href="#" class="btn btn-discord" id="discord-btn" onclick="copyDiscord(event)">
+        <span id="discord-btn-text">Discord: lol066351</span>
+      </a>
     </div>
   </div>
 
+  <!-- Copy toast -->
+  <div id="copy-toast" aria-live="polite"></div>
+
+  <style>
+    #copy-toast {
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #1e2a1e; color: #3fb950;
+      border: 1px solid rgba(63,185,80,.3);
+      padding: .5rem 1.1rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      z-index: 999;
+    }
+    #copy-toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+    #discord-btn.copied {
+      color: #3fb950 !important;
+      border-color: rgba(63,185,80,.4) !important;
+      background: rgba(63,185,80,.1) !important;
+    }
+  </style>
+
   <script>
+    let copyTimer;
+
+    function showToast(msg) {
+      const toast = document.getElementById('copy-toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+
+    function doCopy(text, label) {
+      const btn = document.getElementById('discord-btn');
+      const btnText = document.getElementById('discord-btn-text');
+
+      const tryClipboard = navigator.clipboard
+        ? navigator.clipboard.writeText(text).then(() => true).catch(() => false)
+        : Promise.resolve(false);
+
+      tryClipboard.then(ok => {
+        if (!ok) fallbackCopy(text);
+        btnText.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        showToast(label + ' copied!');
+        clearTimeout(copyTimer);
+        copyTimer = setTimeout(() => {
+          btnText.textContent = 'Discord: lol066351';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
     function copyDiscord(e) {
       e.preventDefault();
-      navigator.clipboard.writeText('lol066351').then(() => {
-        const btn = document.getElementById('discord-btn');
-        const original = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.style.color = '#3fb950';
-        btn.style.borderColor = 'rgba(63,185,80,.4)';
-        btn.style.background = 'rgba(63,185,80,.1)';
-        setTimeout(() => {
-          btn.textContent = original;
-          btn.style.color = '';
-          btn.style.borderColor = '';
-          btn.style.background = '';
-        }, 1800);
-      });
+      doCopy('lol066351', 'lol066351');
     }
   </script>
 
