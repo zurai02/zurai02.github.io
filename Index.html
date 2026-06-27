@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zurai02 — Roblox Scripting Specialist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --bg-card:   #161b22;
+      --bg-card2:  #1c2128;
+      --border:    #30363d;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --accent:    #ff6b35;   /* Roblox-flavored warm orange */
+      --accent-hi: #ff9a6c;
+      --accent2:   #4493f8;   /* cool blue for secondary */
+      --luau:      #a78bfa;   /* luau purple */
+      --success:   #3fb950;
+      --radius:    12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 60px;
+      background: rgba(13,17,23,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+
+    .nav-logo span { color: var(--muted); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: .875rem; font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: clamp(5rem, 12vw, 8rem) clamp(1.5rem, 5vw, 2rem) clamp(4rem, 8vw, 6rem);
+    }
+
+    .status {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .78rem; color: var(--success); font-weight: 600;
+      margin-bottom: 1.5rem; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem; font-weight: 600; color: var(--muted);
+      margin-bottom: 1.25rem; letter-spacing: .02em;
+    }
+    .hero-eyebrow .tag-lang {
+      background: rgba(167,139,250,.12);
+      border: 1px solid rgba(167,139,250,.3);
+      color: var(--luau);
+      padding: .15rem .5rem; border-radius: 5px; font-size: .72rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 6.5vw, 4.5rem);
+      font-weight: 900; line-height: 1.08;
+      letter-spacing: -.035em; margin-bottom: .5rem;
+    }
+
+    .hero h1 .handle {
+      position: relative; display: inline-block;
+      color: var(--accent);
+    }
+    .hero h1 .handle::after {
+      content: '';
+      position: absolute; left: 0; bottom: -5px;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hi));
+      border-radius: 2px;
+      animation: underline-in 1.2s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes underline-in {
+      from { transform: scaleX(0); opacity: 0; }
+      to   { transform: scaleX(1); opacity: 1; }
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      color: var(--muted); max-width: 580px;
+      margin: 1.5rem 0 2.5rem; line-height: 1.8;
+    }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .85rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .65rem 1.35rem; border-radius: 8px;
+      font-size: .875rem; font-weight: 600;
+      text-decoration: none; transition: all .2s; cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover {
+      background: var(--accent-hi);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(255,107,53,.3);
+    }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent-hi); transform: translateY(-1px); }
+    .btn-discord {
+      background: rgba(88,101,242,.15);
+      color: #8ea1e1;
+      border-color: rgba(88,101,242,.3);
+    }
+    .btn-discord:hover {
+      background: rgba(88,101,242,.25);
+      color: #c0caff;
+      border-color: rgba(88,101,242,.6);
+      transform: translateY(-1px);
+    }
+
+    /* ── Sections ── */
+    section {
+      max-width: 900px; margin: 0 auto;
+      padding: 4.5rem clamp(1.5rem, 5vw, 2rem);
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .72rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: .9rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+      font-weight: 800; letter-spacing: -.025em;
+      margin-bottom: .65rem;
+    }
+
+    .section-sub {
+      color: var(--muted); font-size: .95rem;
+      max-width: 520px; margin-bottom: 2.25rem; line-height: 1.75;
+    }
+
+    /* ── Skill Cards ── */
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.6rem;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .skill-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,53,.1);
+    }
+
+    .skill-card h3 {
+      font-size: .95rem; font-weight: 700; margin-bottom: .4rem;
+    }
+    .skill-card p { font-size: .845rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── Tech Stack ── */
+    .stack-row {
+      display: flex; flex-wrap: wrap; gap: .6rem;
+    }
+
+    .stack-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .4rem .9rem;
+      border-radius: 20px;
+      font-size: .8rem; font-weight: 600;
+      border: 1px solid;
+      transition: transform .15s;
+    }
+    .stack-badge:hover { transform: translateY(-1px); }
+
+    .badge-luau {
+      background: rgba(167,139,250,.1);
+      border-color: rgba(167,139,250,.3);
+      color: var(--luau);
+    }
+    .badge-roblox {
+      background: rgba(255,107,53,.1);
+      border-color: rgba(255,107,53,.3);
+      color: var(--accent-hi);
+    }
+    .badge-blue {
+      background: rgba(68,147,248,.1);
+      border-color: rgba(68,147,248,.3);
+      color: var(--accent2);
+    }
+    .badge-green {
+      background: rgba(63,185,80,.1);
+      border-color: rgba(63,185,80,.3);
+      color: var(--success);
+    }
+
+    /* ── Verification block ── */
+    .verify-block {
+      display: flex; align-items: flex-start; gap: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 2rem;
+    }
+    .verify-block p { font-size: .86rem; color: var(--muted); line-height: 1.7; }
+    .verify-block strong { color: var(--text); font-weight: 600; }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: .83rem; color: var(--accent2); }
+
+    /* ── Links ── */
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .85rem;
+    }
+
+    .link-card {
+      display: flex; align-items: center; gap: .85rem;
+      padding: 1.1rem 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none; color: var(--muted);
+      font-size: .875rem; font-weight: 500;
+      transition: all .2s;
+    }
+    .link-card:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .link-card .link-label { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+    .link-card-body { display: flex; flex-direction: column; gap: .05rem; }
+    .link-card-body span:first-child { color: var(--text); font-weight: 600; font-size: .875rem; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--muted); font-size: .78rem;
+      border-top: 1px solid var(--border);
+    }
+    footer .mono { font-size: .78rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero h1 .handle::after { animation: none; }
+      .status-dot { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="nav-logo">zurai02<span>_</span></a>
+    <ul class="nav-links">
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#links">Links</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="status"><span class="status-dot"></span> Active on DevForum</div>
+    <p class="hero-eyebrow">
+      Roblox Scripting Specialist &nbsp;·&nbsp;
+      <span class="tag-lang">Luau</span>
+    </p>
+    <h1>Hi, I'm <span class="handle">zurai02</span></h1>
+    <p class="hero-sub">
+      Roblox Scripting &amp; Engine Optimization Specialist — focused on advanced
+      client-side architecture and custom Luau modules that push performance as
+      far as the engine allows.
+    </p>
+    <div class="hero-actions">
+      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" class="btn btn-primary">DevForum Portfolio →</a>
+      <a href="https://zurai02.github.io" target="_blank" class="btn btn-ghost">zurai02.github.io</a>
+      <a href="#" class="btn btn-discord">Discord: lol066351</a>
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <section id="skills">
+    <p class="section-label">// key_skills</p>
+    <h2 class="section-title">What I specialize in</h2>
+    <p class="section-sub">
+      Deep focus on the parts of Roblox development most people treat as black
+      boxes — squeezing out every frame and byte.
+    </p>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <h3>Client-Side Optimization</h3>
+        <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
+      </div>
+      <div class="skill-card">
+        <h3>Performance Analysis</h3>
+        <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
+      </div>
+      <div class="skill-card">
+        <h3>Networking</h3>
+        <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
+      </div>
+    </div>
+
+    <div class="verify-block">
+      <p>
+        <strong>Verification</strong> — Contact via Discord:
+        <span class="mono">lol066351</span>
+        &nbsp;(ID: <span class="mono">1460949263650652200</span>)
+      </p>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section id="stack">
+    <p class="section-label">// tech_stack</p>
+    <h2 class="section-title">Tools &amp; platform</h2>
+    <p class="section-sub">Everything I work in day-to-day.</p>
+    <div class="stack-row">
+      <span class="stack-badge badge-luau">Luau</span>
+      <span class="stack-badge badge-roblox">Roblox Studio</span>
+      <span class="stack-badge badge-blue">RemoteEvents / RemoteFunctions</span>
+      <span class="stack-badge badge-green">MicroProfiler</span>
+      <span class="stack-badge badge-luau">Custom Luau Modules</span>
+      <span class="stack-badge badge-blue">Streaming Enabled</span>
+      <span class="stack-badge badge-roblox">Client-Server Architecture</span>
+    </div>
+  </section>
+
+  <!-- Links -->
+  <section id="links">
+    <p class="section-label">// links</p>
+    <h2 class="section-title">Find me here</h2>
+    <p class="section-sub">Portfolio, community, and contact.</p>
+    <div class="link-grid">
+      <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" class="link-card">
+        <div class="link-card-body">
+          <span>Scripting Portfolio</span>
+          <span class="link-label">DevForum</span>
+        </div>
+      </a>
+      <a href="https://devforum.roblox.com/u/zurai02" target="_blank" class="link-card">
+        <div class="link-card-body">
+          <span>DevForum Profile</span>
+          <span class="link-label">@zurai02</span>
+        </div>
+      </a>
+      <a href="https://zurai02.github.io" target="_blank" class="link-card">
+        <div class="link-card-body">
+          <span>Personal Site</span>
+          <span class="link-label">zurai02.github.io</span>
+        </div>
+      </a>
+      <a href="https://www.roblox.com/users/5674181802/profile" target="_blank" class="link-card">
+        <div class="link-card-body">
+          <span>Roblox Profile</span>
+          <span class="link-label">roblox.com</span>
+        </div>
+      </a>
+      <a href="#" class="link-card">
+        <div class="link-card-body">
+          <span>Discord</span>
+          <span class="link-label">lol066351</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp;
+    <script>document.write(new Date().getFullYear())</script>
+  </footer>
+
+</body>
+</html>
