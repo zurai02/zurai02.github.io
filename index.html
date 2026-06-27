@@ -230,39 +230,27 @@
     /* ── Skill Cards ── */
     .skill-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
     }
 
     .skill-card {
       background: var(--bg-card);
-      padding: 1.6rem 1.75rem;
-      transition: background .2s;
-      position: relative;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.6rem;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
     }
-    .skill-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 2px; height: 0;
-      background: var(--accent);
-      transition: height .25s;
+    .skill-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,53,.1);
     }
-    .skill-card:hover { background: #1a2130; }
-    .skill-card:hover::before { height: 100%; }
 
-    .skill-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .68rem; color: var(--accent);
-      opacity: .6; margin-bottom: .6rem; display: block;
-    }
     .skill-card h3 {
-      font-size: .95rem; font-weight: 700; margin-bottom: .5rem;
+      font-size: .95rem; font-weight: 700; margin-bottom: .4rem;
     }
-    .skill-card p { font-size: .84rem; color: var(--muted); line-height: 1.7; }
+    .skill-card p { font-size: .845rem; color: var(--muted); line-height: 1.65; }
 
     /* ── Tech Stack ── */
     .stack-row { display: flex; flex-wrap: wrap; gap: .5rem; }
@@ -371,9 +359,29 @@
     <div class="hero-actions">
       <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer" class="btn btn-primary">DevForum Portfolio →</a>
       <a href="https://zurai02.github.io" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">zurai02.github.io</a>
-      <a href="#" class="btn btn-discord">Discord: lol066351</a>
+      <a href="#" class="btn btn-discord" id="discord-btn" onclick="copyDiscord(event)">Discord: lol066351</a>
     </div>
   </div>
+
+  <script>
+    function copyDiscord(e) {
+      e.preventDefault();
+      navigator.clipboard.writeText('lol066351').then(() => {
+        const btn = document.getElementById('discord-btn');
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.color = '#3fb950';
+        btn.style.borderColor = 'rgba(63,185,80,.4)';
+        btn.style.background = 'rgba(63,185,80,.1)';
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.style.color = '';
+          btn.style.borderColor = '';
+          btn.style.background = '';
+        }, 1800);
+      });
+    }
+  </script>
 
   <hr class="divider" />
 
@@ -386,17 +394,14 @@
     </p>
     <div class="skill-grid">
       <div class="skill-card">
-        <span class="skill-num">01</span>
         <h3>Client-Side Optimization</h3>
         <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
       </div>
       <div class="skill-card">
-        <span class="skill-num">02</span>
         <h3>Performance Analysis</h3>
         <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
       </div>
       <div class="skill-card">
-        <span class="skill-num">03</span>
         <h3>Networking</h3>
         <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
       </div>
