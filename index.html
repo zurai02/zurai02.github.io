@@ -6,15 +6,10 @@
   <title>zurai02 — Roblox Scripting Specialist</title>
   <meta name="description" content="Roblox Scripting & Engine Optimization Specialist. Advanced client-side architecture, custom Luau modules, performance analysis." />
   <meta name="robots" content="index, follow" />
-
-  <!-- Security headers via meta -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
-
-  <!-- Open Graph -->
   <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
   <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
   <meta property="og:type" content="website" />
@@ -51,7 +46,6 @@
       font-size: 16px;
       line-height: 1.6;
       min-height: 100vh;
-      /* subtle grid texture */
       background-image: radial-gradient(circle at 1px 1px, #ffffff08 1px, transparent 0);
       background-size: 32px 32px;
     }
@@ -66,7 +60,6 @@
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
-
     .nav-logo {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600; font-size: .95rem;
@@ -98,8 +91,6 @@
       padding: clamp(5rem, 12vw, 8rem) clamp(1.5rem, 5vw, 2rem) clamp(4rem, 8vw, 6rem);
       position: relative;
     }
-
-    /* glow orb behind hero */
     .hero::before {
       content: '';
       position: absolute; top: 4rem; left: -10rem;
@@ -141,7 +132,6 @@
       font-weight: 900; line-height: 1.06;
       letter-spacing: -.04em; margin-bottom: .5rem;
     }
-
     .hero h1 .handle {
       position: relative; display: inline-block;
       color: var(--accent);
@@ -172,7 +162,7 @@
       padding: .6rem 1.25rem; border-radius: 8px;
       font-size: .85rem; font-weight: 600;
       text-decoration: none; transition: all .18s; cursor: pointer;
-      border: 1px solid transparent;
+      border: 1px solid transparent; font-family: inherit; background: none;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover {
@@ -188,6 +178,11 @@
     .btn-discord:hover {
       background: rgba(88,101,242,.2); color: #c0caff;
       border-color: rgba(88,101,242,.5); transform: translateY(-1px);
+    }
+    .btn-discord.copied {
+      color: #3fb950 !important;
+      border-color: rgba(63,185,80,.4) !important;
+      background: rgba(63,185,80,.1) !important;
     }
 
     /* ── Divider ── */
@@ -233,7 +228,6 @@
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 1rem;
     }
-
     .skill-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -246,28 +240,22 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 32px rgba(255,107,53,.1);
     }
-
-    .skill-card h3 {
-      font-size: .95rem; font-weight: 700; margin-bottom: .4rem;
-    }
-    .skill-card p { font-size: .845rem; color: var(--muted); line-height: 1.65; }
+    .skill-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .skill-card p  { font-size: .845rem; color: var(--muted); line-height: 1.65; }
 
     /* ── Tech Stack ── */
     .stack-row { display: flex; flex-wrap: wrap; gap: .5rem; }
-
     .stack-badge {
-      padding: .35rem .85rem;
-      border-radius: 20px;
+      padding: .35rem .85rem; border-radius: 20px;
       font-size: .78rem; font-weight: 600;
       border: 1px solid; transition: transform .15s, box-shadow .15s;
       font-family: 'JetBrains Mono', monospace;
     }
     .stack-badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
-
-    .badge-luau  { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); color: var(--luau); }
-    .badge-roblox { background: rgba(255,107,53,.08); border-color: rgba(255,107,53,.25); color: var(--accent-hi); }
-    .badge-blue  { background: rgba(68,147,248,.08);  border-color: rgba(68,147,248,.25);  color: var(--accent2); }
-    .badge-green { background: rgba(63,185,80,.08);   border-color: rgba(63,185,80,.25);   color: var(--success); }
+    .badge-luau   { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); color: var(--luau); }
+    .badge-roblox { background: rgba(255,107,53,.08);  border-color: rgba(255,107,53,.25);  color: var(--accent-hi); }
+    .badge-blue   { background: rgba(68,147,248,.08);  border-color: rgba(68,147,248,.25);  color: var(--accent2); }
+    .badge-green  { background: rgba(63,185,80,.08);   border-color: rgba(63,185,80,.25);   color: var(--success); }
 
     /* ── Verify block ── */
     .verify-block {
@@ -279,7 +267,6 @@
       margin-top: 2rem;
     }
     .verify-block p { font-size: .84rem; color: var(--muted); line-height: 1.7; }
-    .verify-block strong { color: var(--text); }
     .mono { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--accent2); }
 
     /* ── Links ── */
@@ -288,7 +275,6 @@
       grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
       gap: .75rem;
     }
-
     .link-card {
       display: flex; flex-direction: column; gap: .15rem;
       padding: 1.1rem 1.25rem;
@@ -297,7 +283,7 @@
       border-radius: var(--radius);
       text-decoration: none;
       transition: border-color .18s, transform .18s, box-shadow .18s;
-      position: relative; overflow: hidden;
+      position: relative; overflow: hidden; cursor: pointer;
     }
     .link-card::after {
       content: '↗';
@@ -312,9 +298,47 @@
       box-shadow: 0 8px 24px rgba(0,0,0,.25);
     }
     .link-card:hover::after { opacity: 1; transform: translate(0,0); }
-
-    .link-name { font-size: .875rem; font-weight: 600; color: var(--text); }
+    .link-name  { font-size: .875rem; font-weight: 600; color: var(--text); }
     .link-label { font-size: .72rem; color: var(--muted); }
+
+    /* ── Typewriter Terminal ── */
+    .tw-section {
+      max-width: 900px; margin: 0 auto;
+      padding: 4rem clamp(1.5rem, 5vw, 2rem) 5rem;
+    }
+    .tw-terminal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .tw-titlebar {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .65rem 1rem;
+      background: #0d1117;
+      border-bottom: 1px solid var(--border);
+    }
+    .tw-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .tw-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .72rem; color: var(--muted); margin-left: .5rem;
+    }
+    .tw-body { padding: 1.2rem 1.4rem; min-height: 200px; }
+    .tw-line {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-family: 'JetBrains Mono', monospace; font-size: .83rem;
+      line-height: 1.7; margin-bottom: .2rem;
+    }
+    .tw-prompt { color: var(--accent); user-select: none; flex-shrink: 0; padding-top: .05rem; }
+    .tw-code   { color: var(--accent2); white-space: pre; flex: 1; }
+    .tw-code.dim { color: var(--muted); }
+    .tw-active .tw-code { color: var(--text); }
+    .tw-cursor {
+      display: inline-block; width: 8px; height: 1em;
+      background: var(--accent); vertical-align: middle; margin-left: 1px;
+      animation: curblink 1s step-end infinite;
+    }
+    @keyframes curblink { 0%,100%{opacity:1} 50%{opacity:0} }
 
     /* ── Footer ── */
     footer {
@@ -323,7 +347,20 @@
       border-top: 1px solid var(--border);
     }
 
-    /* ── Responsive ── */
+    /* ── Toast ── */
+    #copy-toast {
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #1e2a1e; color: #3fb950;
+      border: 1px solid rgba(63,185,80,.3);
+      padding: .5rem 1.1rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s; z-index: 999;
+    }
+    #copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     @media (max-width: 600px) {
       .nav-links { display: none; }
       .skill-grid { grid-template-columns: 1fr; }
@@ -359,86 +396,11 @@
     <div class="hero-actions">
       <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer" class="btn btn-primary">DevForum Portfolio →</a>
       <a href="https://zurai02.github.io" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">zurai02.github.io</a>
-      <a href="#" class="btn btn-discord" id="discord-btn" onclick="copyDiscord(event)">
+      <button class="btn btn-discord" id="discord-btn" onclick="copyDiscord()">
         <span id="discord-btn-text">Discord: lol066351</span>
-      </a>
+      </button>
     </div>
   </div>
-
-  <!-- Copy toast -->
-  <div id="copy-toast" aria-live="polite"></div>
-
-  <style>
-    #copy-toast {
-      position: fixed; bottom: 1.5rem; left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: #1e2a1e; color: #3fb950;
-      border: 1px solid rgba(63,185,80,.3);
-      padding: .5rem 1.1rem; border-radius: 8px;
-      font-size: .82rem; font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      white-space: nowrap;
-      opacity: 0; pointer-events: none;
-      transition: opacity .2s, transform .2s;
-      z-index: 999;
-    }
-    #copy-toast.show {
-      opacity: 1; transform: translateX(-50%) translateY(0);
-    }
-    #discord-btn.copied {
-      color: #3fb950 !important;
-      border-color: rgba(63,185,80,.4) !important;
-      background: rgba(63,185,80,.1) !important;
-    }
-  </style>
-
-  <script>
-    let copyTimer;
-
-    function showToast(msg) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(copyTimer);
-      copyTimer = setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    function fallbackCopy(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      try { document.execCommand('copy'); } catch(e) {}
-      document.body.removeChild(ta);
-    }
-
-    function doCopy(text, label) {
-      const btn = document.getElementById('discord-btn');
-      const btnText = document.getElementById('discord-btn-text');
-
-      const tryClipboard = navigator.clipboard
-        ? navigator.clipboard.writeText(text).then(() => true).catch(() => false)
-        : Promise.resolve(false);
-
-      tryClipboard.then(ok => {
-        if (!ok) fallbackCopy(text);
-        btnText.textContent = '✓ Copied!';
-        btn.classList.add('copied');
-        showToast(label + ' copied!');
-        clearTimeout(copyTimer);
-        copyTimer = setTimeout(() => {
-          btnText.textContent = 'Discord: lol066351';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    }
-
-    function copyDiscord(e) {
-      e.preventDefault();
-      doCopy('lol066351', 'lol066351');
-    }
-  </script>
 
   <hr class="divider" />
 
@@ -463,7 +425,6 @@
         <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
       </div>
     </div>
-
     <div class="verify-block">
       <p>
         <strong>Verification</strong> — Contact via Discord:
@@ -513,16 +474,157 @@
         <span class="link-name">Personal Site</span>
         <span class="link-label">zurai02.github.io</span>
       </a>
-      <a href="#" class="link-card">
+      <div class="link-card" onclick="copyDiscord()">
         <span class="link-name">Discord</span>
         <span class="link-label">lol066351</span>
-      </a>
+      </div>
     </div>
   </section>
 
+  <hr class="divider" />
+
+  <!-- ══════════════════════════════════════
+       TYPEWRITER TERMINAL — bottom of page
+       ══════════════════════════════════════ -->
+  <div class="tw-section">
+    <p class="section-label">live_script</p>
+    <h2 class="section-title">Code in motion</h2>
+    <p class="section-sub">A live look at the kind of Luau I write every day.</p>
+
+    <div class="tw-terminal">
+      <div class="tw-titlebar">
+        <span class="tw-dot" style="background:#ff5f57"></span>
+        <span class="tw-dot" style="background:#febc2e"></span>
+        <span class="tw-dot" style="background:#28c840"></span>
+        <span class="tw-title">zurai02 — Luau Script</span>
+      </div>
+      <div class="tw-body" id="tw-body">
+        <!-- history lines pre-rendered -->
+        <div class="tw-line">
+          <span class="tw-prompt">$</span>
+          <span class="tw-code dim">luau -- zurai02 scripting session</span>
+        </div>
+        <div class="tw-line">
+          <span class="tw-prompt">></span>
+          <span class="tw-code dim">require(game.ReplicatedStorage.Modules.NetBatcher)</span>
+        </div>
+        <!-- active line injected by JS -->
+      </div>
+    </div>
+  </div>
+
   <footer>
-    <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp; <script>document.write(new Date().getFullYear())</script>
+    <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization &nbsp;·&nbsp;
+    <script>document.write(new Date().getFullYear())</script>
   </footer>
 
+  <div id="copy-toast"></div>
+
+  <script>
+    /* ── Discord copy ── */
+    let copyTimer;
+    function showToast(msg) {
+      const t = document.getElementById('copy-toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function copyDiscord() {
+      const text = 'lol066351';
+      const btn  = document.getElementById('discord-btn');
+      const btxt = document.getElementById('discord-btn-text');
+      function done() {
+        if (btxt) btxt.textContent = '✓ Copied!';
+        if (btn)  btn.classList.add('copied');
+        showToast('lol066351 copied!');
+        setTimeout(() => {
+          if (btxt) btxt.textContent = 'Discord: lol066351';
+          if (btn)  btn.classList.remove('copied');
+        }, 2000);
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done).catch(done);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    }
+
+    /* ── Typewriter terminal ── */
+    const lines = [
+      'local tween = CustomTween.new(part, {CFrame = goal}, 0.4, "Quad")',
+      'RemoteBatcher:Fire("combat", {action = "hit", target = id})',
+      'Profiler:Mark("RenderStep") -- 0.8ms avg',
+      'ObjectPool:Get("Projectile") -- zero alloc',
+      'StreamingEnabled = true  -- smart LOD configured',
+      'MemoryUsage: 42.3 MB  -- no leaks detected ✓',
+      'Signal.new() -- custom signal, no BindableEvent overhead',
+      'RunService.Heartbeat:Connect(onStep) -- 0.3ms budget',
+    ];
+
+    const body = document.getElementById('tw-body');
+
+    // Build the active typing row
+    const activeRow = document.createElement('div');
+    activeRow.className = 'tw-line tw-active';
+
+    const promptEl = document.createElement('span');
+    promptEl.className = 'tw-prompt';
+    promptEl.textContent = '>';
+
+    const codeEl = document.createElement('span');
+    codeEl.className = 'tw-code';
+
+    const cursorEl = document.createElement('span');
+    cursorEl.className = 'tw-cursor';
+
+    activeRow.appendChild(promptEl);
+    activeRow.appendChild(codeEl);
+    activeRow.appendChild(cursorEl);
+    body.appendChild(activeRow);
+
+    let li = 0, ci = 0, deleting = false;
+
+    function typeStep() {
+      const line = lines[li];
+      if (!deleting) {
+        ci++;
+        codeEl.textContent = line.slice(0, ci);
+        if (ci >= line.length) {
+          deleting = true;
+          setTimeout(typeStep, 2400);
+        } else {
+          setTimeout(typeStep, 42);
+        }
+      } else {
+        ci--;
+        codeEl.textContent = line.slice(0, ci);
+        if (ci <= 0) {
+          deleting = false;
+          // Push completed line into history above active row
+          const done = document.createElement('div');
+          done.className = 'tw-line';
+          done.innerHTML =
+            '<span class="tw-prompt" style="color:var(--success)">✓</span>' +
+            '<span class="tw-code dim">' + line + '</span>';
+          body.insertBefore(done, activeRow);
+          li = (li + 1) % lines.length;
+          setTimeout(typeStep, 380);
+        } else {
+          setTimeout(typeStep, 20);
+        }
+      }
+    }
+
+    typeStep();
+  </script>
 </body>
 </html>
