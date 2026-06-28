@@ -1,0 +1,45 @@
+{
+  "name": "zurai02 — Roblox Scripting Specialist",
+  "short_name": "zurai02",
+  "description": "Roblox Scripting & Engine Optimization Specialist. Advanced client-side architecture, custom Luau modules, performance analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080c11",
+  "theme_color": "#ff6b35",
+  "lang": "en",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "zurai02 portfolio desktop view"
+    },
+    {
+      "src": "screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "zurai02 portfolio mobile view"
+    }
+  ],
+  "categories": ["portfolio", "developer", "technology"],
+  "prefer_related_applications": false
+}
+
