@@ -512,3 +512,29 @@
       .status-dot, .scroll-hint .sh-line, .nav-cursor { animation: none; }
     }
 
+/* ── SVG Icons ── */
+.skill-icon {
+  width: 22px; height: 22px;
+  color: var(--accent);
+  margin-bottom: .75rem;
+  display: block;
+  opacity: .85;
+  transition: opacity .2s, transform .2s;
+}
+.skill-card:hover .skill-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.link-icon {
+  width: 18px; height: 18px;
+  color: var(--muted);
+  margin-bottom: .4rem;
+  display: block;
+  transition: color .18s, transform .18s;
+  flex-shrink: 0;
+}
+.link-card:hover .link-icon {
+  color: var(--accent);
+  transform: scale(1.12);
+}
