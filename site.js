@@ -369,24 +369,38 @@ function initHeroTypewriter() {
    8. SCROLL REVEAL
    ═══════════════════════════════════════════ */
 function initScrollReveal() {
-  if (prefersReducedMotion()) {
+  const revealAll = () =>
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-    return;
-  }
+
+  if (prefersReducedMotion()) { revealAll(); return; }
+
+  /* Fallback — if IO never fires, reveal everything after 2s */
+  const fallback = setTimeout(revealAll, 2000);
+
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+  }, { threshold: 0, rootMargin: '0px' });
 
   document.querySelectorAll('.reveal').forEach(el => {
     const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
+    /* already visible on load — reveal immediately */
+    if (rect.top < window.innerHeight + 50 && rect.bottom > 0) {
       el.classList.add('visible');
     } else {
       io.observe(el);
     }
   });
+
+  /* Cancel fallback if observer worked */
+  setTimeout(() => {
+    const anyVisible = document.querySelector('.reveal.visible');
+    if (anyVisible) clearTimeout(fallback);
+  }, 500);
 }
 
 /* ═══════════════════════════════════════════
