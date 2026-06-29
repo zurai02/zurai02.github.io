@@ -265,7 +265,7 @@
     }
 
     /* scroll reveal */
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s, transform .6s; }
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
     .rd1 { transition-delay: .08s; }
     .rd2 { transition-delay: .16s; }
