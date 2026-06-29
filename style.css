@@ -308,14 +308,14 @@ section {
 
 /* scroll reveal */
 .reveal {
-  opacity: 0; transform: translateY(22px);
-  transition: opacity .55s ease, transform .55s ease;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s ease, transform .5s ease;
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
-.rd1 { transition-delay: .08s; }
-.rd2 { transition-delay: .16s; }
-.rd3 { transition-delay: .24s; }
-.rd4 { transition-delay: .32s; }
+.rd1 { transition-delay: .06s; }
+.rd2 { transition-delay: .12s; }
+.rd3 { transition-delay: .18s; }
+.rd4 { transition-delay: .24s; }
 
 /* section label */
 .section-label {
