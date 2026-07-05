@@ -7,10 +7,14 @@
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "deploy": "gh-pages -d ."
+    "deploy": "gh-pages -d .",
+    "ai:train": "node ai.js train",
+    "ai:serve": "node ai.js serve"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "@xenova/transformers": "^2.17.2",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "typescript": "^5.4.5",
