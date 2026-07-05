@@ -1,39 +1,160 @@
 /**
  * ai.js — Self-contained portfolio AI. No API key. Runs 100% locally.
  *
- * How it works:
- *   1. Reads your HTML, CSS, README, manifest.json as training data.
- *   2. Splits content into chunks and generates vector embeddings using a
- *      real transformer model (~80MB, downloaded once, stored locally).
- *   3. When a visitor asks a question, finds the most semantically similar
- *      chunks and builds an answer from them.
- *   4. Learns more each time you add/change files — just re-run train().
- *
  * Setup:
- *   npm install @xenova/transformers express cors
- *   node ai.js train     ← index your portfolio content (run after changes)
+ *   npm install
+ *   node ai.js train     ← index your portfolio content (re-run after edits)
  *   node ai.js serve     ← start the chat API on localhost:5000
  *
  * Your chat widget calls:
  *   POST http://localhost:5000/chat   { "message": "..." }
  */
 
-const { pipeline, env } = require("@xenova/transformers");
+const { embed, answerFromChunks, detectIntent, warmup } = require("./transformer");
 const express = require("express");
 const cors    = require("cors");
 const fs      = require("fs");
 const path    = require("path");
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const MODEL_NAME   = "Xenova/all-MiniLM-L6-v2";   // 80MB, runs locally
-const VECTOR_DB    = "./portfolio_vectors.json";    // persisted embeddings
-const REPO_ROOT    = process.env.REPO_ROOT || ".";
-const PORT         = process.env.PORT || 5000;
-const CHUNK_SIZE   = 200;   // words per chunk
-const TOP_K        = 3;     // how many chunks to use per answer
+const VECTOR_DB  = "./portfolio_vectors.json";
+const REPO_ROOT  = process.env.REPO_ROOT || ".";
+const PORT       = process.env.PORT || 5000;
+const CHUNK_SIZE = 200;   // words per chunk
+const TOP_K      = 3;     // chunks used per answer
 
-// Cache the model so it only loads once
-let embedder = null;
+
+// ── File reader ───────────────────────────────────────────────────────────────
+
+function readPortfolioFiles() {
+  const targets = [
+    "index.html", "style.css", "site.js", "README.md",
+    "manifest.json", "AITEXT.md", "robots.txt"
+  ];
+  const docs = [];
+  for (const name of targets) {
+    const p = path.join(REPO_ROOT, name);
+    if (fs.existsSync(p)) {
+      const text = fs.readFileSync(p, "utf-8")
+        .replace(/<[^>]+>/g, " ")   // strip HTML tags
+        .replace(/\s+/g, " ")
+        .trim();
+      if (text.length > 50) {
+        docs.push({ source: name, text });
+        console.log(`[ai] loaded: ${name} (${text.length} chars)`);
+      }
+    }
+  }
+  return docs;
+}
+
+
+// ── Chunking ──────────────────────────────────────────────────────────────────
+
+function chunkText(text, source) {
+  const words  = text.split(" ");
+  const chunks = [];
+  for (let i = 0; i < words.length; i += CHUNK_SIZE) {
+    const chunk = words.slice(i, i + CHUNK_SIZE).join(" ");
+    if (chunk.trim().length > 30) {
+      chunks.push({ source, text: chunk });
+    }
+  }
+  return chunks;
+}
+
+
+// ── Train ─────────────────────────────────────────────────────────────────────
+
+async function train() {
+  console.log("\n[ai] training on portfolio content...");
+  const docs   = readPortfolioFiles();
+  const chunks = docs.flatMap(d => chunkText(d.text, d.source));
+  console.log(`[ai] embedding ${chunks.length} chunks...`);
+
+  const vectors = [];
+  for (let i = 0; i < chunks.length; i++) {
+    process.stdout.write(`\r[ai] ${i + 1}/${chunks.length}`);
+    const vector = await embed(chunks[i].text);   // ← uses transformer.js
+    vectors.push({ ...chunks[i], vector });
+  }
+
+  fs.writeFileSync(VECTOR_DB, JSON.stringify(vectors, null, 2));
+  console.log(`\n[ai] done — ${vectors.length} vectors saved to ${VECTOR_DB}`);
+  console.log("[ai] run 'node ai.js serve' to start the chat server.");
+}
+
+
+// ── Answer ────────────────────────────────────────────────────────────────────
+
+async function answer(question) {
+  if (!fs.existsSync(VECTOR_DB)) {
+    return { answer: "I haven't been trained yet. Run: node ai.js train", intent: null };
+  }
+
+  const vectors = JSON.parse(fs.readFileSync(VECTOR_DB, "utf-8"));
+
+  // Detect what the visitor is really asking about
+  const intentResult = await detectIntent(question);   // ← uses transformer.js
+  console.log(`[ai] intent: ${intentResult.intent} (${(intentResult.score * 100).toFixed(1)}%)`);
+
+  // Find best answer from portfolio chunks
+  const result = await answerFromChunks(question, vectors, TOP_K);  // ← uses transformer.js
+
+  return {
+    answer:  result.answer,
+    intent:  intentResult.intent,
+    sources: result.sources || [],
+  };
+}
+
+
+// ── Server ────────────────────────────────────────────────────────────────────
+
+async function serve() {
+  const app = express();
+  app.use(cors());
+  app.use(express.json());
+
+  // Warm up all models on startup so first visitor isn't slow
+  await warmup();   // ← uses transformer.js
+
+  app.post("/chat", async (req, res) => {
+    const message = (req.body.message || "").trim();
+    if (!message) return res.status(400).json({ error: "message required" });
+
+    try {
+      const result = await answer(message);
+      res.json(result);
+    } catch (e) {
+      console.error("[ai] error:", e);
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.get("/health", (_, res) => res.json({ status: "ok" }));
+
+  app.listen(PORT, () => {
+    console.log(`\n🤖 Portfolio AI running at http://localhost:${PORT}`);
+    console.log(`   POST /chat  { "message": "..." }\n`);
+  });
+}
+
+
+// ── CLI ───────────────────────────────────────────────────────────────────────
+
+const cmd = process.argv[2];
+if (cmd === "train") {
+  train().catch(console.error);
+} else if (cmd === "serve") {
+  serve().catch(console.error);
+} else {
+  console.log(`
+Usage:
+  node ai.js train    ← index your portfolio files (re-run after edits)
+  node ai.js serve    ← start chat API on localhost:${PORT}
+  `);
+}
 
 async function getEmbedder() {
   if (!embedder) {
