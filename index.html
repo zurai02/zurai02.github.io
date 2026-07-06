@@ -10,7 +10,7 @@
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data:;" />
   <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
   <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
   <meta property="og:type" content="website" />
@@ -34,6 +34,251 @@
         const div = document.createElement('div');
         div.style.display = 'none';
         div.setAttribute('aria-hidden', 'true');
+        div.innerHTML = svg;
+        document.body.insertBefore(div, document.body.firstChild);
+      });
+  </script>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div id="cursor-glow"></div>
+
+  <nav id="nav">
+    <a href="#" class="nav-logo">zurai02<span class="nav-cursor"></span></a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#links">Links</a></li>
+        <li><a href="#terminal">Terminal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <div class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-glow2"></div>
+
+      <div class="status">
+        <span class="status-dot"></span>
+        Active on DevForum &nbsp;·&nbsp; <span id="greeting"></span>
+      </div>
+
+      <p class="hero-eyebrow">
+        Roblox Scripting Specialist &nbsp;·&nbsp;
+        <span class="tag-lang">Luau</span>
+      </p>
+
+      <h1>Hi, I'm<br><span class="handle">zurai02</span></h1>
+
+      <p class="hero-sub" id="hero-sub"></p>
+
+      <div class="hero-actions">
+        <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442"
+           target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          DevForum Portfolio →
+        </a>
+        <a href="https://zurai02.github.io"
+           target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+          zurai02.github.io
+        </a>
+        <button class="btn btn-discord" id="discord-btn" onclick="copyDiscord()">
+          <span id="dbt">Discord: lol066351</span>
+        </button>
+      </div>
+
+      <div class="scroll-hint">
+        <span>scroll</span>
+        <div class="sh-line"></div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ═══════════ SKILLS ═══════════ -->
+    <section id="skills">
+      <p class="section-label reveal">key_skills</p>
+      <h2 class="section-title reveal rd1">What I specialize in</h2>
+      <p class="section-sub reveal rd2">
+        Deep focus on the parts of Roblox development most people treat as black
+        boxes — squeezing out every frame and byte.
+      </p>
+
+      <div class="skill-grid">
+        <div class="skill-card reveal rd1">
+          <svg class="skill-icon" aria-hidden="true"><use href="#icon-client"/></svg>
+          <span class="skill-num">01</span>
+          <h3>Client-Side Optimization</h3>
+          <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
+        </div>
+        <div class="skill-card reveal rd2">
+          <svg class="skill-icon" aria-hidden="true"><use href="#icon-perf"/></svg>
+          <span class="skill-num">02</span>
+          <h3>Performance Analysis</h3>
+          <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
+        </div>
+        <div class="skill-card reveal rd3">
+          <svg class="skill-icon" aria-hidden="true"><use href="#icon-network"/></svg>
+          <span class="skill-num">03</span>
+          <h3>Networking</h3>
+          <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
+        </div>
+      </div>
+
+      <div class="stat-row reveal rd2">
+        <div class="stat">
+          <span class="stat-val" data-count="100">0</span>
+          <span class="stat-lbl">% client-side focus</span>
+        </div>
+      </div>
+
+      <div class="verify-block reveal rd3">
+        <p>
+          <strong>Verification</strong> — Contact via Discord:
+          <span class="mono">lol066351</span>
+          &nbsp;(ID: <span class="mono">1460949263650652200</span>)
+        </p>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ═══════════ STACK ═══════════ -->
+    <section id="stack">
+      <p class="section-label reveal">tech_stack</p>
+      <h2 class="section-title reveal rd1">Tools &amp; platform</h2>
+      <p class="section-sub reveal rd2">Everything I work in day-to-day.</p>
+      <div class="stack-row reveal rd3">
+        <span class="badge b-luau">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-luau"/></svg>
+          Luau
+        </span>
+        <span class="badge b-rblx">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>
+          Roblox Studio
+        </span>
+        <span class="badge b-blue">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-signal"/></svg>
+          RemoteEvents / RemoteFunctions
+        </span>
+        <span class="badge b-green">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-cpu"/></svg>
+          MicroProfiler
+        </span>
+        <span class="badge b-luau">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-module"/></svg>
+          Custom Luau Modules
+        </span>
+        <span class="badge b-blue">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-network"/></svg>
+          Streaming Enabled
+        </span>
+        <span class="badge b-rblx">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-client"/></svg>
+          Client-Server Architecture
+        </span>
+        <span class="badge b-green">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-module"/></svg>
+          Object Pooling
+        </span>
+        <span class="badge b-luau">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-signal"/></svg>
+          Signal Library
+        </span>
+        <span class="badge b-blue">
+          <svg class="badge-icon" aria-hidden="true"><use href="#icon-perf"/></svg>
+          RunService.Heartbeat
+        </span>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ═══════════ LINKS ═══════════ -->
+    <section id="links">
+      <p class="section-label reveal">links</p>
+      <h2 class="section-title reveal rd1">Find me here</h2>
+      <p class="section-sub reveal rd2">Portfolio, community, and contact.</p>
+      <div class="link-grid">
+        <a href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442"
+           target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg>
+          <span class="link-name">Scripting Portfolio</span>
+          <span class="link-label">DevForum</span>
+        </a>
+        <a href="https://devforum.roblox.com/u/zurai02"
+           target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>
+          <span class="link-name">DevForum Profile</span>
+          <span class="link-label">@zurai02</span>
+        </a>
+        <a href="https://www.roblox.com/users/5674181802/profile"
+           target="_blank" rel="noopener noreferrer" class="link-card reveal rd3">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>
+          <span class="link-name">Roblox Profile</span>
+          <span class="link-label">roblox.com</span>
+        </a>
+        <a href="https://zurai02.github.io"
+           target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-github"/></svg>
+          <span class="link-name">Personal Site</span>
+          <span class="link-label">zurai02.github.io</span>
+        </a>
+        <div class="link-card reveal rd2" onclick="copyDiscord()">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-discord"/></svg>
+          <span class="link-name">Discord</span>
+          <span class="link-label">lol066351 — tap to copy</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ═══════════ TERMINAL ═══════════ -->
+    <div class="tw-wrap" id="terminal">
+      <p class="section-label reveal">live_script</p>
+      <h2 class="section-title reveal rd1">Code in motion</h2>
+      <p class="section-sub reveal rd2">A live look at the kind of Luau I write every day.</p>
+
+      <div class="tw-terminal reveal rd3">
+        <div class="tw-bar">
+          <span class="tw-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57aa"></span>
+          <span class="tw-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2eaa"></span>
+          <span class="tw-dot" style="background:#28c840;box-shadow:0 0 5px #28c840aa"></span>
+          <span class="tw-bar-title">zurai02 — luau session</span>
+        </div>
+        <div class="tw-body" id="tw-body">
+          <div class="tw-line">
+            <span class="tw-prompt">$</span>
+            <span class="tw-code dim">luau -- zurai02 session initialized</span>
+          </div>
+          <div class="tw-line">
+            <span class="tw-prompt">~</span>
+            <span class="tw-code dim">require(ReplicatedStorage.Modules.NetBatcher) <span class="cm">-- loaded</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization
+      &nbsp;·&nbsp; <span id="yr"></span>
+      &nbsp;·&nbsp; <a href="https://zurai02.github.io">zurai02.github.io</a>
+    </footer>
+
+  </div>
+
+  <div id="copy-toast"></div>
+  <script src="wasm.js" defer></script>
+  <script src="tapfx.js" defer></script>
+  <script src="site.js" defer></script>
+
+</body>
+</html>
         div.innerHTML = svg;
         document.body.insertBefore(div, document.body.firstChild);
       });
