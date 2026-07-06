@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "build": "npm run build:wasm && tsc",
-    "build:wasm": "node build-wasm.js",
+    "build:wasm": "wasm-pack build --target web --out-dir pkg",
     "start": "node dist/server.js",
     "deploy": "gh-pages -d .",
     "ai:train": "node ai.js train",
@@ -22,7 +22,6 @@
     "ts-node-dev": "^2.0.0",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.2",
-    "gh-pages": "^6.1.1",
-    "wabt": "^1.0.36"
+    "gh-pages": "^6.1.1"
   }
 }
