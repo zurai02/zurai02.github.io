@@ -1,421 +1,291 @@
 /**
- * site.js — zurai02.github.io
- * Frontend engine: particles, animations, terminal, copy, perf optimisations.
- * ─────────────────────────────────────────────────────────────────────────────
- * Sections
- *  1. Config
- *  2. DOM cache
- *  3. Utilities
- *  4. Welcome system (greeting + visit counter + first-visit overlay)
- *  5. Nav (scroll + active link)
- *  6. Cursor glow (lerp RAF)
- *  7. Particle canvas
- *  8. Hero typewriter
- *  9. Scroll reveal (IntersectionObserver)
- * 10. Animated counters
- * 11. Discord copy
- * 12. Terminal typewriter (syntax-highlighted)
- * 13. Visibility API pause (saves battery when tab hidden)
- * 14. Init
+ * site.js — zurai02.github.io  (enhanced)
+ * NOTE: Particle canvas is handled by wasm.js — initParticles removed.
  */
-
 'use strict';
 
-/* ═══════════════════════════════════════════
-   1. CONFIG
-   ═══════════════════════════════════════════ */
+/* ═══ 1. CONFIG ═══════════════════════════════════════════════════════════ */
 const CFG = {
-  particles: {
-    count:    70,
-    colors:   ['#ff6b35', '#4493f8', '#a78bfa'],
-    maxR:     1.6,
-    minR:     0.3,
-    maxSpeed: 0.38,
-    minSpeed: 0.08,
-    maxOpac:  0.42,
-    minOpac:  0.07,
-    drift:    0.22,   // horizontal drift amplitude
-  },
-  glow: {
-    lerp: 0.07,       // cursor follow smoothness (lower = smoother)
-  },
+  glow:   { lerp: 0.07 },
   hero: {
     phrases: [
       'Roblox Scripting & Engine Optimization Specialist.',
       'Building custom Luau modules that bypass engine limits.',
       'Pushing client-side performance to the absolute limit.',
       'Zero wasted frames. Lightweight networks. Fast code.',
+      'WebAssembly-powered tools. Native-speed results.',
     ],
-    typeSpeed:   36,  // ms per character
-    deleteSpeed: 16,
-    pauseAfterType:   2500,
-    pauseAfterDelete: 300,
-    startDelay:       950,
+    typeSpeed: 34, deleteSpeed: 14,
+    pauseAfterType: 2600, pauseAfterDelete: 280, startDelay: 900,
   },
   terminal: {
-    typeSpeed:   40,
-    deleteSpeed: 18,
-    pauseAfterType:   2700,
-    pauseAfterDelete: 380,
-    maxHistory:  8,
+    typeSpeed: 38, deleteSpeed: 16,
+    pauseAfterType: 2800, pauseAfterDelete: 360, maxHistory: 9,
   },
-  counter: {
-    steps:    48,
-    interval: 26,  // ms
-  },
-  toast: {
-    duration: 2300,
-  },
-  nav: {
-    scrollThreshold: 24,
-  },
+  counter:  { steps: 52, interval: 24 },
+  toast:    { duration: 2400 },
+  nav:      { scrollThreshold: 24 },
 };
 
-/* ═══════════════════════════════════════════
-   2. DOM CACHE
-   ═══════════════════════════════════════════ */
+/* ═══ 2. DOM CACHE ════════════════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
 const DOM = {
-  nav:       $('nav'),
-  glow:      $('cursor-glow'),
-  canvas:    $('bg-canvas'),
-  heroSub:   $('hero-sub'),
-  twBody:    $('tw-body'),
-  toast:     $('copy-toast'),
-  discordBtn:$('discord-btn'),
-  discordTxt:$('dbt'),
-  year:      $('yr'),
+  nav:        $('nav'),
+  glow:       $('cursor-glow'),
+  canvas:     $('bg-canvas'),
+  heroSub:    $('hero-sub'),
+  twBody:     $('tw-body'),
+  toast:      $('copy-toast'),
+  discordBtn: $('discord-btn'),
+  discordTxt: $('dbt'),
+  year:       $('yr'),
 };
 
-/* ═══════════════════════════════════════════
-   3. UTILITIES
-   ═══════════════════════════════════════════ */
-const rand  = (min, max) => Math.random() * (max - min) + min;
-const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-const isMobile = () => window.innerWidth < 640;
-const prefersReducedMotion = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ═══ 3. UTILITIES ════════════════════════════════════════════════════════ */
+const rand    = (a, b)    => Math.random() * (b - a) + a;
+const clamp   = (v, l, h) => Math.min(Math.max(v, l), h);
+const lerp    = (a, b, t) => a + (b - a) * t;
+const isMob   = ()        => window.innerWidth < 640;
+const noMot   = ()        => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const raf     = fn        => requestAnimationFrame(fn);
 
-/* ═══════════════════════════════════════════
-   4. WELCOME SYSTEM
-   ═══════════════════════════════════════════ */
+/* ═══ 4. SCROLL PROGRESS BAR ═════════════════════════════════════════════ */
+function initScrollProgress() {
+  const bar = document.createElement('div');
+  bar.id = 'scroll-bar';
+  document.body.appendChild(bar);
+  window.addEventListener('scroll', () => {
+    const pct = scrollY / (document.body.scrollHeight - innerHeight) * 100;
+    bar.style.width = clamp(pct, 0, 100) + '%';
+  }, { passive: true });
+}
+
+/* ═══ 5. WELCOME SYSTEM ══════════════════════════════════════════════════ */
 function initWelcome() {
-  /* ── Time-based greeting ── */
   const hour = new Date().getHours();
-  const greeting =
+  const greet =
     hour < 5  ? 'Up late?' :
     hour < 12 ? 'Good morning' :
     hour < 17 ? 'Good afternoon' :
-    hour < 21 ? 'Good evening' :
-                'Good night';
+    hour < 21 ? 'Good evening' : 'Good night';
 
-  const greetEl = document.getElementById('greeting');
-  if (greetEl) greetEl.textContent = greeting;
+  const el = document.getElementById('greeting');
+  if (el) el.textContent = greet;
 
-  /* ── Visit counter (localStorage) ── */
   const visits = parseInt(localStorage.getItem('zurai02_visits') || '0', 10) + 1;
   localStorage.setItem('zurai02_visits', String(visits));
 
-  /* ── First-visit welcome overlay ── */
-  const firstVisit = !localStorage.getItem('zurai02_welcomed');
-  if (firstVisit) {
-    localStorage.setItem('zurai02_welcomed', '1');
-    _showWelcomeOverlay(greeting);
-  }
-
-  /* ── Returning visitor toast ── */
-  if (visits > 1 && !firstVisit) {
-    setTimeout(() => showToast(`Welcome back! Visit #${visits}`), 1200);
-  }
+  const first = !localStorage.getItem('zurai02_welcomed');
+  if (first) { localStorage.setItem('zurai02_welcomed', '1'); _showOverlay(greet); }
+  else if (visits > 1) setTimeout(() => showToast(`Welcome back! Visit #${visits} 🔥`), 1200);
 }
 
-function _showWelcomeOverlay(greeting) {
-  const overlay = document.createElement('div');
-  overlay.id = 'welcome-overlay';
-  overlay.innerHTML = `
+function _showOverlay(greet) {
+  const ov = document.createElement('div');
+  ov.id = 'welcome-overlay';
+  ov.innerHTML = `
     <div id="welcome-card">
       <div id="welcome-logo">zurai02<span>_</span></div>
-      <p id="welcome-greeting">${greeting}!</p>
+      <p id="welcome-greeting">${greet}!</p>
       <p id="welcome-sub">Roblox Scripting &amp; Engine Optimization</p>
-      <button id="welcome-enter">Enter site</button>
+      <div id="welcome-tags">
+        <span>Luau</span><span>WebAssembly</span><span>Client-Side</span>
+      </div>
+      <button id="welcome-enter">Enter site <span>→</span></button>
     </div>`;
-  document.body.appendChild(overlay);
+  document.body.appendChild(ov);
 
-  /* Inject overlay styles */
   const s = document.createElement('style');
   s.textContent = `
     #welcome-overlay {
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(8,12,17,.97);
-      backdrop-filter: blur(20px);
-      animation: wo-in .4s ease both;
+      position:fixed;inset:0;z-index:9999;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(7,9,14,.97);backdrop-filter:blur(24px);
+      animation:wo-in .4s ease both;
     }
-    @keyframes wo-in { from{opacity:0} to{opacity:1} }
-    @keyframes wo-out { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(.96)} }
-
-    #welcome-card {
-      text-align: center;
-      animation: wc-in .55s cubic-bezier(.22,1,.36,1) .1s both;
+    @keyframes wo-in{from{opacity:0}to{opacity:1}}
+    @keyframes wo-out{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.97)}}
+    #welcome-card{
+      text-align:center;max-width:380px;padding:0 2rem;
+      animation:wc-in .6s cubic-bezier(.22,1,.36,1) .1s both;
     }
-    @keyframes wc-in { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-    #welcome-logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.6rem; font-weight: 700;
-      color: #ff6b35; margin-bottom: 1rem;
-      letter-spacing: -.02em;
+    @keyframes wc-in{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    #welcome-logo{
+      font-family:'JetBrains Mono',monospace;font-size:1.4rem;
+      font-weight:700;color:#ff6b35;margin-bottom:1.2rem;letter-spacing:-.02em;
     }
-    #welcome-logo span { color: #8b949e; animation: blink-c 1.1s step-end infinite; }
-
-    #welcome-greeting {
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      font-weight: 900; letter-spacing: -.04em;
-      color: #eaf0f8; margin-bottom: .5rem;
+    #welcome-logo span{color:#4a5568;animation:blink-c 1.1s step-end infinite;}
+    #welcome-greeting{
+      font-size:clamp(2.2rem,7vw,3.8rem);font-weight:900;
+      letter-spacing:-.04em;color:#eaf1fa;margin-bottom:.4rem;
     }
-    #welcome-sub {
-      font-size: .85rem; color: #8b949e;
-      margin-bottom: 2.5rem; letter-spacing: .02em;
+    #welcome-sub{font-size:.82rem;color:#6e7e94;margin-bottom:1.5rem;}
+    #welcome-tags{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;}
+    #welcome-tags span{
+      background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);
+      color:#ff9560;padding:.2rem .7rem;border-radius:20px;
+      font-size:.7rem;font-family:'JetBrains Mono',monospace;
     }
-    #welcome-enter {
-      background: #ff6b35; color: #fff;
-      border: none; border-radius: 8px;
-      padding: .7rem 2rem; font-size: .9rem;
-      font-weight: 700; font-family: inherit;
-      cursor: pointer; letter-spacing: .02em;
-      transition: background .18s, transform .18s, box-shadow .18s;
+    #welcome-enter{
+      background:#ff6b35;color:#fff;border:none;border-radius:10px;
+      padding:.75rem 2.2rem;font-size:.9rem;font-weight:700;
+      font-family:inherit;cursor:pointer;letter-spacing:.02em;
+      transition:all .18s;display:inline-flex;align-items:center;gap:.5rem;
     }
-    #welcome-enter:hover {
-      background: #ff9560;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255,107,53,.4);
-    }`;
+    #welcome-enter span{transition:transform .18s;}
+    #welcome-enter:hover{background:#ff9560;transform:translateY(-2px);box-shadow:0 12px 36px rgba(255,107,53,.45);}
+    #welcome-enter:hover span{transform:translateX(3px);}`;
   document.head.appendChild(s);
 
-  /* Dismiss on button click or any key */
   const dismiss = () => {
-    overlay.style.animation = 'wo-out .35s ease forwards';
-    setTimeout(() => overlay.remove(), 380);
+    ov.style.animation = 'wo-out .35s ease forwards';
+    setTimeout(() => ov.remove(), 380);
   };
-
-  document.getElementById('welcome-enter').addEventListener('click', dismiss);
+  $('welcome-enter').addEventListener('click', dismiss);
   document.addEventListener('keydown', dismiss, { once: true });
 }
 
-/* ═══════════════════════════════════════════
-   5. NAV  — scroll class + active section link
-   ═══════════════════════════════════════════ */
+/* ═══ 6. HAMBURGER MOBILE MENU ══════════════════════════════════════════ */
+function initMobileMenu() {
+  const nav  = DOM.nav;
+  const ul   = nav.querySelector('.nav-links');
+  if (!ul) return;
+
+  const btn  = document.createElement('button');
+  btn.id     = 'nav-hamburger';
+  btn.setAttribute('aria-label', 'Toggle menu');
+  btn.innerHTML = `<span></span><span></span><span></span>`;
+  nav.querySelector('.nav-right')?.prepend(btn) || nav.appendChild(btn);
+
+  let open = false;
+  btn.addEventListener('click', () => {
+    open = !open;
+    btn.classList.toggle('open', open);
+    ul.classList.toggle('mobile-open', open);
+  });
+  // close on link click
+  ul.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => {
+      open = false; btn.classList.remove('open'); ul.classList.remove('mobile-open');
+    }));
+}
+
+/* ═══ 7. NAV ═════════════════════════════════════════════════════════════ */
 function initNav() {
-  const links = document.querySelectorAll('.nav-links a[href^="#"]');
+  const links    = document.querySelectorAll('.nav-links a[href^="#"]');
   const sections = [...links].map(a => ({
-    a,
-    el: document.querySelector(a.getAttribute('href')),
+    a, el: document.querySelector(a.getAttribute('href'))
   })).filter(o => o.el);
 
   const onScroll = () => {
-    /* scrolled class */
     DOM.nav.classList.toggle('scrolled', scrollY > CFG.nav.scrollThreshold);
-
-    /* active nav link */
-    let current = '';
+    let cur = '';
     sections.forEach(({ el, a }) => {
-      if (el.getBoundingClientRect().top <= 100) current = a.getAttribute('href');
+      if (el.getBoundingClientRect().top <= 110) cur = a.getAttribute('href');
     });
-    links.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === current);
-    });
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === cur));
   };
-
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 }
 
-/* ═══════════════════════════════════════════
-   6. CURSOR GLOW  (desktop-only smooth lerp)
-   ═══════════════════════════════════════════ */
+/* ═══ 8. CURSOR GLOW + MAGNETIC BUTTONS ═════════════════════════════════ */
 function initCursorGlow() {
-  if (isMobile() || !DOM.glow) return;
-
-  let mx = innerWidth / 2, my = innerHeight / 2;
-  let gx = mx, gy = my;
-  let visible = false;
+  if (isMob() || !DOM.glow) return;
+  let mx = innerWidth/2, my = innerHeight/2, gx = mx, gy = my, vis = false;
 
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
-    if (!visible) { DOM.glow.style.opacity = '1'; visible = true; }
+    if (!vis) { DOM.glow.style.opacity = '1'; vis = true; }
   }, { passive: true });
-
-  document.addEventListener('mouseleave', () => {
-    DOM.glow.style.opacity = '0'; visible = false;
-  });
+  document.addEventListener('mouseleave', () => { DOM.glow.style.opacity = '0'; vis = false; });
 
   const tick = () => {
-    gx += (mx - gx) * CFG.glow.lerp;
-    gy += (my - gy) * CFG.glow.lerp;
-    DOM.glow.style.transform = `translate(calc(${gx}px - 50%), calc(${gy}px - 50%))`;
-    requestAnimationFrame(tick);
+    gx = lerp(gx, mx, CFG.glow.lerp);
+    gy = lerp(gy, my, CFG.glow.lerp);
+    DOM.glow.style.transform = `translate(calc(${gx}px - 50%),calc(${gy}px - 50%))`;
+    raf(tick);
   };
-  tick();
-}
+  raf(tick);
 
-/* ═══════════════════════════════════════════
-   6. PARTICLE CANVAS
-   ═══════════════════════════════════════════ */
-function initParticles() {
-  const cv = DOM.canvas;
-  if (!cv) return;
-  const cx = cv.getContext('2d');
-  let W = 0, H = 0, paused = false;
-
-  const resize = () => {
-    W = cv.width  = innerWidth;
-    H = cv.height = innerHeight;
-  };
-  resize();
-  window.addEventListener('resize', resize, { passive: true });
-
-  /* reduce particle count on mobile for perf */
-  const count = isMobile()
-    ? Math.floor(CFG.particles.count * 0.45)
-    : CFG.particles.count;
-
-  class Particle {
-    constructor(init = false) { this.reset(init); }
-    reset(init = false) {
-      this.x  = rand(0, W || 800);
-      this.y  = init ? rand(0, H || 600) : H + rand(2, 8);
-      this.r  = rand(CFG.particles.minR, CFG.particles.maxR);
-      this.s  = rand(CFG.particles.minSpeed, CFG.particles.maxSpeed);
-      this.o  = rand(CFG.particles.minOpac, CFG.particles.maxOpac);
-      this.c  = CFG.particles.colors[Math.floor(Math.random() * CFG.particles.colors.length)];
-      this.dx = rand(-CFG.particles.drift, CFG.particles.drift);
-      /* subtle pulse */
-      this.phase = rand(0, Math.PI * 2);
-      this.freq  = rand(0.005, 0.015);
-    }
-    update(t) {
-      this.y -= this.s;
-      this.x += this.dx;
-      /* slow pulse on opacity */
-      const pulse = Math.sin(this.phase + t * this.freq) * 0.12;
-      this._o = clamp(this.o + pulse, 0.02, 0.55);
-      if (this.y < -8) this.reset(false);
-      if (this.x < -8 || this.x > W + 8) this.dx *= -1;
-    }
-    draw() {
-      cx.beginPath();
-      cx.arc(this.x, this.y, this.r, 0, 6.2832);
-      cx.fillStyle = this.c;
-      cx.globalAlpha = this._o || this.o;
-      cx.fill();
-    }
-  }
-
-  const pts = Array.from({ length: count }, () => new Particle(true));
-
-  let lastT = 0;
-  const raf = t => {
-    if (!paused) {
-      cx.clearRect(0, 0, W, H);
-      pts.forEach(p => { p.update(t); p.draw(); });
-      cx.globalAlpha = 1;
-    }
-    lastT = t;
-    requestAnimationFrame(raf);
-  };
-  requestAnimationFrame(raf);
-
-  /* pause when tab hidden — saves battery + CPU */
-  document.addEventListener('visibilitychange', () => {
-    paused = document.hidden;
+  // Magnetic pull on buttons
+  document.querySelectorAll('.btn, .link-card').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      const r  = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top  + r.height/2);
+      el.style.transform = `translate(${dx*0.12}px,${dy*0.12}px)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = '';
+    });
   });
 }
 
-/* ═══════════════════════════════════════════
-   7. HERO TYPEWRITER
-   ═══════════════════════════════════════════ */
+/* ═══ 9. CARD TILT ═══════════════════════════════════════════════════════ */
+function initCardTilt() {
+  if (isMob() || noMot()) return;
+  document.querySelectorAll('.skill-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r  = card.getBoundingClientRect();
+      const x  = (e.clientX - r.left) / r.width  - 0.5;
+      const y  = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `translateY(-4px) rotateX(${-y*8}deg) rotateY(${x*8}deg)`;
+      card.style.transition = 'none';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = '';
+    });
+  });
+}
+
+/* ═══ 10. HERO TYPEWRITER ════════════════════════════════════════════════ */
 function initHeroTypewriter() {
   const el = DOM.heroSub;
   if (!el) return;
-
-  if (prefersReducedMotion()) {
-    el.textContent = CFG.hero.phrases[0];
-    return;
-  }
-
-  const { phrases, typeSpeed, deleteSpeed,
-          pauseAfterType, pauseAfterDelete, startDelay } = CFG.hero;
-  let pi = 0, ci = 0, deleting = false;
-
+  if (noMot()) { el.textContent = CFG.hero.phrases[0]; return; }
+  const { phrases, typeSpeed, deleteSpeed, pauseAfterType, pauseAfterDelete, startDelay } = CFG.hero;
+  let pi = 0, ci = 0, del = false;
   const tick = () => {
     const ph = phrases[pi];
-    if (!deleting) {
-      el.innerHTML = ph.slice(0, ++ci) + '<span class="tw-cur"></span>';
-      if (ci === ph.length) { deleting = true; setTimeout(tick, pauseAfterType); }
+    if (!del) {
+      el.innerHTML = ph.slice(0,++ci) + '<span class="tw-cur"></span>';
+      if (ci === ph.length) { del = true; setTimeout(tick, pauseAfterType); }
       else setTimeout(tick, typeSpeed);
     } else {
-      el.innerHTML = ph.slice(0, --ci) + '<span class="tw-cur"></span>';
-      if (ci === 0) {
-        deleting = false;
-        pi = (pi + 1) % phrases.length;
-        setTimeout(tick, pauseAfterDelete);
-      } else setTimeout(tick, deleteSpeed);
+      el.innerHTML = ph.slice(0,--ci) + '<span class="tw-cur"></span>';
+      if (ci === 0) { del = false; pi = (pi+1) % phrases.length; setTimeout(tick, pauseAfterDelete); }
+      else setTimeout(tick, deleteSpeed);
     }
   };
   setTimeout(tick, startDelay);
 }
 
-/* ═══════════════════════════════════════════
-   8. SCROLL REVEAL
-   ═══════════════════════════════════════════ */
+/* ═══ 11. SCROLL REVEAL ══════════════════════════════════════════════════ */
 function initScrollReveal() {
-  const revealAll = () =>
-    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-
-  if (prefersReducedMotion()) { revealAll(); return; }
-
-  /* Fallback — if IO never fires, reveal everything after 2s */
-  const fallback = setTimeout(revealAll, 2000);
-
+  const all = () => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  if (noMot()) { all(); return; }
+  const fb = setTimeout(all, 2000);
   const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        io.unobserve(e.target);
-      }
-    });
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
   }, { threshold: 0, rootMargin: '0px' });
-
   document.querySelectorAll('.reveal').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    /* already visible on load — reveal immediately */
-    if (rect.top < window.innerHeight + 50 && rect.bottom > 0) {
-      el.classList.add('visible');
-    } else {
-      io.observe(el);
-    }
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight + 50 && r.bottom > 0) el.classList.add('visible');
+    else io.observe(el);
   });
-
-  /* Cancel fallback if observer worked */
-  setTimeout(() => {
-    const anyVisible = document.querySelector('.reveal.visible');
-    if (anyVisible) clearTimeout(fallback);
-  }, 500);
+  setTimeout(() => { if (document.querySelector('.reveal.visible')) clearTimeout(fb); }, 500);
 }
 
-/* ═══════════════════════════════════════════
-   9. ANIMATED COUNTERS
-   ═══════════════════════════════════════════ */
+/* ═══ 12. COUNTERS ═══════════════════════════════════════════════════════ */
 function initCounters() {
   const { steps, interval } = CFG.counter;
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
-      const el    = e.target;
-      const target = +el.dataset.count;
-      const suffix = el.dataset.suffix || '';
-      let cur = 0;
-      const step = target / steps;
+      const el = e.target, target = +el.dataset.count, suffix = el.dataset.suffix || '';
+      let cur = 0; const step = target / steps;
       const t = setInterval(() => {
         cur = Math.min(cur + step, target);
         el.textContent = Math.floor(cur) + suffix;
@@ -424,211 +294,151 @@ function initCounters() {
       io.unobserve(el);
     });
   }, { threshold: 0.5 });
-
   document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
 }
 
-/* ═══════════════════════════════════════════
-   10. DISCORD COPY
-   ═══════════════════════════════════════════ */
-let _toastTimer = null;
-
+/* ═══ 13. DISCORD COPY ═══════════════════════════════════════════════════ */
+let _tTimer = null;
 function showToast(msg) {
-  const t = DOM.toast;
-  if (!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => t.classList.remove('show'), CFG.toast.duration);
+  const t = DOM.toast; if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tTimer);
+  _tTimer = setTimeout(() => t.classList.remove('show'), CFG.toast.duration);
 }
-
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none';
-  document.body.appendChild(ta);
-  ta.focus(); ta.select();
-  try { document.execCommand('copy'); } catch (_) {}
-  document.body.removeChild(ta);
+function fallbackCopy(txt) {
+  const ta = Object.assign(document.createElement('textarea'),
+    { value: txt, style: 'position:fixed;top:-999px;opacity:0' });
+  document.body.append(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(_) {}
+  ta.remove();
 }
-
-window.copyDiscord = function () {
+window.copyDiscord = function() {
   const text = 'lol066351';
-  const btn  = DOM.discordBtn;
-  const btxt = DOM.discordTxt;
-
   const done = () => {
-    if (btxt) btxt.textContent = '✓ Copied!';
-    if (btn)  btn.classList.add('copied');
-    showToast('lol066351 copied to clipboard!');
+    if (DOM.discordTxt) DOM.discordTxt.textContent = '✓ Copied!';
+    DOM.discordBtn?.classList.add('copied');
+    showToast('lol066351 copied! 📋');
     setTimeout(() => {
-      if (btxt) btxt.textContent = 'Discord: lol066351';
-      if (btn)  btn.classList.remove('copied');
+      if (DOM.discordTxt) DOM.discordTxt.textContent = 'Discord: lol066351';
+      DOM.discordBtn?.classList.remove('copied');
     }, CFG.toast.duration);
   };
-
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(done).catch(() => { fallbackCopy(text); done(); });
-  } else {
-    fallbackCopy(text); done();
-  }
+  navigator.clipboard ? navigator.clipboard.writeText(text).then(done).catch(()=>{fallbackCopy(text);done();})
+                      : (fallbackCopy(text), done());
 };
 
-/* ═══════════════════════════════════════════
-   11. TERMINAL TYPEWRITER
-   ═══════════════════════════════════════════ */
+/* ═══ 14. TERMINAL ═══════════════════════════════════════════════════════ */
 const TW_LINES = [
-  {
-    raw: "local tween = CustomTween.new(part, {CFrame = goal}, 0.4, 'Quad')",
-    hl:  '<span class="kw">local</span> tween = <span class="fn">CustomTween.new</span>(part, {CFrame = goal}, <span class="num">0.4</span>, <span class="str">\'Quad\'</span>)',
-  },
-  {
-    raw: "RemoteBatcher:Fire('combat', {action = 'hit', target = id})",
-    hl:  '<span class="op">RemoteBatcher</span>:<span class="fn">Fire</span>(<span class="str">\'combat\'</span>, {action = <span class="str">\'hit\'</span>, target = id})',
-  },
-  {
-    raw: "Profiler:Mark('RenderStep')  -- 0.8ms avg",
-    hl:  '<span class="op">Profiler</span>:<span class="fn">Mark</span>(<span class="str">\'RenderStep\'</span>)  <span class="cm">-- 0.8ms avg</span>',
-  },
-  {
-    raw: "local pool = ObjectPool.new('Projectile', 64)",
-    hl:  '<span class="kw">local</span> pool = <span class="fn">ObjectPool.new</span>(<span class="str">\'Projectile\'</span>, <span class="num">64</span>)',
-  },
-  {
-    raw: "StreamingEnabled = true  -- smart LOD active",
-    hl:  '<span class="op">StreamingEnabled</span> = <span class="kw">true</span>  <span class="cm">-- smart LOD active</span>',
-  },
-  {
-    raw: "print('MemoryUsage:', Stats:GetTotalMemoryUsageMb(), 'MB')",
-    hl:  '<span class="fn">print</span>(<span class="str">\'MemoryUsage:\'</span>, Stats:<span class="fn">GetTotalMemoryUsageMb</span>(), <span class="str">\'MB\'</span>)',
-  },
-  {
-    raw: "local sig = Signal.new()  -- no BindableEvent overhead",
-    hl:  '<span class="kw">local</span> sig = <span class="fn">Signal.new</span>()  <span class="cm">-- no BindableEvent overhead</span>',
-  },
-  {
-    raw: "RunService.Heartbeat:Connect(onStep)  -- 0.3ms budget",
-    hl:  '<span class="op">RunService</span>.Heartbeat:<span class="fn">Connect</span>(onStep)  <span class="cm">-- 0.3ms budget</span>',
-  },
+  { raw:"local tween = CustomTween.new(part, {CFrame=goal}, 0.4, 'Quad')",
+    hl: '<span class="kw">local</span> tween = <span class="fn">CustomTween.new</span>(part, {CFrame=goal}, <span class="num">0.4</span>, <span class="str">\'Quad\'</span>)' },
+  { raw:"RemoteBatcher:Fire('combat', {action='hit', target=id})",
+    hl: '<span class="op">RemoteBatcher</span>:<span class="fn">Fire</span>(<span class="str">\'combat\'</span>, {action=<span class="str">\'hit\'</span>, target=id})' },
+  { raw:"Profiler:Mark('RenderStep')  -- 0.8ms avg",
+    hl: '<span class="op">Profiler</span>:<span class="fn">Mark</span>(<span class="str">\'RenderStep\'</span>)  <span class="cm">-- 0.8ms avg</span>' },
+  { raw:"local pool = ObjectPool.new('Projectile', 64)",
+    hl: '<span class="kw">local</span> pool = <span class="fn">ObjectPool.new</span>(<span class="str">\'Projectile\'</span>, <span class="num">64</span>)' },
+  { raw:"StreamingEnabled = true  -- smart LOD active",
+    hl: '<span class="op">StreamingEnabled</span> = <span class="kw">true</span>  <span class="cm">-- smart LOD active</span>' },
+  { raw:"print('MemoryUsage:', Stats:GetTotalMemoryUsageMb(), 'MB')",
+    hl: '<span class="fn">print</span>(<span class="str">\'MemoryUsage:\'</span>, Stats:<span class="fn">GetTotalMemoryUsageMb</span>(), <span class="str">\'MB\'</span>)' },
+  { raw:"local sig = Signal.new()  -- no BindableEvent overhead",
+    hl: '<span class="kw">local</span> sig = <span class="fn">Signal.new</span>()  <span class="cm">-- no BindableEvent overhead</span>' },
+  { raw:"RunService.Heartbeat:Connect(onStep)  -- 0.3ms budget",
+    hl: '<span class="op">RunService</span>.Heartbeat:<span class="fn">Connect</span>(onStep)  <span class="cm">-- 0.3ms budget</span>' },
+  { raw:"local wasm = await import('./pkg/particle_engine.js')",
+    hl: '<span class="kw">local</span> wasm = <span class="kw">await</span> <span class="fn">import</span>(<span class="str">\'./pkg/particle_engine.js\'</span>)  <span class="cm">-- Rust WASM</span>' },
 ];
 
 function initTerminal() {
-  const body = DOM.twBody;
-  if (!body) return;
-
-  /* build active row */
-  const aRow = document.createElement('div');
-  aRow.className = 'tw-line tw-active';
-  const aPr  = document.createElement('span'); aPr.className  = 'tw-prompt'; aPr.textContent = '>';
-  const aCd  = document.createElement('span'); aCd.className  = 'tw-code';
-  const aCur = document.createElement('span'); aCur.className = 'tw-block-cur';
-  aRow.append(aPr, aCd, aCur);
-  body.appendChild(aRow);
+  const body = DOM.twBody; if (!body) return;
+  const row = document.createElement('div');
+  row.className = 'tw-line tw-active';
+  const pr = document.createElement('span'); pr.className = 'tw-prompt'; pr.textContent = '>';
+  const cd = document.createElement('span'); cd.className = 'tw-code';
+  const cr = document.createElement('span'); cr.className = 'tw-block-cur';
+  row.append(pr, cd, cr); body.appendChild(row);
 
   const { typeSpeed, deleteSpeed, pauseAfterType, pauseAfterDelete, maxHistory } = CFG.terminal;
   let li = 0, ci = 0, del = false;
-
   const step = () => {
-    const entry = TW_LINES[li];
-    const raw   = entry.raw;
-
+    const entry = TW_LINES[li], raw = entry.raw;
     if (!del) {
-      aCd.textContent = raw.slice(0, ++ci);
+      cd.textContent = raw.slice(0,++ci);
       if (ci >= raw.length) { del = true; setTimeout(step, pauseAfterType); }
       else setTimeout(step, typeSpeed);
     } else {
-      aCd.textContent = raw.slice(0, --ci);
+      cd.textContent = raw.slice(0,--ci);
       if (ci <= 0) {
         del = false;
-
-        /* commit line with syntax highlight */
         const done = document.createElement('div');
         done.className = 'tw-line';
-        done.innerHTML =
-          `<span class="tw-prompt" style="color:var(--success)">✓</span>` +
-          `<span class="tw-code">${entry.hl}</span>`;
-        body.insertBefore(done, aRow);
-
-        /* trim history */
+        done.innerHTML = `<span class="tw-prompt" style="color:var(--success)">✓</span><span class="tw-code">${entry.hl}</span>`;
+        body.insertBefore(done, row);
         const hist = body.querySelectorAll('.tw-line:not(.tw-active)');
         if (hist.length > maxHistory) hist[0].remove();
-
-        li = (li + 1) % TW_LINES.length;
+        li = (li+1) % TW_LINES.length;
         setTimeout(step, pauseAfterDelete);
       } else setTimeout(step, deleteSpeed);
     }
   };
-
   step();
 }
 
-/* ═══════════════════════════════════════════
-   12. ACTIVE NAV LINK CSS  (add style once)
-   ═══════════════════════════════════════════ */
-function injectActiveNavStyle() {
-  const s = document.createElement('style');
-  s.textContent = `.nav-links a.active { color: var(--text); }
-  .nav-links a.active::after { width: 100%; }`;
-  document.head.appendChild(s);
+/* ═══ 15. BACK TO TOP ════════════════════════════════════════════════════ */
+function initBackToTop() {
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top'; btn.innerHTML = '↑'; btn.setAttribute('aria-label','Back to top');
+  document.body.appendChild(btn);
+  window.addEventListener('scroll', () =>
+    btn.classList.toggle('show', scrollY > 500), { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-/* ═══════════════════════════════════════════
-   13. PERFORMANCE: GPU HINT ON CARDS
-   ═══════════════════════════════════════════ */
+/* ═══ 16. GPU HINTS ══════════════════════════════════════════════════════ */
 function hintGPU() {
-  document.querySelectorAll('.skill-card, .link-card, .tw-terminal')
-    .forEach(el => { el.style.willChange = 'transform'; });
+  document.querySelectorAll('.skill-card,.link-card,.tw-terminal')
+    .forEach(el => el.style.willChange = 'transform');
 }
 
-/* ═══════════════════════════════════════════
-   14. INIT
-   ═══════════════════════════════════════════ */
+/* ═══ 17. INIT ═══════════════════════════════════════════════════════════ */
 function init() {
-  /* year */
   if (DOM.year) DOM.year.textContent = new Date().getFullYear();
 
+  // Inject active nav style
+  const s = document.createElement('style');
+  s.textContent = `.nav-links a.active{color:var(--text)}.nav-links a.active::after{width:100%}`;
+  document.head.appendChild(s);
+
+  initScrollProgress();
   initWelcome();
-  injectActiveNavStyle();
+  initMobileMenu();
   initNav();
   initCursorGlow();
-
-  if (!prefersReducedMotion()) {
-    initParticles();
-  } else {
-    /* hide canvas entirely if reduced motion */
-    if (DOM.canvas) DOM.canvas.style.display = 'none';
-  }
-
+  initCardTilt();
   initHeroTypewriter();
   initScrollReveal();
   initCounters();
   initTerminal();
+  initBackToTop();
   hintGPU();
 }
 
-/* run after DOM is ready */
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+document.readyState === 'loading'
+  ? document.addEventListener('DOMContentLoaded', init)
+  : init();
 
-/* ── Service Worker registration ── */
+/* ── Service Worker ── */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => {
-        console.log('[SW] registered — scope:', reg.scope);
-        /* auto-update: if new SW waiting, activate it */
         reg.addEventListener('updatefound', () => {
-          const newSW = reg.installing;
-          newSW.addEventListener('statechange', () => {
-            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-              newSW.postMessage('SKIP_WAITING');
-            }
+          const sw = reg.installing;
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'installed' && navigator.serviceWorker.controller)
+              sw.postMessage('SKIP_WAITING');
           });
         });
-      })
-      .catch(err => console.warn('[SW] registration failed:', err));
+      }).catch(e => console.warn('[SW] failed:', e));
   });
 }
