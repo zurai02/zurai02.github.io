@@ -1,17 +1,15 @@
 /**
- * site.ts — zurai02.github.io
- * TypeScript source — compile to site.js via:
- *   npx tsc --project tsconfig.json
- *
- * This file is the typed source of truth.
- * site.js is the compiled output served to browsers.
+ * site.ts — zurai02.github.io  (enhanced)
+ * Compile: npx tsc --project tsconfig.json
+ * NOTE: Particle canvas is owned by wasm.js — initParticles() kept as fallback only.
  */
 
 'use strict';
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    TYPES
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 interface ParticleConfig {
   count:    number;
   colors:   string[];
@@ -46,19 +44,25 @@ interface TerminalLine {
   hl:  string;
 }
 
+interface CounterConfig {
+  steps:    number;
+  interval: number;
+}
+
 interface SiteConfig {
   particles: ParticleConfig;
   glow:      { lerp: number };
   hero:      HeroConfig;
   terminal:  TerminalConfig;
-  counter:   { steps: number; interval: number };
+  counter:   CounterConfig;
   toast:     { duration: number };
   nav:       { scrollThreshold: number };
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    CONFIG
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 const CFG: SiteConfig = {
   particles: {
     count:    70,
@@ -71,56 +75,277 @@ const CFG: SiteConfig = {
     minOpac:  0.07,
     drift:    0.22,
   },
-  glow:     { lerp: 0.07 },
+  glow:    { lerp: 0.07 },
   hero: {
     phrases: [
       'Roblox Scripting & Engine Optimization Specialist.',
       'Building custom Luau modules that bypass engine limits.',
       'Pushing client-side performance to the absolute limit.',
       'Zero wasted frames. Lightweight networks. Fast code.',
+      'WebAssembly-powered tools. Native-speed results.',
     ],
-    typeSpeed:        36,
-    deleteSpeed:      16,
-    pauseAfterType:   2500,
-    pauseAfterDelete: 300,
-    startDelay:       950,
+    typeSpeed:        34,
+    deleteSpeed:      14,
+    pauseAfterType:   2600,
+    pauseAfterDelete: 280,
+    startDelay:       900,
   },
   terminal: {
-    typeSpeed:        40,
-    deleteSpeed:      18,
-    pauseAfterType:   2700,
-    pauseAfterDelete: 380,
-    maxHistory:       8,
+    typeSpeed:        38,
+    deleteSpeed:      16,
+    pauseAfterType:   2800,
+    pauseAfterDelete: 360,
+    maxHistory:       9,
   },
-  counter:  { steps: 48, interval: 26 },
-  toast:    { duration: 2300 },
-  nav:      { scrollThreshold: 24 },
+  counter: { steps: 52, interval: 24 },
+  toast:   { duration: 2400 },
+  nav:     { scrollThreshold: 24 },
 };
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    UTILITIES
-   ═══════════════════════════════════════════ */
-const $       = (id: string): HTMLElement | null => document.getElementById(id);
-const rand    = (min: number, max: number): number => Math.random() * (max - min) + min;
-const clamp   = (v: number, lo: number, hi: number): number => Math.min(Math.max(v, lo), hi);
-const isMobile              = (): boolean => window.innerWidth < 640;
-const prefersReducedMotion  = (): boolean =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+   ════════════════════════════════════════════════════════════ */
 
-/* ═══════════════════════════════════════════
-   PARTICLE CLASS
-   ═══════════════════════════════════════════ */
+const $       = (id: string): HTMLElement | null => document.getElementById(id);
+const rand    = (a: number, b: number): number   => Math.random() * (b - a) + a;
+const clamp   = (v: number, lo: number, hi: number): number => Math.min(Math.max(v, lo), hi);
+const lerp    = (a: number, b: number, t: number): number   => a + (b - a) * t;
+const isMob   = (): boolean => window.innerWidth < 640;
+const noMot   = (): boolean => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const raf     = (fn: FrameRequestCallback): number => requestAnimationFrame(fn);
+
+/* ════════════════════════════════════════════════════════════
+   SCROLL PROGRESS BAR
+   ════════════════════════════════════════════════════════════ */
+
+function initScrollProgress(): void {
+  const bar = document.createElement('div');
+  bar.id = 'scroll-bar';
+  document.body.appendChild(bar);
+
+  window.addEventListener('scroll', (): void => {
+    const pct = (scrollY / (document.body.scrollHeight - innerHeight)) * 100;
+    bar.style.width = clamp(pct, 0, 100) + '%';
+  }, { passive: true });
+}
+
+/* ════════════════════════════════════════════════════════════
+   WELCOME SYSTEM
+   ════════════════════════════════════════════════════════════ */
+
+function initWelcome(): void {
+  const hour  = new Date().getHours();
+  const greet =
+    hour < 5  ? 'Up late?'      :
+    hour < 12 ? 'Good morning'  :
+    hour < 17 ? 'Good afternoon':
+    hour < 21 ? 'Good evening'  : 'Good night';
+
+  const el = document.getElementById('greeting');
+  if (el) el.textContent = greet;
+
+  const visits = parseInt(localStorage.getItem('zurai02_visits') ?? '0', 10) + 1;
+  localStorage.setItem('zurai02_visits', String(visits));
+
+  const first = !localStorage.getItem('zurai02_welcomed');
+  if (first) {
+    localStorage.setItem('zurai02_welcomed', '1');
+    _showOverlay(greet);
+  } else if (visits > 1) {
+    setTimeout(() => showToast(`Welcome back! Visit #${visits} 🔥`), 1200);
+  }
+}
+
+function _showOverlay(greet: string): void {
+  const ov = document.createElement('div');
+  ov.id = 'welcome-overlay';
+  ov.innerHTML = `
+    <div id="welcome-card">
+      <div id="welcome-logo">zurai02<span>_</span></div>
+      <p id="welcome-greeting">${greet}!</p>
+      <p id="welcome-sub">Roblox Scripting &amp; Engine Optimization</p>
+      <div id="welcome-tags">
+        <span>Luau</span><span>WebAssembly</span><span>Client-Side</span>
+      </div>
+      <button id="welcome-enter">Enter site <span>→</span></button>
+    </div>`;
+  document.body.appendChild(ov);
+
+  const s = document.createElement('style');
+  s.textContent = `
+    #welcome-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;
+      justify-content:center;background:rgba(7,9,14,.97);backdrop-filter:blur(24px);
+      animation:wo-in .4s ease both}
+    @keyframes wo-in{from{opacity:0}to{opacity:1}}
+    @keyframes wo-out{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.97)}}
+    #welcome-card{text-align:center;max-width:380px;padding:0 2rem;
+      animation:wc-in .6s cubic-bezier(.22,1,.36,1) .1s both}
+    @keyframes wc-in{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    #welcome-logo{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;
+      color:#ff6b35;margin-bottom:1.2rem;letter-spacing:-.02em}
+    #welcome-logo span{color:#4a5568;animation:blink-c 1.1s step-end infinite}
+    #welcome-greeting{font-size:clamp(2.2rem,7vw,3.8rem);font-weight:900;letter-spacing:-.04em;
+      color:#eaf1fa;margin-bottom:.4rem}
+    #welcome-sub{font-size:.82rem;color:#6e7e94;margin-bottom:1.5rem}
+    #welcome-tags{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+    #welcome-tags span{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);
+      color:#ff9560;padding:.2rem .7rem;border-radius:20px;font-size:.7rem;
+      font-family:'JetBrains Mono',monospace}
+    #welcome-enter{background:#ff6b35;color:#fff;border:none;border-radius:10px;
+      padding:.75rem 2.2rem;font-size:.9rem;font-weight:700;font-family:inherit;cursor:pointer;
+      letter-spacing:.02em;transition:all .18s;display:inline-flex;align-items:center;gap:.5rem}
+    #welcome-enter span{transition:transform .18s}
+    #welcome-enter:hover{background:#ff9560;transform:translateY(-2px);
+      box-shadow:0 12px 36px rgba(255,107,53,.45)}
+    #welcome-enter:hover span{transform:translateX(3px)}`;
+  document.head.appendChild(s);
+
+  const dismiss = (): void => {
+    ov.style.animation = 'wo-out .35s ease forwards';
+    setTimeout(() => ov.remove(), 380);
+  };
+
+  ($('welcome-enter') as HTMLButtonElement | null)
+    ?.addEventListener('click', dismiss);
+  document.addEventListener('keydown', dismiss, { once: true });
+}
+
+/* ════════════════════════════════════════════════════════════
+   HAMBURGER MOBILE MENU
+   ════════════════════════════════════════════════════════════ */
+
+function initMobileMenu(): void {
+  const nav = $('nav');
+  const ul  = nav?.querySelector<HTMLUListElement>('.nav-links');
+  if (!nav || !ul) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'nav-hamburger';
+  btn.setAttribute('aria-label', 'Toggle menu');
+  btn.innerHTML = '<span></span><span></span><span></span>';
+
+  const right = nav.querySelector<HTMLElement>('.nav-right');
+  right ? right.prepend(btn) : nav.appendChild(btn);
+
+  let open = false;
+  btn.addEventListener('click', (): void => {
+    open = !open;
+    btn.classList.toggle('open', open);
+    ul.classList.toggle('mobile-open', open);
+  });
+
+  ul.querySelectorAll<HTMLAnchorElement>('a').forEach(a =>
+    a.addEventListener('click', (): void => {
+      open = false;
+      btn.classList.remove('open');
+      ul.classList.remove('mobile-open');
+    })
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   NAV
+   ════════════════════════════════════════════════════════════ */
+
+function initNav(): void {
+  const nav = $('nav');
+  if (!nav) return;
+
+  const links = document.querySelectorAll<HTMLAnchorElement>('.nav-links a[href^="#"]');
+  const sections = [...links].map(a => ({
+    a,
+    el: document.querySelector<HTMLElement>(a.getAttribute('href') ?? ''),
+  })).filter((o): o is { a: HTMLAnchorElement; el: HTMLElement } => o.el !== null);
+
+  const onScroll = (): void => {
+    nav.classList.toggle('scrolled', scrollY > CFG.nav.scrollThreshold);
+    let current = '';
+    sections.forEach(({ el, a }) => {
+      if (el.getBoundingClientRect().top <= 110)
+        current = a.getAttribute('href') ?? '';
+    });
+    links.forEach(a =>
+      a.classList.toggle('active', a.getAttribute('href') === current)
+    );
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ════════════════════════════════════════════════════════════
+   CURSOR GLOW + MAGNETIC BUTTONS
+   ════════════════════════════════════════════════════════════ */
+
+function initCursorGlow(): void {
+  const glow = $('cursor-glow');
+  if (!glow || isMob()) return;
+
+  let mx = innerWidth / 2, my = innerHeight / 2;
+  let gx = mx, gy = my;
+  let visible = false;
+
+  document.addEventListener('mousemove', (e: MouseEvent): void => {
+    mx = e.clientX; my = e.clientY;
+    if (!visible) { glow.style.opacity = '1'; visible = true; }
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', (): void => {
+    glow.style.opacity = '0'; visible = false;
+  });
+
+  const tick = (): void => {
+    gx = lerp(gx, mx, CFG.glow.lerp);
+    gy = lerp(gy, my, CFG.glow.lerp);
+    glow.style.transform = `translate(calc(${gx}px - 50%), calc(${gy}px - 50%))`;
+    raf(tick);
+  };
+  raf(tick);
+
+  // Magnetic pull on interactive elements
+  document.querySelectorAll<HTMLElement>('.btn, .link-card').forEach(el => {
+    el.addEventListener('mousemove', (e: MouseEvent): void => {
+      const r  = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width  / 2);
+      const dy = e.clientY - (r.top  + r.height / 2);
+      el.style.transform = `translate(${dx * 0.12}px, ${dy * 0.12}px)`;
+    });
+    el.addEventListener('mouseleave', (): void => {
+      el.style.transform = '';
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   CARD TILT  (3D perspective on hover)
+   ════════════════════════════════════════════════════════════ */
+
+function initCardTilt(): void {
+  if (isMob() || noMot()) return;
+
+  document.querySelectorAll<HTMLElement>('.skill-card').forEach(card => {
+    card.addEventListener('mousemove', (e: MouseEvent): void => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left)  / r.width  - 0.5;
+      const y = (e.clientY - r.top)   / r.height - 0.5;
+      card.style.transform  = `translateY(-4px) rotateX(${-y * 8}deg) rotateY(${x * 8}deg)`;
+      card.style.transition = 'none';
+    });
+    card.addEventListener('mouseleave', (): void => {
+      card.style.transform  = '';
+      card.style.transition = '';
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   PARTICLES  (fallback — wasm.js owns the canvas)
+   ════════════════════════════════════════════════════════════ */
+
 class Particle {
-  x!:     number;
-  y!:     number;
-  r!:     number;
-  s!:     number;
-  o!:     number;
-  _o!:    number;
-  c!:     string;
-  dx!:    number;
-  phase!: number;
-  freq!:  number;
+  x!: number; y!: number; r!: number; s!: number;
+  o!: number; _o!: number; c!: string; dx!: number;
+  phase!: number; freq!: number;
 
   constructor(private W: number, private H: number, init = false) {
     this.reset(init);
@@ -145,104 +370,57 @@ class Particle {
     this.x += this.dx;
     const pulse = Math.sin(this.phase + t * this.freq) * 0.12;
     this._o = clamp(this.o + pulse, 0.02, 0.55);
-    if (this.y < -8)                      this.reset(false);
+    if (this.y < -8)                         this.reset(false);
     if (this.x < -8 || this.x > this.W + 8) this.dx *= -1;
   }
 
   draw(cx: CanvasRenderingContext2D): void {
     cx.beginPath();
     cx.arc(this.x, this.y, this.r, 0, 6.2832);
-    cx.fillStyle    = this.c;
-    cx.globalAlpha  = this._o;
+    cx.fillStyle   = this.c;
+    cx.globalAlpha = this._o;
     cx.fill();
   }
 }
 
-/* ═══════════════════════════════════════════
-   NAV
-   ═══════════════════════════════════════════ */
-function initNav(): void {
-  const nav   = $('nav');
-  if (!nav) return;
-
-  const links    = document.querySelectorAll<HTMLAnchorElement>('.nav-links a[href^="#"]');
-  const sections = [...links].map(a => ({
-    a,
-    el: document.querySelector<HTMLElement>(a.getAttribute('href') ?? ''),
-  })).filter((o): o is { a: HTMLAnchorElement; el: HTMLElement } => o.el !== null);
-
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', scrollY > CFG.nav.scrollThreshold);
-    let current = '';
-    sections.forEach(({ el, a }) => {
-      if (el.getBoundingClientRect().top <= 100) current = a.getAttribute('href') ?? '';
-    });
-    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === current));
-  }, { passive: true });
-}
-
-/* ═══════════════════════════════════════════
-   CURSOR GLOW
-   ═══════════════════════════════════════════ */
-function initCursorGlow(): void {
-  const glow = $('cursor-glow');
-  if (!glow || isMobile()) return;
-
-  let mx = innerWidth / 2, my = innerHeight / 2;
-  let gx = mx, gy = my;
-
-  document.addEventListener('mousemove', (e: MouseEvent) => {
-    mx = e.clientX; my = e.clientY;
-    glow.style.opacity = '1';
-  }, { passive: true });
-
-  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
-
-  const tick = (): void => {
-    gx += (mx - gx) * CFG.glow.lerp;
-    gy += (my - gy) * CFG.glow.lerp;
-    glow.style.transform = `translate(calc(${gx}px - 50%), calc(${gy}px - 50%))`;
-    requestAnimationFrame(tick);
-  };
-  tick();
-}
-
-/* ═══════════════════════════════════════════
-   PARTICLES
-   ═══════════════════════════════════════════ */
 function initParticles(): void {
   const cv = $('bg-canvas') as HTMLCanvasElement | null;
   if (!cv) return;
-  const cx = cv.getContext('2d')!;
+
+  // wasm.js takes over if available — this is a pure JS fallback
+  if ((window as any).__wasmParticlesActive) return;
+
+  const cx  = cv.getContext('2d')!;
   let W = 0, H = 0, paused = false;
 
   const resize = (): void => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
   resize();
   window.addEventListener('resize', resize, { passive: true });
 
-  const count = isMobile() ? Math.floor(CFG.particles.count * 0.45) : CFG.particles.count;
+  const count = isMob() ? Math.floor(CFG.particles.count * 0.45) : CFG.particles.count;
   const pts   = Array.from({ length: count }, () => new Particle(W, H, true));
 
-  const raf = (t: number): void => {
+  const loop = (t: number): void => {
     if (!paused) {
       cx.clearRect(0, 0, W, H);
       pts.forEach(p => { p.update(t * 0.001); p.draw(cx); });
       cx.globalAlpha = 1;
     }
-    requestAnimationFrame(raf);
+    raf(loop);
   };
-  requestAnimationFrame(raf);
+  raf(loop);
 
-  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+  document.addEventListener('visibilitychange', (): void => { paused = document.hidden; });
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    HERO TYPEWRITER
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 function initHeroTypewriter(): void {
   const el = $('hero-sub');
   if (!el) return;
-  if (prefersReducedMotion()) { el.textContent = CFG.hero.phrases[0]; return; }
+  if (noMot()) { el.textContent = CFG.hero.phrases[0]; return; }
 
   const { phrases, typeSpeed, deleteSpeed, pauseAfterType, pauseAfterDelete, startDelay } = CFG.hero;
   let pi = 0, ci = 0, del = false;
@@ -255,32 +433,55 @@ function initHeroTypewriter(): void {
       else setTimeout(tick, typeSpeed);
     } else {
       el.innerHTML = ph.slice(0, --ci) + '<span class="tw-cur"></span>';
-      if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; setTimeout(tick, pauseAfterDelete); }
-      else setTimeout(tick, deleteSpeed);
+      if (ci === 0) {
+        del = false;
+        pi  = (pi + 1) % phrases.length;
+        setTimeout(tick, pauseAfterDelete);
+      } else setTimeout(tick, deleteSpeed);
     }
   };
   setTimeout(tick, startDelay);
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    SCROLL REVEAL
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 function initScrollReveal(): void {
-  if (prefersReducedMotion()) {
+  const revealAll = (): void =>
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-    return;
-  }
+
+  if (noMot()) { revealAll(); return; }
+
+  const fallback = setTimeout(revealAll, 2000);
+
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  }, { threshold: 0, rootMargin: '0px' });
+
+  document.querySelectorAll<Element>('.reveal').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight + 50 && r.bottom > 0) {
+      el.classList.add('visible');
+    } else {
+      io.observe(el);
+    }
+  });
+
+  setTimeout((): void => {
+    if (document.querySelector('.reveal.visible')) clearTimeout(fallback);
+  }, 500);
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    COUNTERS
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 function initCounters(): void {
   const { steps, interval } = CFG.counter;
   const io = new IntersectionObserver(entries => {
@@ -291,7 +492,7 @@ function initCounters(): void {
       const suffix = el.dataset['suffix'] ?? '';
       let cur = 0;
       const step = target / steps;
-      const t = setInterval(() => {
+      const t = setInterval((): void => {
         cur = Math.min(cur + step, target);
         el.textContent = Math.floor(cur) + suffix;
         if (cur >= target) clearInterval(t);
@@ -299,12 +500,14 @@ function initCounters(): void {
       io.unobserve(el);
     });
   }, { threshold: 0.5 });
+
   document.querySelectorAll<HTMLElement>('[data-count]').forEach(el => io.observe(el));
 }
 
-/* ═══════════════════════════════════════════
-   DISCORD COPY
-   ═══════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   DISCORD COPY + TOAST
+   ════════════════════════════════════════════════════════════ */
+
 let _toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 function showToast(msg: string): void {
@@ -313,17 +516,18 @@ function showToast(msg: string): void {
   t.textContent = msg;
   t.classList.add('show');
   if (_toastTimer) clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => t.classList.remove('show'), CFG.toast.duration);
+  _toastTimer = setTimeout((): void => t.classList.remove('show'), CFG.toast.duration);
 }
 
 function fallbackCopy(text: string): void {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none';
-  document.body.appendChild(ta);
+  const ta = Object.assign(document.createElement('textarea'), {
+    value: text,
+    style: 'position:fixed;top:-999px;opacity:0',
+  });
+  document.body.append(ta);
   ta.focus(); ta.select();
   try { document.execCommand('copy'); } catch (_) { /* silent */ }
-  document.body.removeChild(ta);
+  ta.remove();
 }
 
 (window as any).copyDiscord = (): void => {
@@ -333,49 +537,69 @@ function fallbackCopy(text: string): void {
 
   const done = (): void => {
     if (btxt) btxt.textContent = '✓ Copied!';
-    if (btn)  btn.classList.add('copied');
-    showToast('lol066351 copied to clipboard!');
-    setTimeout(() => {
+    btn?.classList.add('copied');
+    showToast('lol066351 copied! 📋');
+    setTimeout((): void => {
       if (btxt) btxt.textContent = 'Discord: lol066351';
-      if (btn)  btn.classList.remove('copied');
+      btn?.classList.remove('copied');
     }, CFG.toast.duration);
   };
 
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(done).catch(() => { fallbackCopy(text); done(); });
-  } else {
-    fallbackCopy(text); done();
-  }
+  navigator.clipboard
+    ? navigator.clipboard.writeText(text).then(done).catch((): void => { fallbackCopy(text); done(); })
+    : (fallbackCopy(text), done());
 };
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
    TERMINAL
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 const TW_LINES: TerminalLine[] = [
-  { raw: "local tween = CustomTween.new(part, {CFrame = goal}, 0.4, 'Quad')",
-    hl:  '<span class="kw">local</span> tween = <span class="fn">CustomTween.new</span>(part, {CFrame = goal}, <span class="num">0.4</span>, <span class="str">\'Quad\'</span>)' },
-  { raw: "RemoteBatcher:Fire('combat', {action = 'hit', target = id})",
-    hl:  '<span class="op">RemoteBatcher</span>:<span class="fn">Fire</span>(<span class="str">\'combat\'</span>, {action = <span class="str">\'hit\'</span>, target = id})' },
-  { raw: "Profiler:Mark('RenderStep')  -- 0.8ms avg",
-    hl:  '<span class="op">Profiler</span>:<span class="fn">Mark</span>(<span class="str">\'RenderStep\'</span>)  <span class="cm">-- 0.8ms avg</span>' },
-  { raw: "local pool = ObjectPool.new('Projectile', 64)",
-    hl:  '<span class="kw">local</span> pool = <span class="fn">ObjectPool.new</span>(<span class="str">\'Projectile\'</span>, <span class="num">64</span>)' },
-  { raw: "StreamingEnabled = true  -- smart LOD active",
-    hl:  '<span class="op">StreamingEnabled</span> = <span class="kw">true</span>  <span class="cm">-- smart LOD active</span>' },
-  { raw: "RunService.Heartbeat:Connect(onStep)  -- 0.3ms budget",
-    hl:  '<span class="op">RunService</span>.Heartbeat:<span class="fn">Connect</span>(onStep)  <span class="cm">-- 0.3ms budget</span>' },
+  {
+    raw: "local tween = CustomTween.new(part, {CFrame=goal}, 0.4, 'Quad')",
+    hl:  '<span class="kw">local</span> tween = <span class="fn">CustomTween.new</span>(part, {CFrame=goal}, <span class="num">0.4</span>, <span class="str">\'Quad\'</span>)',
+  },
+  {
+    raw: "RemoteBatcher:Fire('combat', {action='hit', target=id})",
+    hl:  '<span class="op">RemoteBatcher</span>:<span class="fn">Fire</span>(<span class="str">\'combat\'</span>, {action=<span class="str">\'hit\'</span>, target=id})',
+  },
+  {
+    raw: "Profiler:Mark('RenderStep')  -- 0.8ms avg",
+    hl:  '<span class="op">Profiler</span>:<span class="fn">Mark</span>(<span class="str">\'RenderStep\'</span>)  <span class="cm">-- 0.8ms avg</span>',
+  },
+  {
+    raw: "local pool = ObjectPool.new('Projectile', 64)",
+    hl:  '<span class="kw">local</span> pool = <span class="fn">ObjectPool.new</span>(<span class="str">\'Projectile\'</span>, <span class="num">64</span>)',
+  },
+  {
+    raw: "StreamingEnabled = true  -- smart LOD active",
+    hl:  '<span class="op">StreamingEnabled</span> = <span class="kw">true</span>  <span class="cm">-- smart LOD active</span>',
+  },
+  {
+    raw: "local sig = Signal.new()  -- no BindableEvent overhead",
+    hl:  '<span class="kw">local</span> sig = <span class="fn">Signal.new</span>()  <span class="cm">-- no BindableEvent overhead</span>',
+  },
+  {
+    raw: "RunService.Heartbeat:Connect(onStep)  -- 0.3ms budget",
+    hl:  '<span class="op">RunService</span>.Heartbeat:<span class="fn">Connect</span>(onStep)  <span class="cm">-- 0.3ms budget</span>',
+  },
+  {
+    raw: "await import('./pkg/particle_engine.js')  -- Rust WASM",
+    hl:  '<span class="kw">await</span> <span class="fn">import</span>(<span class="str">\'./pkg/particle_engine.js\'</span>)  <span class="cm">-- Rust WASM</span>',
+  },
 ];
 
 function initTerminal(): void {
   const body = $('tw-body');
   if (!body) return;
 
-  const aRow = document.createElement('div'); aRow.className = 'tw-line tw-active';
-  const aPr  = document.createElement('span'); aPr.className  = 'tw-prompt'; aPr.textContent = '>';
-  const aCd  = document.createElement('span'); aCd.className  = 'tw-code';
-  const aCur = document.createElement('span'); aCur.className = 'tw-block-cur';
-  aRow.append(aPr, aCd, aCur);
-  body.appendChild(aRow);
+  const row = document.createElement('div');
+  row.className = 'tw-line tw-active';
+  const pr  = document.createElement('span'); pr.className  = 'tw-prompt'; pr.textContent = '>';
+  const cd  = document.createElement('span'); cd.className  = 'tw-code';
+  const cur = document.createElement('span'); cur.className = 'tw-block-cur';
+  row.append(pr, cd, cur);
+  body.appendChild(row);
 
   const { typeSpeed, deleteSpeed, pauseAfterType, pauseAfterDelete, maxHistory } = CFG.terminal;
   let li = 0, ci = 0, del = false;
@@ -383,18 +607,21 @@ function initTerminal(): void {
   const step = (): void => {
     const entry = TW_LINES[li];
     const raw   = entry.raw;
+
     if (!del) {
-      aCd.textContent = raw.slice(0, ++ci);
+      cd.textContent = raw.slice(0, ++ci);
       if (ci >= raw.length) { del = true; setTimeout(step, pauseAfterType); }
       else setTimeout(step, typeSpeed);
     } else {
-      aCd.textContent = raw.slice(0, --ci);
+      cd.textContent = raw.slice(0, --ci);
       if (ci <= 0) {
         del = false;
         const done = document.createElement('div');
         done.className = 'tw-line';
-        done.innerHTML = `<span class="tw-prompt" style="color:var(--success)">✓</span><span class="tw-code">${entry.hl}</span>`;
-        body.insertBefore(done, aRow);
+        done.innerHTML =
+          `<span class="tw-prompt" style="color:var(--success)">✓</span>` +
+          `<span class="tw-code">${entry.hl}</span>`;
+        body.insertBefore(done, row);
         const hist = body.querySelectorAll('.tw-line:not(.tw-active)');
         if (hist.length > maxHistory) hist[0].remove();
         li = (li + 1) % TW_LINES.length;
@@ -405,53 +632,91 @@ function initTerminal(): void {
   step();
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════
+   BACK TO TOP
+   ════════════════════════════════════════════════════════════ */
+
+function initBackToTop(): void {
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.innerHTML = '↑';
+  btn.setAttribute('aria-label', 'Back to top');
+  document.body.appendChild(btn);
+
+  window.addEventListener('scroll', (): void =>
+    btn.classList.toggle('show', scrollY > 500),
+  { passive: true });
+
+  btn.addEventListener('click', (): void =>
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   GPU HINTS
+   ════════════════════════════════════════════════════════════ */
+
+function hintGPU(): void {
+  document.querySelectorAll<HTMLElement>('.skill-card, .link-card, .tw-terminal')
+    .forEach(el => { el.style.willChange = 'transform'; });
+}
+
+/* ════════════════════════════════════════════════════════════
    INIT
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
+
 function init(): void {
   const yr = $('yr');
   if (yr) yr.textContent = String(new Date().getFullYear());
 
+  // Inject active nav style
+  const s = document.createElement('style');
+  s.textContent = `.nav-links a.active{color:var(--text)}.nav-links a.active::after{width:100%}`;
+  document.head.appendChild(s);
+
+  initScrollProgress();
+  initWelcome();
+  initMobileMenu();
   initNav();
   initCursorGlow();
+  initCardTilt();
 
-  if (prefersReducedMotion()) {
+  if (noMot()) {
     const cv = $('bg-canvas') as HTMLCanvasElement | null;
     if (cv) cv.style.display = 'none';
   } else {
-    initParticles();
+    initParticles();   // no-op if wasm.js already claimed the canvas
   }
 
   initHeroTypewriter();
   initScrollReveal();
   initCounters();
   initTerminal();
-
-  /* GPU hints */
-  document.querySelectorAll<HTMLElement>('.skill-card, .link-card, .tw-terminal')
-    .forEach(el => { el.style.willChange = 'transform'; });
+  initBackToTop();
+  hintGPU();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+document.readyState === 'loading'
+  ? document.addEventListener('DOMContentLoaded', init)
+  : init();
 
-/* Service Worker */
+/* ════════════════════════════════════════════════════════════
+   SERVICE WORKER
+   ════════════════════════════════════════════════════════════ */
+
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', (): void => {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => {
-        reg.addEventListener('updatefound', () => {
+      .then((reg: ServiceWorkerRegistration): void => {
+        reg.addEventListener('updatefound', (): void => {
           const sw = reg.installing;
-          sw?.addEventListener('statechange', () => {
+          sw?.addEventListener('statechange', (): void => {
             if (sw.state === 'installed' && navigator.serviceWorker.controller) {
               sw.postMessage('SKIP_WAITING');
             }
           });
         });
       })
-      .catch(err => console.warn('[SW] failed:', err));
+      .catch((err: Error): void => console.warn('[SW] failed:', err));
   });
 }
