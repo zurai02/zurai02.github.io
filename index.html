@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>zurai02 — blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <nav class="nav">
+    <a href="/" class="nav-brand">zurai02</a>
+    <div class="nav-links">
+      <a href="/">blog</a>
+      <a href="https://zurai02.github.io" target="_blank">portfolio</a>
+      <a href="https://github.com/zurai02/Luazi" target="_blank">Luazi</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="hero">
+      <div class="hero-greeting" id="greeting"></div>
+      <h1 class="hero-title">
+        <span class="typewriter" id="typewriter"></span><span class="cursor">|</span>
+      </h1>
+      <p class="hero-subtitle">Thoughts on Luau, systems programming, and squeezing frames.</p>
+    </header>
+
+    <section class="posts-section">
+      <div class="section-header">
+        <span class="section-label">posts</span>
+        <span class="post-count" id="post-count"></span>
+      </div>
+      <div class="posts-grid" id="posts-grid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>zurai02 — built with raw HTML, CSS, and JS</span>
+    <span class="footer-right">
+      <a href="https://github.com/zurai02" target="_blank">GitHub</a>
+      <a href="https://devforum.roblox.com/u/zurai02" target="_blank">DevForum</a>
+    </span>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+        </html>
