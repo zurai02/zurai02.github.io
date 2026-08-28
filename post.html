@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">zurai02 — blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <nav class="nav">
+    <a href="/" class="nav-brand">zurai02</a>
+    <div class="nav-links">
+      <a href="/">blog</a>
+      <a href="https://zurai02.github.io" target="_blank">portfolio</a>
+      <a href="https://github.com/zurai02/Luazi" target="_blank">Luazi</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <article class="post-article" id="post-article">
+      <div class="post-meta">
+        <a href="/" class="back-link">← all posts</a>
+        <span class="post-date" id="post-date"></span>
+      </div>
+      <h1 class="post-title" id="post-title"></h1>
+      <div class="post-tags" id="post-tags"></div>
+      <div class="post-content" id="post-content"></div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <span>zurai02 — built with raw HTML, CSS, and JS</span>
+    <span class="footer-right">
+      <a href="https://github.com/zurai02" target="_blank">GitHub</a>
+      <a href="https://devforum.roblox.com/u/zurai02" target="_blank">DevForum</a>
+    </span>
+  </footer>
+
+  <script src="site.js"></script>
+  <script>
+    (function(){
+      const params = new URLSearchParams(location.search);
+      const postId = params.get('id');
+      if (!postId) { location.href = '/'; return; }
+      loadPost(postId);
+    })();
+  </script>
+</body>
+</html>
