@@ -415,72 +415,70 @@
   <script>
     // Inline: Load SVG sprite with error handling
     fetch('icons.svg')
-      .then(r => { if (!r.ok) throw new Error('SVG sprite not found'); return r.text(); })
-      .then(svg => {
-        const div = document.getElementById('svg-sprite');
+      .then(function(r) { 
+        if (!r.ok) throw new Error('SVG sprite not found'); 
+        return r.text(); 
+      })
+      .then(function(svg) {
+        var div = document.getElementById('svg-sprite');
         div.innerHTML = svg;
       })
-      .catch(err => console.warn('Icon sprite failed to load:', err));
+      .catch(function(err) { 
+        console.warn('Icon sprite failed to load:', err); 
+      });
 
     // Blog fetcher — dynamically loads latest posts from zurai02.is-a.dev/Blog
     (function loadBlogPosts() {
-      const container = document.getElementById('blog-container');
-      const blogUrl = 'https://zurai02.is-a.dev/Blog';
+      var container = document.getElementById('blog-container');
+      var blogUrl = 'https://zurai02.is-a.dev/Blog';
 
-      // Try to fetch blog content
       fetch(blogUrl, { 
         mode: 'cors',
         headers: { 'Accept': 'text/html' }
       })
-      .then(r => {
+      .then(function(r) {
         if (!r.ok) throw new Error('Blog unavailable');
         return r.text();
       })
-      .then(html => {
-        // Parse the blog HTML to extract posts
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+      .then(function(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        var posts = [];
 
-        // Look for common blog post patterns
-        const posts = [];
-
-        // Try to find article/post elements
-        const articles = doc.querySelectorAll('article, .post, .blog-post, [class*="post"], [class*="entry"]');
+        var articles = doc.querySelectorAll('article, .post, .blog-post, [class*="post"], [class*="entry"]');
 
         if (articles.length > 0) {
-          articles.forEach((article, idx) => {
-            if (idx >= 6) return; // Limit to 6 posts
+          articles.forEach(function(article, idx) {
+            if (idx >= 6) return;
 
-            const titleEl = article.querySelector('h1, h2, h3, .title, [class*="title"]');
-            const linkEl = article.querySelector('a[href]');
-            const descEl = article.querySelector('p, .excerpt, .summary, [class*="desc"]');
-            const dateEl = article.querySelector('time, .date, [class*="date"], [class*="time"]');
-            const tagEls = article.querySelectorAll('.tag, [class*="tag"], [class*="category"]');
+            var titleEl = article.querySelector('h1, h2, h3, .title, [class*="title"]');
+            var linkEl = article.querySelector('a[href]');
+            var descEl = article.querySelector('p, .excerpt, .summary, [class*="desc"]');
+            var dateEl = article.querySelector('time, .date, [class*="date"], [class*="time"]');
+            var tagEls = article.querySelectorAll('.tag, [class*="tag"], [class*="category"]');
 
-            const title = titleEl ? titleEl.textContent.trim() : 'Untitled Post';
-            let link = linkEl ? linkEl.href : blogUrl;
-            // Fix relative URLs
+            var title = titleEl ? titleEl.textContent.trim() : 'Untitled Post';
+            var link = linkEl ? linkEl.href : blogUrl;
             if (link && !link.startsWith('http')) {
               link = new URL(link, blogUrl).href;
             }
-            const description = descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '';
-            const date = dateEl ? dateEl.textContent.trim() : '';
-            const tags = Array.from(tagEls).map(t => t.textContent.trim()).filter(t => t);
+            var description = descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '';
+            var date = dateEl ? dateEl.textContent.trim() : '';
+            var tags = Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(function(t) { return t; });
 
-            posts.push({ title, link, description, date, tags });
+            posts.push({ title: title, link: link, description: description, date: date, tags: tags });
           });
         }
 
-        // Fallback: try to find any links that look like blog posts
         if (posts.length === 0) {
-          const links = doc.querySelectorAll('a[href]');
-          const seen = new Set();
-          links.forEach(link => {
-            const href = link.getAttribute('href');
+          var links = doc.querySelectorAll('a[href]');
+          var seen = new Set();
+          links.forEach(function(link) {
+            var href = link.getAttribute('href');
             if (href && (href.includes('/post') || href.includes('/blog') || href.includes('/article') || href.match(/\d{4}/))) {
               if (!seen.has(href) && posts.length < 6) {
                 seen.add(href);
-                const fullUrl = href.startsWith('http') ? href : new URL(href, blogUrl).href;
+                var fullUrl = href.startsWith('http') ? href : new URL(href, blogUrl).href;
                 posts.push({
                   title: link.textContent.trim() || 'Blog Post',
                   link: fullUrl,
@@ -493,43 +491,36 @@
           });
         }
 
-        // Render posts
         if (posts.length > 0) {
-          container.innerHTML = posts.map(post => `
-            <a href="${post.link}" target="_blank" rel="noopener noreferrer" class="blog-card">
-              <h3>${escapeHtml(post.title)}</h3>
-              ${post.description ? `<p>${escapeHtml(post.description)}</p>` : ''}
-              <div class="blog-meta">
-                ${post.date ? `<span>${escapeHtml(post.date)}</span>` : ''}
-                ${post.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
-                <span style="margin-left:auto;color:#ff6b35;">Read →</span>
-              </div>
-            </a>
-          `).join('');
+          container.innerHTML = posts.map(function(post) {
+            return '<a href="' + escapeHtml(post.link) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
+              '<h3>' + escapeHtml(post.title) + '</h3>' +
+              (post.description ? '<p>' + escapeHtml(post.description) + '</p>' : '') +
+              '<div class="blog-meta">' +
+                (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
+                post.tags.map(function(tag) { return '<span class="tag">' + escapeHtml(tag) + '</span>'; }).join('') +
+                '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
+              '</div>' +
+            '</a>';
+          }).join('');
         } else {
-          // Fallback: show embedded blog iframe
-          container.innerHTML = `
-            <div style="grid-column:1/-1;">
-              <iframe src="${blogUrl}" class="blog-embed" title="zurai02 Blog" loading="lazy"></iframe>
-            </div>
-          `;
+          container.innerHTML = '<div style="grid-column:1/-1;">' +
+            '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy"></iframe>' +
+          '</div>';
         }
       })
-      .catch(err => {
+      .catch(function(err) {
         console.warn('Blog fetch failed:', err);
-        // Fallback: show link to blog with embedded preview
-        container.innerHTML = `
-          <div class="blog-error" style="grid-column:1/-1;">
-            <p>Unable to load blog posts directly due to CORS restrictions.</p>
-            <p><a href="${blogUrl}" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/Blog →</a></p>
-            <iframe src="${blogUrl}" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>
-          </div>
-        `;
+        container.innerHTML = '<div class="blog-error" style="grid-column:1/-1;">' +
+          '<p>Unable to load blog posts directly due to CORS restrictions.</p>' +
+          '<p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/Blog →</a></p>' +
+          '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>' +
+        '</div>';
       });
     })();
 
     function escapeHtml(text) {
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
     }
