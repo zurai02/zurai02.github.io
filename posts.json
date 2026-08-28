@@ -1,0 +1,63 @@
+[
+  {
+    "id": "welcome",
+    "title": "Welcome to my blog",
+    "date": "2026-08-28",
+    "tags": ["meta", "intro"],
+    "content": "This is the first post on my new blog. Built with the same aesthetic as my portfolio site — dark, minimal, and fast.
+
+I'll be writing about Roblox scripting, Luau optimization, systems programming with Luazi, and whatever else catches my interest.
+
+Stay tuned."
+  },
+  {
+    "id": "luazi-why-i-built-it",
+    "title": "Why I Built Luazi",
+    "date": "2026-08-25",
+    "tags": ["luazi", "systems", "compiler"],
+    "content": "Luazi started as a frustration with existing scripting languages on Roblox. I wanted something with:
+
+- Type safety without the bloat
+- Memory safety that doesn't kill performance
+- Multi-target compilation (WASM, C++, C#)
+- A syntax that feels like Lua but with modern features
+
+The result is a Hindley-Milner type system, ownership/borrowing inspired by Rust, and a bytecode VM that can target multiple runtimes.
+
+```lz
+fn fib(n: number) -> number {
+    guard n >= 0 else { return 0 }
+    match n {
+        0 => 0,
+        1 => 1,
+        _ => fib(n - 1) + fib(n - 2)
+    }
+}
+```
+
+More on the compiler architecture soon."
+  },
+  {
+    "id": "roblox-optimization-tips",
+    "title": "Roblox Optimization Tips That Actually Work",
+    "date": "2026-08-20",
+    "tags": ["roblox", "luau", "performance"],
+    "content": "Here are three optimization techniques I use on every project:
+
+**1. Object Pooling**
+Don't Destroy() and Instance.new() in loops. Pool your parts, UI elements, and sounds. The GC pressure alone will tank your frame rate.
+
+**2. Batch RemoteEvents**
+Instead of firing 50 individual remotes per frame, batch them into a single table send. Network replication is expensive — treat it like a scarce resource.
+
+**3. Avoid TweenService for complex sequences**
+TweenService creates a new tween object every call and doesn't give you fine-grained control. A custom interpolation module with RunService.Heartbeat gives you cancellation, chaining, and zero-allocation updates.
+
+```luau
+local pool = ObjectPool.new("Part", 100)
+local part = pool:Acquire()
+-- use part
+pool:Release(part)
+```"
+  }
+    ]
