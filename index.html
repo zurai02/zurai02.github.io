@@ -8,45 +8,45 @@
   <meta name="author" content="zurai02" />
   <meta name="robots" content="index, follow" />
   <meta name="color-scheme" content="dark" />
-  
+
   <!-- Security -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://zurai02.is-a.dev; frame-src https://zurai02.is-a.dev;" />
-  
+
   <!-- Open Graph -->
   <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
   <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://zurai02.github.io" />
   <meta property="og:locale" content="en_US" />
-  
+
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#ff6b35" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="zurai02" />
-  
+
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  
+
   <!-- Critical inline styles for FCP -->
   <style>
     html { scroll-behavior: smooth; }
     body { margin: 0; opacity: 0; animation: fadeIn 0.3s ease forwards; }
     @keyframes fadeIn { to { opacity: 1; } }
-    
+
     /* Blog section styles */
     .blog-grid {
       display: grid;
@@ -137,7 +137,7 @@
       margin-top: 1.5rem;
     }
   </style>
-  
+
   <!-- Maintenance check (non-blocking) -->
   <script src="maintenance.js" async></script>
 </head>
@@ -426,7 +426,7 @@
     (function loadBlogPosts() {
       const container = document.getElementById('blog-container');
       const blogUrl = 'https://zurai02.is-a.dev/Blog';
-      
+
       // Try to fetch blog content
       fetch(blogUrl, { 
         mode: 'cors',
@@ -440,23 +440,23 @@
         // Parse the blog HTML to extract posts
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        
+
         // Look for common blog post patterns
         const posts = [];
-        
+
         // Try to find article/post elements
         const articles = doc.querySelectorAll('article, .post, .blog-post, [class*="post"], [class*="entry"]');
-        
+
         if (articles.length > 0) {
           articles.forEach((article, idx) => {
             if (idx >= 6) return; // Limit to 6 posts
-            
+
             const titleEl = article.querySelector('h1, h2, h3, .title, [class*="title"]');
             const linkEl = article.querySelector('a[href]');
             const descEl = article.querySelector('p, .excerpt, .summary, [class*="desc"]');
             const dateEl = article.querySelector('time, .date, [class*="date"], [class*="time"]');
             const tagEls = article.querySelectorAll('.tag, [class*="tag"], [class*="category"]');
-            
+
             const title = titleEl ? titleEl.textContent.trim() : 'Untitled Post';
             let link = linkEl ? linkEl.href : blogUrl;
             // Fix relative URLs
@@ -466,11 +466,11 @@
             const description = descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '';
             const date = dateEl ? dateEl.textContent.trim() : '';
             const tags = Array.from(tagEls).map(t => t.textContent.trim()).filter(t => t);
-            
+
             posts.push({ title, link, description, date, tags });
           });
         }
-        
+
         // Fallback: try to find any links that look like blog posts
         if (posts.length === 0) {
           const links = doc.querySelectorAll('a[href]');
@@ -492,7 +492,7 @@
             }
           });
         }
-        
+
         // Render posts
         if (posts.length > 0) {
           container.innerHTML = posts.map(post => `
@@ -527,7 +527,7 @@
         `;
       });
     })();
-    
+
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
