@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>zurai02 — admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <nav class="nav">
+    <a href="/" class="nav-brand">zurai02</a>
+    <div class="nav-links">
+      <a href="/">blog</a>
+      <a href="https://zurai02.github.io" target="_blank">portfolio</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Login Screen -->
+    <div class="admin-login" id="admin-login">
+      <div class="glass-card login-card">
+        <h2>admin access</h2>
+        <p class="login-subtitle">Enter credentials to manage posts</p>
+        <input type="email" id="login-email" placeholder="email" autocomplete="email">
+        <input type="password" id="login-password" placeholder="password" autocomplete="current-password">
+        <button class="btn-primary" id="login-btn" onclick="attemptLogin()">authenticate</button>
+        <p class="login-error" id="login-error"></p>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="admin-dashboard" style="display:none;">
+      <div class="admin-header">
+        <h2>post manager</h2>
+        <button class="btn-primary" onclick="showEditor()">+ new post</button>
+      </div>
+
+      <div class="admin-posts-list" id="admin-posts-list"></div>
+
+      <!-- Editor -->
+      <div class="editor-overlay" id="editor-overlay" style="display:none;">
+        <div class="glass-card editor-card">
+          <div class="editor-header">
+            <h3 id="editor-title-label">new post</h3>
+            <button class="btn-ghost" onclick="closeEditor()">×</button>
+          </div>
+          <input type="text" id="edit-id" placeholder="post-id (url-safe, no spaces)" style="display:none;">
+          <input type="text" id="edit-title" placeholder="Post Title">
+          <input type="date" id="edit-date">
+          <input type="text" id="edit-tags" placeholder="tags (comma separated)">
+          <textarea id="edit-content" placeholder="Write your post in markdown..."></textarea>
+          <div class="editor-actions">
+            <button class="btn-ghost" onclick="closeEditor()">cancel</button>
+            <button class="btn-primary" onclick="savePost()">save post</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="site.js"></script>
+  <script>
+    (function(){
+      if (localStorage.getItem('zurai_admin') === 'true') {
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'block';
+        renderAdminPosts();
+      }
+    })();
+  </script>
+</body>
+</html>
