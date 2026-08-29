@@ -20,7 +20,7 @@
   <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
   <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://zurai02.github.io" />
+  <meta property="og:url" content="https://zurai02.is-a.dev" />
   <meta property="og:locale" content="en_US" />
 
   <!-- PWA -->
@@ -94,6 +94,7 @@
       gap: 0.75rem;
       font-size: 0.8rem;
       color: rgba(255,255,255,0.35);
+      flex-wrap: wrap;
     }
     .blog-meta .tag {
       background: rgba(255,107,53,0.15);
@@ -135,6 +136,19 @@
       border-radius: 12px;
       background: rgba(255,255,255,0.02);
       margin-top: 1.5rem;
+    }
+    .blog-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #ff6b35;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: gap 0.3s ease;
+    }
+    .blog-cta:hover {
+      gap: 0.75rem;
     }
   </style>
 
@@ -197,9 +211,9 @@
            target="_blank" rel="noopener noreferrer" class="btn btn-primary">
           DevForum Portfolio <span aria-hidden="true">→</span>
         </a>
-        <a href="https://zurai02.github.io"
+        <a href="https://zurai02.is-a.dev/Blog"
            target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
-          zurai02.github.io
+          Blog
         </a>
         <button class="btn btn-discord" id="discord-btn" data-clipboard="lol066351" type="button">
           <span id="dbt">Discord: lol066351</span>
@@ -319,7 +333,7 @@
       <h2 class="section-title reveal rd1" id="blog-heading">From the blog</h2>
       <p class="section-sub reveal rd2">
         Thoughts on Luau, systems programming, and squeezing frames.
-        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" style="color:#ff6b35;text-decoration:none;">View all →</a>
+        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" class="blog-cta">View all posts →</a>
       </p>
 
       <div id="blog-container" class="blog-grid reveal rd3">
@@ -356,13 +370,19 @@
           <span class="link-name">Roblox Profile</span>
           <span class="link-label">roblox.com</span>
         </a>
-        <a href="https://zurai02.github.io"
+        <a href="https://zurai02.is-a.dev/Blog"
            target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
           <svg class="link-icon" aria-hidden="true"><use href="#icon-github"/></svg>
-          <span class="link-name">Personal Site</span>
-          <span class="link-label">zurai02.github.io</span>
+          <span class="link-name">Blog</span>
+          <span class="link-label">zurai02.is-a.dev/Blog</span>
         </a>
-        <button class="link-card reveal rd2" data-clipboard="lol066351" type="button">
+        <a href="https://github.com/zurai02"
+           target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-github"/></svg>
+          <span class="link-name">GitHub</span>
+          <span class="link-label">@zurai02</span>
+        </a>
+        <button class="link-card reveal rd3" data-clipboard="lol066351" type="button">
           <svg class="link-icon" aria-hidden="true"><use href="#icon-discord"/></svg>
           <span class="link-name">Discord</span>
           <span class="link-label">lol066351 — tap to copy</span>
@@ -404,7 +424,7 @@
       <span aria-hidden="true">&nbsp;·&nbsp;</span>
       <span id="yr"></span>
       <span aria-hidden="true">&nbsp;·&nbsp;</span>
-      <a href="https://zurai02.github.io">zurai02.github.io</a>
+      <a href="https://zurai02.is-a.dev">zurai02.is-a.dev</a>
     </footer>
   </main>
 
@@ -431,7 +451,57 @@
     (function loadBlogPosts() {
       var container = document.getElementById('blog-container');
       var blogUrl = 'https://zurai02.is-a.dev/Blog';
+      var postsJsonUrl = 'https://zurai02.is-a.dev/Blog/posts.json';
 
+      // Try fetching posts.json directly first (more reliable than HTML scraping)
+      fetch(postsJsonUrl, { 
+        mode: 'cors',
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('posts.json unavailable');
+        return r.json();
+      })
+      .then(function(posts) {
+        if (!Array.isArray(posts) || posts.length === 0) {
+          throw new Error('No posts found');
+        }
+
+        // Sort by date descending and take top 6
+        posts.sort(function(a, b) {
+          return new Date(b.date) - new Date(a.date);
+        });
+        posts = posts.slice(0, 6);
+
+        container.innerHTML = posts.map(function(post) {
+          var excerpt = post.content
+            .replace(/```[\s\S]*?```/g, '[code]')
+            .replace(/[#*_`]/g, '')
+            .substring(0, 140) + '...';
+
+          var tagsHtml = post.tags.map(function(tag) {
+            return '<span class="tag">' + escapeHtml(tag) + '</span>';
+          }).join('');
+
+          return '<a href="' + blogUrl + '/post.html?id=' + encodeURIComponent(post.id) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
+            '<h3>' + escapeHtml(post.title) + '</h3>' +
+            '<p>' + escapeHtml(excerpt) + '</p>' +
+            '<div class="blog-meta">' +
+              '<span>' + escapeHtml(post.date) + '</span>' +
+              tagsHtml +
+              '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
+            '</div>' +
+          '</a>';
+        }).join('');
+      })
+      .catch(function(err) {
+        console.warn('Blog JSON fetch failed:', err);
+        // Fallback: try HTML scraping
+        fallbackHtmlFetch(container, blogUrl);
+      });
+    })();
+
+    function fallbackHtmlFetch(container, blogUrl) {
       fetch(blogUrl, { 
         mode: 'cors',
         headers: { 'Accept': 'text/html' }
@@ -445,49 +515,25 @@
         var doc = parser.parseFromString(html, 'text/html');
         var posts = [];
 
-        var articles = doc.querySelectorAll('article, .post, .blog-post, [class*="post"], [class*="entry"]');
+        var cards = doc.querySelectorAll('.post-card, [class*="post-card"]');
 
-        if (articles.length > 0) {
-          articles.forEach(function(article, idx) {
+        if (cards.length > 0) {
+          cards.forEach(function(card, idx) {
             if (idx >= 6) return;
 
-            var titleEl = article.querySelector('h1, h2, h3, .title, [class*="title"]');
-            var linkEl = article.querySelector('a[href]');
-            var descEl = article.querySelector('p, .excerpt, .summary, [class*="desc"]');
-            var dateEl = article.querySelector('time, .date, [class*="date"], [class*="time"]');
-            var tagEls = article.querySelectorAll('.tag, [class*="tag"], [class*="category"]');
+            var titleEl = card.querySelector('.post-card-title, h1, h2, h3, .title');
+            var linkEl = card.closest('a') || card.querySelector('a');
+            var descEl = card.querySelector('.post-card-excerpt, p, .excerpt');
+            var dateEl = card.querySelector('.post-card-date, time, .date');
+            var tagEls = card.querySelectorAll('.tag');
 
-            var title = titleEl ? titleEl.textContent.trim() : 'Untitled Post';
+            var title = titleEl ? titleEl.textContent.trim() : 'Blog Post';
             var link = linkEl ? linkEl.href : blogUrl;
-            if (link && !link.startsWith('http')) {
-              link = new URL(link, blogUrl).href;
-            }
             var description = descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '';
             var date = dateEl ? dateEl.textContent.trim() : '';
             var tags = Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(function(t) { return t; });
 
             posts.push({ title: title, link: link, description: description, date: date, tags: tags });
-          });
-        }
-
-        if (posts.length === 0) {
-          var links = doc.querySelectorAll('a[href]');
-          var seen = new Set();
-          links.forEach(function(link) {
-            var href = link.getAttribute('href');
-            if (href && (href.includes('/post') || href.includes('/blog') || href.includes('/article') || href.match(/\d{4}/))) {
-              if (!seen.has(href) && posts.length < 6) {
-                seen.add(href);
-                var fullUrl = href.startsWith('http') ? href : new URL(href, blogUrl).href;
-                posts.push({
-                  title: link.textContent.trim() || 'Blog Post',
-                  link: fullUrl,
-                  description: '',
-                  date: '',
-                  tags: []
-                });
-              }
-            }
           });
         }
 
@@ -504,20 +550,23 @@
             '</a>';
           }).join('');
         } else {
-          container.innerHTML = '<div style="grid-column:1/-1;">' +
-            '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy"></iframe>' +
-          '</div>';
+          showBlogFallback(container, blogUrl);
         }
       })
       .catch(function(err) {
-        console.warn('Blog fetch failed:', err);
-        container.innerHTML = '<div class="blog-error" style="grid-column:1/-1;">' +
-          '<p>Unable to load blog posts directly due to CORS restrictions.</p>' +
+        console.warn('Blog HTML fetch failed:', err);
+        showBlogFallback(container, blogUrl);
+      });
+    }
+
+    function showBlogFallback(container, blogUrl) {
+      container.innerHTML = 
+        '<div class="blog-error" style="grid-column:1/-1;">' +
+          '<p>Unable to load blog posts directly.</p>' +
           '<p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/Blog →</a></p>' +
           '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>' +
         '</div>';
-      });
-    })();
+    }
 
     function escapeHtml(text) {
       var div = document.createElement('div');
