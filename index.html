@@ -32,10 +32,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="zurai02" />
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <!-- Preconnect (Removed redundant dns-prefetch and fixed crossorigin) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -374,7 +373,8 @@
         </a>
         <a href="https://zurai02.is-a.dev/Blog"
            target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-github"/></svg>
+          <!-- Fixed duplicated icon: changed from #icon-github to #icon-portfolio -->
+          <svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg>
           <span class="link-name">Blog</span>
           <span class="link-label">zurai02.is-a.dev/Blog</span>
         </a>
@@ -449,13 +449,33 @@
         console.warn('Icon sprite failed to load:', err); 
       });
 
+    // Helper function to eliminate duplicated blog card rendering HTML logic
+    function renderBlogCard(post, defaultUrl) {
+      var link = post.link || (defaultUrl + '/post.html?id=' + encodeURIComponent(post.id));
+      var excerpt = post.description || (post.content ? post.content.replace(/```[\s\S]*?```/g, '[code]').replace(/[#*_`]/g, '').substring(0, 140) + '...' : '');
+      var tags = post.tags || [];
+
+      var tagsHtml = tags.map(function(tag) {
+        return '<span class="tag">' + escapeHtml(tag) + '</span>';
+      }).join('');
+
+      return '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
+        '<h3>' + escapeHtml(post.title) + '</h3>' +
+        (excerpt ? '<p>' + escapeHtml(excerpt) + '</p>' : '') +
+        '<div class="blog-meta">' +
+          (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
+          tagsHtml +
+          '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
+        '</div>' +
+      '</a>';
+    }
+
     // Blog fetcher — dynamically loads latest posts from zurai02.is-a.dev/Blog
     (function loadBlogPosts() {
       var container = document.getElementById('blog-container');
       var blogUrl = 'https://zurai02.is-a.dev/Blog';
       var postsJsonUrl = 'https://zurai02.is-a.dev/Blog/posts.json';
 
-      // Try fetching posts.json directly first (more reliable than HTML scraping)
       fetch(postsJsonUrl, { 
         mode: 'cors',
         headers: { 'Accept': 'application/json' }
@@ -469,36 +489,16 @@
           throw new Error('No posts found');
         }
 
-        // Sort by date descending and take top 6
         posts.sort(function(a, b) {
           return new Date(b.date) - new Date(a.date);
         });
-        posts = posts.slice(0, 6);
 
-        container.innerHTML = posts.map(function(post) {
-          var excerpt = post.content
-            .replace(/```[\s\S]*?```/g, '[code]')
-            .replace(/[#*_`]/g, '')
-            .substring(0, 140) + '...';
-
-          var tagsHtml = post.tags.map(function(tag) {
-            return '<span class="tag">' + escapeHtml(tag) + '</span>';
-          }).join('');
-
-          return '<a href="' + blogUrl + '/post.html?id=' + encodeURIComponent(post.id) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
-            '<h3>' + escapeHtml(post.title) + '</h3>' +
-            '<p>' + escapeHtml(excerpt) + '</p>' +
-            '<div class="blog-meta">' +
-              '<span>' + escapeHtml(post.date) + '</span>' +
-              tagsHtml +
-              '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
-            '</div>' +
-          '</a>';
+        container.innerHTML = posts.slice(0, 6).map(function(post) {
+          return renderBlogCard(post, blogUrl);
         }).join('');
       })
       .catch(function(err) {
         console.warn('Blog JSON fetch failed:', err);
-        // Fallback: try HTML scraping
         fallbackHtmlFetch(container, blogUrl);
       });
     })();
@@ -529,27 +529,19 @@
             var dateEl = card.querySelector('.post-card-date, time, .date');
             var tagEls = card.querySelectorAll('.tag');
 
-            var title = titleEl ? titleEl.textContent.trim() : 'Blog Post';
-            var link = linkEl ? linkEl.href : blogUrl;
-            var description = descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '';
-            var date = dateEl ? dateEl.textContent.trim() : '';
-            var tags = Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(function(t) { return t; });
-
-            posts.push({ title: title, link: link, description: description, date: date, tags: tags });
+            posts.push({
+              title: titleEl ? titleEl.textContent.trim() : 'Blog Post',
+              link: linkEl ? linkEl.href : blogUrl,
+              description: descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '',
+              date: dateEl ? dateEl.textContent.trim() : '',
+              tags: Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(Boolean)
+            });
           });
         }
 
         if (posts.length > 0) {
           container.innerHTML = posts.map(function(post) {
-            return '<a href="' + escapeHtml(post.link) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
-              '<h3>' + escapeHtml(post.title) + '</h3>' +
-              (post.description ? '<p>' + escapeHtml(post.description) + '</p>' : '') +
-              '<div class="blog-meta">' +
-                (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
-                post.tags.map(function(tag) { return '<span class="tag">' + escapeHtml(tag) + '</span>'; }).join('') +
-                '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
-              '</div>' +
-            '</a>';
+            return renderBlogCard(post, blogUrl);
           }).join('');
         } else {
           showBlogFallback(container, blogUrl);
