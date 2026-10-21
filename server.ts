@@ -5,6 +5,38 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 
+const SECURITY_HEADERS = {
+  "Content-Security-Policy": [
+    "default-src 'self';",
+    "base-uri 'self';",
+    "object-src 'none';",
+    "frame-ancestors 'none';",
+    "form-action 'self' https:;",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://*.cloudflareinsights.com;",
+    "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://*.cloudflareinsights.com;",
+    "style-src 'self' 'unsafe-inline' https:;",
+    "img-src 'self' data: https:;",
+    "font-src 'self' data: https:;",
+    "connect-src 'self' https://api.github.com https://cloudflare-dns.com https://dns.google https://*.cloudflare.com https://*.cloudflareinsights.com https://*.github.io https://*.githubusercontent.com;",
+    "media-src 'self' data:;",
+    "worker-src 'self' blob:;",
+    "upgrade-insecure-requests;"
+  ].join(" "),
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "cross-origin"
+};
+
+app.use((_req, res, next) => {
+  Object.entries(SECURITY_HEADERS).forEach(([header, value]) => {
+    res.setHeader(header, value);
+  });
+  next();
+});
+
 // Serve static assets (css, js, svg, glsl, etc.)
 app.use(express.static(ROOT, {
   extensions: ["html"],

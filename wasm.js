@@ -44,6 +44,19 @@ const WasmEngine = (() => {
   const rand     = (mn, mx) => mn + Math.random() * (mx - mn);
   const randSign = ()        => Math.random() < 0.5 ? 1 : -1;
 
+  async function fileExists(url) {
+    try {
+      const res = await fetch(url, {
+        method: "HEAD",
+        cache: "no-store",
+        credentials: "omit",
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
   // ── Minimal WAT -> WASM assembler ────────────────────────────────────────
   // Supports the folded-instruction subset used by engine.wat (i32/f32 maths,
   // locals, memory load/store, if/else, block/loop/br/br_if, call).
@@ -204,7 +217,7 @@ const WasmEngine = (() => {
     ]);
   }
 
-  // ── Engines ──────────────────────────────────────────────────────────────
+  // ── Engines ──────────────────────────────────────────────────────────
   // Plain-JS engine with the same interface as the WASM ones.
   function makeJSEngine() {
     const N = PARTICLE_COUNT;
@@ -228,15 +241,22 @@ const WasmEngine = (() => {
   }
 
   async function loadEngine() {
+    const rustModuleUrl = new URL("pkg/particle_engine.js", BASE);
+    const rustBuildExists = await fileExists(rustModuleUrl);
+
     // 1) Rust / wasm-bindgen build, used automatically if pkg/ has been built
-    try {
-      const mod = await import("./pkg/particle_engine.js");
-      await mod.default();
-      engine = new mod.ParticleEngine(PARTICLE_COUNT);
-      console.log("[wasm] Rust engine loaded.");
-      return;
-    } catch (err) {
-      console.info("[wasm] Rust build (pkg/) not found, trying engine.wat.");
+    if (rustBuildExists) {
+      try {
+        const mod = await import(rustModuleUrl.href);
+        await mod.default();
+        engine = new mod.ParticleEngine(PARTICLE_COUNT);
+        console.log("[wasm] Rust engine loaded.");
+        return;
+      } catch (err) {
+        console.warn("[wasm] Rust engine import failed, falling back to WAT/JS.", err);
+      }
+    } else {
+      console.info("[wasm] Rust build not present, trying engine.wat.");
     }
 
     // 2) engine.wat, compiled right here in the browser
