@@ -1,5 +1,5 @@
-# robots.txt — zurai02.github.io
 User-agent: *
 Allow: /
+Disallow: /404.html
 
-Sitemap: https://zurai02.github.io/sitemap.xml
+Sitemap: https://zurai02.is-a.dev/sitemap.xml
