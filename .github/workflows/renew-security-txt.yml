@@ -1,0 +1,29 @@
+name: Renew security.txt
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"   # 03:00 UTC on the 1st of every month
+  workflow_dispatch:       # lets you run it by hand
+
+permissions:
+  contents: write
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push the Expires date 180 days ahead
+        run: |
+          NEW=$(date -u -d "+180 days" +"%Y-%m-%dT00:00:00.000Z")
+          sed -i "s/^Expires:.*/Expires: $NEW/" .well-known/security.txt
+
+      - name: Commit the change
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "Renew security.txt expiry"
+            git push
+          fi
