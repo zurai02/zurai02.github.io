@@ -4,177 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>zurai02 Roblox Scripting Specialist</title>
-  <meta name="description" content="Roblox Scripting & Engine Optimization Specialist. Advanced client-side architecture, custom Luau modules, performance analysis." />
+  <meta name="description" content="Roblox Scripting & Engine Optimization Specialist." />
   <meta name="author" content="zurai02" />
   <meta name="robots" content="index, follow" />
   <meta name="color-scheme" content="dark" />
 
-  <!-- Security -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' https://zurai02.is-a.dev https://api.github.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';" />
-  <!-- Canonical host redirect: silently redirect to zurai02.is-a.dev if visited from any other host.
-       Kept synchronous (no defer/async) so it runs before the page paints. -->
-  <script src="redirect.js"></script>
-  <!-- Open Graph -->
-  <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
-  <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://zurai02.is-a.dev" />
-  <meta property="og:locale" content="en_US" />
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <meta name="theme-color" content="#ff6b35" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="zurai02" />
-
-  <!-- Preconnect (Removed redundant dns-prefetch and fixed crossorigin) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Critical inline styles for FCP -->
-  <style>
-    html { scroll-behavior: smooth; }
-    body { margin: 0; opacity: 0; animation: fadeIn 0.3s ease forwards; }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-    /* Blog section styles */
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    .blog-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    .blog-card:hover {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(255,107,53,0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    }
-    .blog-card h3 {
-      margin: 0 0 0.75rem 0;
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.4;
-    }
-    .blog-card p {
-      margin: 0 0 1rem 0;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.9rem;
-      line-height: 1.6;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .blog-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.35);
-      flex-wrap: wrap;
-    }
-    .blog-meta .tag {
-      background: rgba(255,107,53,0.15);
-      color: #ff6b35;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-    .blog-loading {
-      text-align: center;
-      padding: 3rem;
-      color: rgba(255,255,255,0.4);
-    }
-    .blog-loading .spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #ff6b35;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .blog-error {
-      text-align: center;
-      padding: 2rem;
-      color: rgba(255,255,255,0.4);
-    }
-    .blog-error a {
-      color: #ff6b35;
-      text-decoration: none;
-    }
-    .blog-error a:hover { text-decoration: underline; }
-    .blog-embed {
-      width: 100%;
-      height: 600px;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.02);
-      margin-top: 1.5rem;
-    }
-    .blog-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #ff6b35;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: gap 0.3s ease;
-    }
-    .blog-cta:hover {
-      gap: 0.75rem;
-    }
-  </style>
-
-  <!-- Maintenance check (non-blocking) -->
-  <script src="maintenance.js" defer></script>
 </head>
 
 <body>
-  <!-- SVG Sprite -->
-  <div id="svg-sprite" aria-hidden="true" style="display:none;"></div>
-
-  <!-- Background & Cursor -->
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
   <div id="cursor-glow" aria-hidden="true"></div>
+  <div id="cursor-star-layer" aria-hidden="true"></div>
 
-  <!-- Skip Link -->
-  <a href="#skills" class="skip-link">Skip to content</a>
-
-  <!-- Navigation -->
   <nav id="nav" aria-label="Main navigation">
     <a href="#" class="nav-logo" aria-label="zurai02 home">zurai02<span class="nav-cursor" aria-hidden="true"></span></a>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation">
-      <span class="nav-toggle-bar"></span>
-    </button>
+
     <div class="nav-right" id="nav-menu">
       <ul class="nav-links" role="menubar">
         <li role="none"><a href="#skills" role="menuitem">Skills</a></li>
@@ -187,7 +36,6 @@
   </nav>
 
   <main class="page">
-    <!-- Hero -->
     <header class="hero">
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="hero-glow2" aria-hidden="true"></div>
@@ -209,12 +57,10 @@
       <p class="hero-sub" id="hero-sub"></p>
 
       <div class="hero-actions">
-        <a href="https://zurai02.is-a.dev/portfolio"
-           target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        <a href="https://zurai02.is-a.dev/portfolio" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
           DevForum Portfolio <span aria-hidden="true">→</span>
         </a>
-        <a href="https://zurai02.is-a.dev/Blog"
-           target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
           Blog
         </a>
         <button class="btn btn-discord" id="discord-btn" data-clipboard="lol066351" type="button">
@@ -230,154 +76,62 @@
 
     <hr class="divider" />
 
-    <!-- Skills -->
-    <section id="skills" aria-labelledby="skills-heading">
+    <section id="skills">
       <p class="section-label reveal">key_skills</p>
-      <h2 class="section-title reveal rd1" id="skills-heading">What I specialize in</h2>
+      <h2 class="section-title reveal rd1">What I specialize in</h2>
       <p class="section-sub reveal rd2">
-        Deep focus on the parts of Roblox development most people treat as black
-        boxes — squeezing out every frame and byte.
+        Deep focus on the parts of Roblox development most people treat as black boxes.
       </p>
 
       <div class="skill-grid">
         <article class="skill-card reveal rd1">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-client"/></svg>
-          <span class="skill-num" aria-hidden="true">01</span>
+          <span class="skill-num">01</span>
           <h3>Client-Side Optimization</h3>
-          <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
+          <p>Custom tweening modules that bypass TweenService limitations.</p>
         </article>
         <article class="skill-card reveal rd2">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-perf"/></svg>
-          <span class="skill-num" aria-hidden="true">02</span>
+          <span class="skill-num">02</span>
           <h3>Performance Analysis</h3>
-          <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
+          <p>Micro-profiling, streaming enabled configs, and memory safety.</p>
         </article>
         <article class="skill-card reveal rd3">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-network"/></svg>
-          <span class="skill-num" aria-hidden="true">03</span>
+          <span class="skill-num">03</span>
           <h3>Networking</h3>
-          <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
+          <p>Lightweight RemoteEvent structures designed to minimize packet loss.</p>
         </article>
       </div>
-
-      <div class="stat-row reveal rd2">
-        <div class="stat">
-          <span class="stat-val" data-count="100" aria-label="100 percent">0</span>
-          <span class="stat-lbl">% client-side focus</span>
-        </div>
-      </div>
-
-      <div class="verification-block">
-        <strong>Verification</strong> — Contact via Discord:
-        <code class="mono">lol066351</code>
-        (ID: <code class="mono">1460949263650652200</code>)
-      </div>
     </section>
 
     <hr class="divider" />
 
-    <!-- Stack -->
-    <section id="stack" aria-labelledby="stack-heading">
+    <section id="stack">
       <p class="section-label reveal">tech_stack</p>
-      <h2 class="section-title reveal rd1" id="stack-heading">Tools &amp; platform</h2>
-      <p class="section-sub reveal rd2">Everything I work in day-to-day.</p>
-      <div class="stack-row reveal rd3" role="list">
-        <span class="badge b-luau" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-luau"/></svg>
-          Luau
-        </span>
-        <span class="badge b-rblx" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>
-          Roblox Studio
-        </span>
-        <span class="badge b-blue" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-signal"/></svg>
-          RemoteEvents / RemoteFunctions
-        </span>
-        <span class="badge b-green" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-cpu"/></svg>
-          MicroProfiler
-        </span>
-        <span class="badge b-luau" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-module"/></svg>
-          Custom Luau Modules
-        </span>
-        <span class="badge b-blue" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-network"/></svg>
-          Streaming Enabled
-        </span>
-        <span class="badge b-rblx" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-client"/></svg>
-          Client-Server Architecture
-        </span>
-        <span class="badge b-green" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-module"/></svg>
-          Object Pooling
-        </span>
-        <span class="badge b-luau" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-signal"/></svg>
-          Signal Library
-        </span>
-        <span class="badge b-blue" role="listitem">
-          <svg class="badge-icon" aria-hidden="true"><use href="#icon-perf"/></svg>
-          RunService.Heartbeat
-        </span>
+      <h2 class="section-title reveal rd1">Tools & platform</h2>
+      <div class="stack-row reveal rd3">
+        <span class="badge b-rblx">Luau</span>
+        <span class="badge b-luau">Roblox Studio</span>
+        <span class="badge b-blue">RemoteEvents</span>
+        <span class="badge b-green">MicroProfiler</span>
+        <span class="badge b-rblx">Object Pooling</span>
+        <span class="badge b-luau">RunService.Heartbeat</span>
       </div>
     </section>
 
     <hr class="divider" />
 
-    <!-- Blog -->
-    <section id="blog" aria-labelledby="blog-heading">
-      <p class="section-label reveal">latest_writing</p>
-      <h2 class="section-title reveal rd1" id="blog-heading">From the blog</h2>
-      <p class="section-sub reveal rd2">
-        Thoughts on Luau, systems programming, and squeezing frames.
-        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" class="blog-cta">View all posts →</a>
-      </p>
-
-      <div id="blog-container" class="blog-grid reveal rd3">
-        <div class="blog-loading">
-          <div class="spinner"></div>
-          <span>Fetching latest posts...</span>
-        </div>
-      </div>
-    </section>
-
-    <hr class="divider" />
-
-    <!-- Links -->
-    <section id="links" aria-labelledby="links-heading">
+    <section id="links">
       <p class="section-label reveal">links</p>
-      <h2 class="section-title reveal rd1" id="links-heading">Find me here</h2>
-      <p class="section-sub reveal rd2">Portfolio, community, and contact.</p>
+      <h2 class="section-title reveal rd1">Find me here</h2>
       <div class="link-grid">
-        <a href="https://zurai02.is-a.dev/portfolio"
-           target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg>
+        <a href="https://zurai02.is-a.dev/portfolio" target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
           <span class="link-name">Scripting Portfolio</span>
           <span class="link-label">DevForum</span>
         </a>
-        <a href="https://zurai02.is-a.dev/devforum"
-           target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>
-          <span class="link-name">DevForum Profile</span>
-          <span class="link-label">@zurai02</span>
-        </a>
-        <a href="https://zurai02.is-a.dev/Blog"
-           target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg>
+        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
           <span class="link-name">Blog</span>
           <span class="link-label">zurai02.is-a.dev/Blog</span>
         </a>
-        <a href="https://zurai02.is-a.dev/github"
-           target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-github"/></svg>
-          <span class="link-name">GitHub</span>
-          <span class="link-label">@zurai02</span>
-        </a>
         <button class="link-card reveal rd3" data-clipboard="lol066351" type="button">
-          <svg class="link-icon" aria-hidden="true"><use href="#icon-discord"/></svg>
           <span class="link-name">Discord</span>
           <span class="link-label">lol066351 — tap to copy</span>
         </button>
@@ -386,183 +140,29 @@
 
     <hr class="divider" />
 
-    <!-- Terminal -->
-    <section class="tw-wrap" id="terminal" aria-labelledby="terminal-heading">
+    <section class="tw-wrap" id="terminal">
       <p class="section-label reveal">live_script</p>
-      <h2 class="section-title reveal rd1" id="terminal-heading">Code in motion</h2>
-      <p class="section-sub reveal rd2">A live look at the kind of Luau I write every day.</p>
-
+      <h2 class="section-title reveal rd1">Code in motion</h2>
       <figure class="tw-terminal reveal rd3" aria-label="Luau code terminal">
         <div class="tw-bar">
-          <span class="tw-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57aa" aria-hidden="true"></span>
-          <span class="tw-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2eaa" aria-hidden="true"></span>
-          <span class="tw-dot" style="background:#28c840;box-shadow:0 0 5px #28c840aa" aria-hidden="true"></span>
+          <span class="tw-dot" style="background:#ff5f57"></span>
+          <span class="tw-dot" style="background:#febc2e"></span>
+          <span class="tw-dot" style="background:#28c840"></span>
           <span class="tw-bar-title">zurai02 — luau session</span>
         </div>
-        <pre class="tw-body" id="tw-body"><code>
-          <div class="tw-line">
-            <span class="tw-prompt" aria-hidden="true">$</span>
-            <span class="tw-code dim">luau -- zurai02 session initialized</span>
-          </div>
-          <div class="tw-line">
-            <span class="tw-prompt" aria-hidden="true">~</span>
-            <span class="tw-code dim">require(ReplicatedStorage.Modules.NetBatcher) <span class="cm">-- loaded</span></span>
-          </div>
-        </code></pre>
+        <pre class="tw-body" id="tw-body"></pre>
       </figure>
     </section>
 
-    <!-- Footer -->
     <footer>
       <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization
       <span aria-hidden="true">&nbsp;·&nbsp;</span>
       <span id="yr"></span>
-      <span aria-hidden="true">&nbsp;·&nbsp;</span>
-      <a href="https://zurai02.is-a.dev">zurai02.is-a.dev</a>
     </footer>
   </main>
 
-  <!-- Toast -->
   <div id="copy-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Scripts -->
-  <script>
-    // Inline: Load SVG sprite with error handling
-    fetch('icons.svg')
-      .then(function(r) { 
-        if (!r.ok) throw new Error('SVG sprite not found'); 
-        return r.text(); 
-      })
-      .then(function(svg) {
-        var div = document.getElementById('svg-sprite');
-        div.innerHTML = svg;
-      })
-      .catch(function(err) { 
-        console.warn('Icon sprite failed to load:', err); 
-      });
-
-    // Helper function to eliminate duplicated blog card rendering HTML logic
-    function renderBlogCard(post, defaultUrl) {
-      var link = post.link || (defaultUrl + '/post.html?id=' + encodeURIComponent(post.id));
-      var excerpt = post.description || (post.content ? post.content.replace(/```[\s\S]*?```/g, '[code]').replace(/[#*_`]/g, '').substring(0, 140) + '...' : '');
-      var tags = post.tags || [];
-
-      var tagsHtml = tags.map(function(tag) {
-        return '<span class="tag">' + escapeHtml(tag) + '</span>';
-      }).join('');
-
-      return '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
-        '<h3>' + escapeHtml(post.title) + '</h3>' +
-        (excerpt ? '<p>' + escapeHtml(excerpt) + '</p>' : '') +
-        '<div class="blog-meta">' +
-          (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
-          tagsHtml +
-          '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
-        '</div>' +
-      '</a>';
-    }
-
-    // Blog fetcher — dynamically loads latest posts from zurai02.is-a.dev/Blog
-    (function loadBlogPosts() {
-      var container = document.getElementById('blog-container');
-      var blogUrl = 'https://zurai02.is-a.dev/Blog';
-      var postsJsonUrl = 'https://zurai02.is-a.dev/Blog/posts.json';
-
-      fetch(postsJsonUrl, { 
-        mode: 'cors',
-        headers: { 'Accept': 'application/json' }
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('posts.json unavailable');
-        return r.json();
-      })
-      .then(function(posts) {
-        if (!Array.isArray(posts) || posts.length === 0) {
-          throw new Error('No posts found');
-        }
-
-        posts.sort(function(a, b) {
-          return new Date(b.date) - new Date(a.date);
-        });
-
-        container.innerHTML = posts.slice(0, 6).map(function(post) {
-          return renderBlogCard(post, blogUrl);
-        }).join('');
-      })
-      .catch(function(err) {
-        console.warn('Blog JSON fetch failed:', err);
-        fallbackHtmlFetch(container, blogUrl);
-      });
-    })();
-
-    function fallbackHtmlFetch(container, blogUrl) {
-      fetch(blogUrl, { 
-        mode: 'cors',
-        headers: { 'Accept': 'text/html' }
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('Blog unavailable');
-        return r.text();
-      })
-      .then(function(html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
-        var posts = [];
-
-        var cards = doc.querySelectorAll('.post-card, [class*="post-card"]');
-
-        if (cards.length > 0) {
-          cards.forEach(function(card, idx) {
-            if (idx >= 6) return;
-
-            var titleEl = card.querySelector('.post-card-title, h1, h2, h3, .title');
-            var linkEl = card.closest('a') || card.querySelector('a');
-            var descEl = card.querySelector('.post-card-excerpt, p, .excerpt');
-            var dateEl = card.querySelector('.post-card-date, time, .date');
-            var tagEls = card.querySelectorAll('.tag');
-
-            posts.push({
-              title: titleEl ? titleEl.textContent.trim() : 'Blog Post',
-              link: linkEl ? linkEl.href : blogUrl,
-              description: descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '',
-              date: dateEl ? dateEl.textContent.trim() : '',
-              tags: Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(Boolean)
-            });
-          });
-        }
-
-        if (posts.length > 0) {
-          container.innerHTML = posts.map(function(post) {
-            return renderBlogCard(post, blogUrl);
-          }).join('');
-        } else {
-          showBlogFallback(container, blogUrl);
-        }
-      })
-      .catch(function(err) {
-        console.warn('Blog HTML fetch failed:', err);
-        showBlogFallback(container, blogUrl);
-      });
-    }
-
-    function showBlogFallback(container, blogUrl) {
-      container.innerHTML = 
-        '<div class="blog-error" style="grid-column:1/-1;">' +
-          '<p>Unable to load blog posts directly.</p>' +
-          '<p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/Blog →</a></p>' +
-          '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>' +
-        '</div>';
-    }
-
-    function escapeHtml(text) {
-      var div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-  </script>
-  <script src="wasm.js" defer></script>
-  <script src="tapfx.js" defer></script>
   <script src="site.js" defer></script>
-  <script src="chatbot.js" defer></script>
 </body>
 </html>
