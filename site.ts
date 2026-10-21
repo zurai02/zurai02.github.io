@@ -160,7 +160,7 @@ function initWelcome(): void {
     localStorage.setItem('zurai02_welcomed', '1');
     _showOverlay(greet);
   } else if (visits > 1) {
-    setTimeout(() => showToast(`Welcome back! Visit #${visits} 🔥`), 1200);
+    setTimeout(() => showToast(`Welcome back! Visit #${visits} `), 1200);
   }
 }
 
@@ -546,7 +546,7 @@ function fallbackCopy(text: string): void {
   const done = (): void => {
     if (btxt) btxt.textContent = '✓ Copied!';
     btn?.classList.add('copied');
-    showToast('lol066351 copied! 📋');
+    showToast('lol066351 copied!');
     setTimeout((): void => {
       if (btxt) btxt.textContent = 'Discord: lol066351';
       btn?.classList.remove('copied');

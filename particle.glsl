@@ -1,5 +1,5 @@
 /**
- * particle.glsl — zurai02.github.io  (enhanced WebGL2)
+ * particle.glsl — zurai02.is-a.dev  (enhanced WebGL2)
  *
  * Three shader programs in one file — split by #ifdef:
  *   VERTEX     → particle point sprite

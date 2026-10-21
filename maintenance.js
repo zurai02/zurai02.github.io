@@ -1,27 +1,3 @@
-/**
- * maintenance.js — zurai02.github.io
- * ────────────────────────────────────────────────────────────────
- * Maintenance mode system.
- *
- * HOW TO ACTIVATE:
- *   Option A — hardcode (commit to GitHub):
- *     Set MAINTENANCE.enabled = true below, push to GitHub.
- *
- *   Option B — browser console (instant, no commit needed):
- *     localStorage.setItem('zurai02_maintenance', 'true')
- *     location.reload()
- *
- * HOW TO DEACTIVATE:
- *   Option A — set MAINTENANCE.enabled = false, push.
- *   Option B — localStorage.removeItem('zurai02_maintenance')
- *              location.reload()
- *
- * BYPASS (admin access while site is down):
- *   Add ?admin=zurai02 to the URL.
- *   e.g. https://zurai02.github.io/?admin=zurai02
- * ────────────────────────────────────────────────────────────────
- */
-
 'use strict';
 
 const MAINTENANCE = {
