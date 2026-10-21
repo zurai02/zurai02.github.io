@@ -1,13 +1,9 @@
 'use strict';
 
-/* ------------------------------------------------------------------ *
- *  CONFIG
- * ------------------------------------------------------------------ */
 const CFG = {
   glow: { lerp: 0.08 },
   github: { user: 'zurai02', cacheMs: 30 * 60 * 1000 },
   hero: {
-    // Static phrases. Dynamic ones (time, visitor, GitHub) are mixed in at runtime.
     phrases: [
       'Building fast, resilient Roblox systems with less overlap and more control.',
       'Designing Luau modules that cut latency and keep client-side performance sharp.',
@@ -42,7 +38,9 @@ const DOM = {
   termOut: $('term-out'),
   termForm: $('term-form'),
   termIn: $('term-in'),
-  termPrompt: $('term-prompt')
+  termPrompt: $('term-prompt'),
+  dnsToggle: $('dns-toggle'),
+  dnsPanel: $('dns-panel')
 };
 
 const isMob = () => window.innerWidth < 640;
@@ -57,20 +55,12 @@ const shuffle = (arr) => {
   return a;
 };
 
-/* safe storage helpers (storage can throw in private mode) */
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } }
 };
 
-/* ------------------------------------------------------------------ *
- *  DYNAMIC CONTEXT (time, visitor, GitHub) -> feeds hero speeches
- * ------------------------------------------------------------------ */
-const ctx = {
-  repos: null,
-  recentRepo: null,
-  followers: null
-};
+const ctx = { repos: null, recentRepo: null, followers: null };
 
 async function loadGithubContext() {
   const key = 'gh-ctx-v1';
@@ -80,7 +70,7 @@ async function loadGithubContext() {
       Object.assign(ctx, cached.d);
       return;
     }
-  } catch { /* ignore bad cache */ }
+  } catch { /* ignore */ }
 
   try {
     const ctrl = new AbortController();
@@ -100,7 +90,7 @@ async function loadGithubContext() {
     };
     Object.assign(ctx, data);
     store.set(key, JSON.stringify({ t: Date.now(), d: data }));
-  } catch { /* offline / rate-limited: static phrases still work */ }
+  } catch { /* offline */ }
 }
 
 function buildDynamicPhrases() {
@@ -109,12 +99,9 @@ function buildDynamicPhrases() {
   const day = now.toLocaleDateString(undefined, { weekday: 'long' });
   const part = h < 5 ? 'late night' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 21 ? 'evening' : 'night';
   const time = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-
   let tz = '';
   try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* ignore */ }
-
   const visits = Number(store.get('visit-count') || 1);
-
   const out = [];
   out.push(`Good ${part}. It's ${time} on a ${day}, a fine time to ship something.`);
   if (tz) out.push(`Hello from wherever ${tz.replace('_', ' ')} is. Welcome in.`);
@@ -127,9 +114,6 @@ function buildDynamicPhrases() {
   return out;
 }
 
-/* ------------------------------------------------------------------ *
- *  HERO TYPEWRITER (static + dynamic phrases)
- * ------------------------------------------------------------------ */
 function initHeroTypewriter() {
   const el = DOM.heroSub;
   if (!el) return;
@@ -141,16 +125,13 @@ function initHeroTypewriter() {
     return;
   }
 
-  // visit counter (used by dynamic phrases)
   store.set('visit-count', String(Number(store.get('visit-count') || 0) + 1));
 
   let queue = [];
   let last = '';
   const nextPhrase = () => {
     if (!queue.length) {
-      // rebuild each cycle so time / GitHub data stay fresh
       queue = shuffle([...H.phrases, ...buildDynamicPhrases()]);
-      // avoid repeating the last phrase back-to-back
       if (queue[0] === last && queue.length > 1) queue.push(queue.shift());
     }
     last = queue.shift();
@@ -193,9 +174,6 @@ function initHeroTypewriter() {
   setTimeout(tick, H.startDelay);
 }
 
-/* ------------------------------------------------------------------ *
- *  CURSOR GLOW + STARS (unchanged behaviour)
- * ------------------------------------------------------------------ */
 function initCursorGlow() {
   if (isMob() || !DOM.glow) return;
 
@@ -276,9 +254,6 @@ function initCursorGlow() {
   requestAnimationFrame(tick);
 }
 
-/* ------------------------------------------------------------------ *
- *  DNS (DNS-over-HTTPS, runs fully in the browser, no backend)
- * ------------------------------------------------------------------ */
 const DNS = {
   types: { A: 1, NS: 2, CNAME: 5, SOA: 6, PTR: 12, MX: 15, TXT: 16, AAAA: 28, SRV: 33, CAA: 257 },
   names: { 1: 'A', 2: 'NS', 5: 'CNAME', 6: 'SOA', 12: 'PTR', 15: 'MX', 16: 'TXT', 28: 'AAAA', 33: 'SRV', 257: 'CAA' },
@@ -292,7 +267,7 @@ function normalizeHost(raw) {
   let s = String(raw || '').trim().toLowerCase();
   s = s.replace(/^[a-z]+:\/\//, '').split(/[/?#]/)[0].replace(/^[^@]*@/, '').replace(/:\d+$/, '').replace(/\.$/, '');
   if (!s) return null;
-  try { s = new URL('http://' + s).hostname; } catch { return null; } // punycode for IDNs
+  try { s = new URL('http://' + s).hostname; } catch { return null; }
   return HOST_RE.test(s) ? s : null;
 }
 
@@ -325,7 +300,6 @@ function formatRecord(r) {
   const t = DNS.names[r.type] || `TYPE${r.type}`;
   let data = String(r.data ?? '');
   if (t === 'TXT') {
-    // resolvers return TXT chunks wrapped in quotes; join them back together
     const parts = data.match(/"((?:[^"\\]|\\.)*)"/g);
     data = parts ? parts.map((p) => p.slice(1, -1)).join('') : data.replace(/^"|"$/g, '');
     data = `"${data}"`;
@@ -333,9 +307,6 @@ function formatRecord(r) {
   return `${r.name.replace(/\.$/, '')}.\t${r.TTL}\tIN\t${t}\t${data}`;
 }
 
-/* ------------------------------------------------------------------ *
- *  TERMINAL
- * ------------------------------------------------------------------ */
 function initTerminal() {
   const out = DOM.termOut;
   const form = DOM.termForm;
@@ -349,7 +320,7 @@ function initTerminal() {
   const print = (text = '', cls = '') => {
     const line = document.createElement('div');
     line.className = 'term-line' + (cls ? ' ' + cls : '');
-    line.textContent = text; // always textContent: lookups echo remote data
+    line.textContent = text;
     out.appendChild(line);
     out.scrollTop = out.scrollHeight;
     return line;
@@ -460,7 +431,6 @@ function initTerminal() {
     sudo() { print('nice try. permission denied.', 'term-warn'); }
   };
 
-  // shortcut commands: `a example.com`, `txt example.com`, ...
   ['a', 'aaaa', 'cname', 'txt', 'mx', 'ns', 'soa', 'caa', 'ptr'].forEach((t) => {
     COMMANDS[t] = async (args) => {
       if (!args[0]) return print(`usage: ${t} ${t === 'ptr' ? '<ipv4>' : '<domain>'}`, 'term-err');
@@ -519,19 +489,6 @@ function initTerminal() {
     }
   });
 
-  // clicking the terminal focuses the input (unless selecting text)
-  out.addEventListener('click', () => {
-    if (!String(window.getSelection())) input.focus();
-  });
-
-  // quick-run chips: <button data-term-cmd="dig example.com TXT">
-  document.querySelectorAll('[data-term-cmd]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      input.value = '';
-      run(btn.dataset.termCmd);
-    });
-  });
-
   printBlock([
     'Welcome to the portfolio terminal.',
     'Run real DNS lookups from your browser, e.g.:',
@@ -543,17 +500,29 @@ function initTerminal() {
   ], 'term-dim');
 }
 
-/* ------------------------------------------------------------------ *
- *  INIT
- * ------------------------------------------------------------------ */
+function initDNSButton() {
+  if (!DOM.dnsToggle || !DOM.dnsPanel) return;
+
+  const sync = () => {
+    const open = !DOM.dnsPanel.classList.contains('hidden');
+    DOM.dnsToggle.textContent = open ? 'Hide DNS Terminal' : 'Open DNS Terminal';
+    DOM.dnsToggle.setAttribute('aria-expanded', String(open));
+  };
+
+  DOM.dnsToggle.addEventListener('click', () => {
+    DOM.dnsPanel.classList.toggle('hidden');
+    sync();
+  });
+
+  sync();
+}
+
 function init() {
   if (DOM.year) DOM.year.textContent = new Date().getFullYear();
-
   initHeroTypewriter();
   initCursorGlow();
   initTerminal();
-
-  // GitHub data loads in the background; the next typewriter cycle picks it up
+  initDNSButton();
   loadGithubContext();
 }
 
