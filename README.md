@@ -1,118 +1,947 @@
-# zurai02.github.io
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  cursor: none;
+}
 
-Personal portfolio site for **zurai02** — Roblox Scripting & Engine Optimization Specialist.
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 143, 61, 0.12), transparent 28%),
+    radial-gradient(circle at 70% 15%, rgba(255, 82, 160, 0.08), transparent 26%),
+    #070b12;
+  color: #edf3ff;
+  overflow-x: hidden;
+}
 
-Live at **[zurai02.is-a.dev](https://zurai02.is-a.dev)**
+* { box-sizing: border-box; }
 
----
+a, button, input, textarea, select {
+  cursor: none;
+}
 
-## Stack
+@media (pointer: coarse) {
+  html, body, a, button, input, textarea, select { cursor: auto; }
+}
 
-| File | Role |
-|---|---|
-| `index.html` | Structure & markup |
-| `style.css` | Visual layer — layout, animations, liquid glass |
-| `site.js` | Frontend engine — particles, typewriter, terminal, copy |
-| `maintenance.js` | Maintenance mode system |
-| `sw.js` | Service Worker — offline caching, PWA |
-| `manifest.json` | PWA manifest — installable app config |
-| `tsconfig.json` | TypeScript compiler config |
-| `site.ts` | TypeScript source (compiles to `site.js`) |
-| `icons.svg` | SVG icon sprite sheet |
-| `particle.glsl` | GLSL shader source for WebGL particle upgrade |
-| `sitemap.xml` | XML sitemap for search engines |
-| `robots.txt` | Search bot crawl instructions |
-| `deploy.sh` | Shell deployment script |
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+}
 
----
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
 
-## Features
+#cursor-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle, rgba(255, 188, 120, 0.28) 0%, rgba(255, 143, 61, 0.18) 18%, rgba(255, 102, 49, 0.08) 36%, transparent 68%);
+  filter: blur(14px);
+  will-change: transform, opacity;
+  transition: opacity 0.25s ease;
+}
 
-- Particle background with per-particle sine pulse
-- Smooth cursor glow with lerp RAF (desktop)
-- Hero typewriter cycling through 4 phrases
-- Scroll reveal with IntersectionObserver
-- Animated counter (100% client-side focus)
-- Terminal typewriter with Luau syntax highlighting
-- Discord username copy with toast notification
-- Time-based greeting + first-visit welcome overlay
-- Visit counter via localStorage
-- Maintenance mode system with admin bypass
-- Liquid glass cards with backdrop-filter
-- PWA — installable, offline-capable via Service Worker
-- Full security headers via CSP meta tags
-- `prefers-reduced-motion` respected throughout
+#cursor-star-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
 
----
+.cursor-star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.9) 18%,
+    rgba(255,196,116,0.9) 38%,
+    rgba(255,143,61,0.42) 62%,
+    rgba(255,143,61,0) 100%
+  );
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.95),
+    0 0 18px rgba(255, 190, 117, 0.8),
+    0 0 28px rgba(255, 143, 61, 0.45);
+}
 
-## Maintenance Mode
+.cursor-star::before,
+.cursor-star::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+}
 
-**Enable (instant, no commit):**
-```js
-MAINT.enable()
-```
+.cursor-star::before {
+  width: 12px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.95), rgba(255,255,255,0));
+}
 
-**Disable:**
-```js
-MAINT.disable()
-```
+.cursor-star::after {
+  width: 2px;
+  height: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.95), rgba(255,255,255,0));
+}
 
-**Admin bypass while site is down:**
-```
-https://zurai02.github.io/?admin=zurai02
-```
+.page {
+  position: relative;
+  z-index: 2;
+}
 
-**Enable permanently (via GitHub):**
-Open `maintenance.js`, set `enabled: true`, commit and push.
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 16px 18px 0;
+  backdrop-filter: blur(6px);
+}
 
----
+.nav-shell {
+  width: min(960px, calc(100% - 14px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  background: rgba(10, 13, 19, 0.7);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
 
-## Deployment
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #edf3ff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 
-```bash
-chmod +x deploy.sh   # first time only
-./deploy.sh          # auto commit message
-./deploy.sh "update hero copy"  # custom message
-```
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff8f3d, #ff6b35);
+  box-shadow: 0 0 20px rgba(255, 143, 61, 0.35);
+  position: relative;
+}
 
-The script checks all required files exist, runs TypeScript compile if Node is available, reports file sizes, stages everything, commits, and pushes to `main`.
+.brand-mark::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.7);
+}
 
----
+.brand span:last-child {
+  color: #edf3ff;
+}
 
-## TypeScript
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
 
-`site.ts` is the fully typed source. Compile it to regenerate `site.js`:
+.nav a {
+  color: #9aa9bb;
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+}
 
-```bash
-npx tsc --project tsconfig.json
-```
+.nav a:hover,
+.nav a.active {
+  color: #edf3ff;
+}
 
----
+.hero {
+  width: min(1200px, calc(100% - 36px));
+  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  align-items: center;
+  gap: 20px;
+  padding: 54px 12px 32px;
+}
 
-## File Structure
+.hero-copy {
+  padding-left: 10px;
+}
 
-```
-zurai02.github.io/
-├── index.html
-├── style.css
-├── site.js
-├── site.ts
-├── maintenance.js
-├── sw.js
-├── manifest.json
-├── tsconfig.json
-├── icons.svg
-├── particle.glsl
-├── sitemap.xml
-├── robots.txt
-└── deploy.sh
-```
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.36rem 0.72rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #d9e8ff;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.1s forwards;
+}
 
----
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3fb950;
+  box-shadow: 0 0 10px rgba(63, 185, 80, 0.8);
+}
 
-## Contact
+.hero-title {
+  margin-top: 22px;
+  margin-bottom: 18px;
+  font-size: clamp(3.2rem, 7vw, 7rem);
+  line-height: 0.93;
+  letter-spacing: -0.08em;
+  font-weight: 900;
+  opacity: 0;
+  animation: fadeUp 0.68s ease 0.18s forwards;
+}
 
-- DevForum: [zurai02 Scripting Portfolio](https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442)
-- DevForum Profile: [@zurai02](https://devforum.roblox.com/u/zurai02)
-- Roblox: [Profile](https://www.roblox.com/users/5674181802/profile)
-- Discord: `lol066351`
+.hero-title .accent {
+  color: #ff9f6a;
+  text-shadow: 0 0 18px rgba(255, 143, 61, 0.35);
+}
+
+.hero-sub {
+  min-height: 3.7em;
+  margin: 0;
+  color: #9aa9bb;
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.9;
+  max-width: 620px;
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.28s forwards;
+}
+
+.tw-cur {
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  background: #ff8f3d;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink-c 0.85s step-end infinite;
+}
+
+@keyframes blink-c {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 26px;
+  opacity: 0;
+  animation: fadeUp 0.74s ease 0.36s forwards;
+}
+
+.btn,
+.dns-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.82rem 1.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.02);
+  color: #edf3ff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+}
+
+.btn:hover,
+.dns-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(255, 143, 61, 0.14);
+}
+
+.btn.primary,
+.dns-toggle {
+  background: linear-gradient(135deg, #ff8f3d, #ff6b35);
+  color: white;
+  border-color: rgba(255, 143, 61, 0.3);
+  box-shadow: 0 14px 30px rgba(255, 143, 61, 0.32);
+}
+
+.btn.secondary {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 450px;
+}
+
+.avatar-ring {
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  position: relative;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 172, 113, 0.42), rgba(255, 143, 61, 0.18) 28%, rgba(0,0,0,0) 42%),
+    linear-gradient(135deg, rgba(255, 143, 61, 0.16), rgba(255, 143, 61, 0.08));
+  border: 1px solid rgba(255, 143, 61, 0.2);
+  box-shadow:
+    0 0 32px rgba(255, 143, 61, 0.2),
+    0 0 20px rgba(255, 143, 61, 0.2),
+    0 0 28px rgba(255, 122, 193, 0.1);
+}
+
+.avatar-ring::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 109, 49, 0.8), rgba(255, 136, 175, 0.6));
+  box-shadow: 0 0 38px rgba(255, 143, 61, 0.28);
+}
+
+.avatar-ring::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 79, 79, 0.08), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.avatar {
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.25) 24%, rgba(255,255,255,0) 48%),
+    linear-gradient(135deg, #ffd8d2 0%, #ffe9df 35%, #f8d5d3 30%, #d5b1c3 18%, #b4526c 32%, #d0a0d4 30%, #f7ebea 100%);
+  box-shadow: 0 0 38px rgba(255, 143, 61, 0.32);
+  overflow: hidden;
+}
+
+.avatar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.38), rgba(0,0,0,0) 38%),
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.26), rgba(0,0,0,0) 40%);
+}
+
+.avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0));
+}
+
+.dns-toggle-wrap {
+  width: min(1100px, calc(100% - 36px));
+  margin: 0 auto 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.dns-toggle {
+  appearance: none;
+  border: 1px solid rgba(255, 143, 61, 0.3);
+  cursor: pointer;
+}
+
+.dns-panel {
+  width: min(1100px, calc(100% - 36px));
+  margin: 0 auto 80px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(10, 15, 20, 0.72);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.25);
+  display: block;
+}
+
+.dns-panel.hidden {
+  display: none;
+}
+
+.dns-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 0.76rem;
+  color: #9aa9bb;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.term-output {
+  min-height: 260px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 16px 16px 12px;
+  background: rgba(5, 9, 13, 0.9);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.term-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0 0 6px;
+  color: #dfeafc;
+}
+
+.term-line.term-cmd { color: #fff; }
+.term-line.term-ok { color: #8ef0ae; }
+.term-line.term-warn { color: #ffd78a; }
+.term-line.term-err { color: #ffb5b5; }
+.term-line.term-dim { color: #91a5bf; }
+
+.term-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+
+.term-prompt {
+  color: #7ce2ff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+#term-in {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #edf3ff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+#term-in::placeholder {
+  color: rgba(255,255,255,0.28);
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-copy {
+    padding-left: 0;
+  }
+
+  .nav-shell {
+    width: calc(100% - 20px);
+  }
+
+  .brand-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .avatar-ring {
+    width: 320px;
+    height: 320px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+n
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
