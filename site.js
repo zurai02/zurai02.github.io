@@ -1,8 +1,13 @@
 'use strict';
 
+/* ------------------------------------------------------------------ *
+ *  CONFIG
+ * ------------------------------------------------------------------ */
 const CFG = {
   glow: { lerp: 0.08 },
+  github: { user: 'zurai02', cacheMs: 30 * 60 * 1000 },
   hero: {
+    // Static phrases. Dynamic ones (time, visitor, GitHub) are mixed in at runtime.
     phrases: [
       'Building fast, resilient Roblox systems with less overlap and more control.',
       'Designing Luau modules that cut latency and keep client-side performance sharp.',
@@ -10,11 +15,18 @@ const CFG = {
       'Turning difficult game logic into clean, scalable, high-performance code.',
       'Optimizing Roblox experiences by squeezing every frame and every byte.'
     ],
-    typeSpeed: 34,
-    deleteSpeed: 14,
-    pauseAfterType: 2600,
-    pauseAfterDelete: 280,
-    startDelay: 900
+    typeMin: 32, typeJitter: 18,
+    deleteMin: 18, deleteJitter: 16,
+    pauseAfterType: 1600,
+    pauseAfterDelete: 220,
+    startDelay: 850
+  },
+  dns: {
+    timeoutMs: 6000,
+    providers: {
+      cloudflare: 'https://cloudflare-dns.com/dns-query',
+      google: 'https://dns.google/resolve'
+    }
   }
 };
 
@@ -26,65 +38,164 @@ const DOM = {
   heroSub: $('hero-sub'),
   twBody: $('tw-body'),
   toast: $('copy-toast'),
-  year: $('yr')
+  year: $('yr'),
+  termOut: $('term-out'),
+  termForm: $('term-form'),
+  termIn: $('term-in'),
+  termPrompt: $('term-prompt')
 };
 
 const isMob = () => window.innerWidth < 640;
 const noMot = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = (arr) => {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
+/* safe storage helpers (storage can throw in private mode) */
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } }
+};
+
+/* ------------------------------------------------------------------ *
+ *  DYNAMIC CONTEXT (time, visitor, GitHub) -> feeds hero speeches
+ * ------------------------------------------------------------------ */
+const ctx = {
+  repos: null,
+  recentRepo: null,
+  followers: null
+};
+
+async function loadGithubContext() {
+  const key = 'gh-ctx-v1';
+  try {
+    const cached = JSON.parse(store.get(key) || 'null');
+    if (cached && Date.now() - cached.t < CFG.github.cacheMs) {
+      Object.assign(ctx, cached.d);
+      return;
+    }
+  } catch { /* ignore bad cache */ }
+
+  try {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 5000);
+    const [userRes, repoRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${CFG.github.user}`, { signal: ctrl.signal }),
+      fetch(`https://api.github.com/users/${CFG.github.user}/repos?sort=pushed&per_page=5`, { signal: ctrl.signal })
+    ]);
+    clearTimeout(to);
+    if (!userRes.ok || !repoRes.ok) return;
+    const user = await userRes.json();
+    const repos = await repoRes.json();
+    const data = {
+      repos: user.public_repos ?? null,
+      followers: user.followers ?? null,
+      recentRepo: Array.isArray(repos) && repos[0] ? repos[0].name : null
+    };
+    Object.assign(ctx, data);
+    store.set(key, JSON.stringify({ t: Date.now(), d: data }));
+  } catch { /* offline / rate-limited: static phrases still work */ }
+}
+
+function buildDynamicPhrases() {
+  const now = new Date();
+  const h = now.getHours();
+  const day = now.toLocaleDateString(undefined, { weekday: 'long' });
+  const part = h < 5 ? 'late night' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 21 ? 'evening' : 'night';
+  const time = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+  let tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* ignore */ }
+
+  const visits = Number(store.get('visit-count') || 1);
+
+  const out = [];
+  out.push(`Good ${part}. It's ${time} on a ${day}, a fine time to ship something.`);
+  if (tz) out.push(`Hello from wherever ${tz.replace('_', ' ')} is. Welcome in.`);
+  if (visits > 1) out.push(`Visit #${visits}. Good to see you back.`);
+  if (ctx.repos) out.push(`${ctx.repos} public repos and counting. There's always more to build.`);
+  if (ctx.recentRepo) out.push(`Latest push: ${ctx.recentRepo}. Fresh commits, fresh ideas.`);
+  if (ctx.followers) out.push(`${ctx.followers} people are following along on GitHub. Thank you.`);
+  out.push('Tip: scroll down and try the terminal. It can run real DNS lookups.');
+  if (h >= 0 && h < 5) out.push('Still up? Same. The best bugs get fixed after midnight.');
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
+ *  HERO TYPEWRITER (static + dynamic phrases)
+ * ------------------------------------------------------------------ */
 function initHeroTypewriter() {
   const el = DOM.heroSub;
   if (!el) return;
 
-  const speeches = [
-    'Building fast, resilient Roblox systems with less overlap and more control.',
-    'Designing Luau modules that cut latency and keep client-side performance sharp.',
-    'Shipping custom tooling, systems architecture, and engine-aware optimization.',
-    'Turning difficult game logic into clean, scalable, high-performance code.',
-    'Optimizing Roblox experiences by squeezing every frame and every byte.'
-  ];
+  const H = CFG.hero;
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReducedMotion) {
-    el.textContent = speeches[0];
+  if (noMot()) {
+    el.textContent = H.phrases[0];
     return;
   }
 
-  let phraseIndex = 0;
-  let visibleText = '';
+  // visit counter (used by dynamic phrases)
+  store.set('visit-count', String(Number(store.get('visit-count') || 0) + 1));
+
+  let queue = [];
+  let last = '';
+  const nextPhrase = () => {
+    if (!queue.length) {
+      // rebuild each cycle so time / GitHub data stay fresh
+      queue = shuffle([...H.phrases, ...buildDynamicPhrases()]);
+      // avoid repeating the last phrase back-to-back
+      if (queue[0] === last && queue.length > 1) queue.push(queue.shift());
+    }
+    last = queue.shift();
+    return last;
+  };
+
+  let phrase = nextPhrase();
+  let visible = '';
   let deleting = false;
 
+  const cursor = document.createElement('span');
+  cursor.className = 'tw-cur';
+  const text = document.createTextNode('');
+  el.textContent = '';
+  el.append(text, cursor);
+
   const tick = () => {
-    const phrase = speeches[phraseIndex];
-    const delay = deleting ? 18 + Math.random() * 16 : 32 + Math.random() * 18;
+    visible = deleting
+      ? phrase.slice(0, Math.max(0, visible.length - 1))
+      : phrase.slice(0, visible.length + 1);
+    text.nodeValue = visible;
 
-    if (!deleting) {
-      visibleText = phrase.slice(0, visibleText.length + 1);
-    } else {
-      visibleText = phrase.slice(0, Math.max(0, visibleText.length - 1));
-    }
-
-    el.innerHTML = visibleText + '<span class="tw-cur"></span>';
-
-    if (!deleting && visibleText.length === phrase.length) {
+    if (!deleting && visible.length === phrase.length) {
       deleting = true;
-      setTimeout(tick, 1400);
+      setTimeout(tick, H.pauseAfterType);
       return;
     }
-
-    if (deleting && visibleText.length === 0) {
+    if (deleting && visible.length === 0) {
       deleting = false;
-      phraseIndex = (phraseIndex + 1) % speeches.length;
-      setTimeout(tick, 220);
+      phrase = nextPhrase();
+      setTimeout(tick, H.pauseAfterDelete);
       return;
     }
-
+    const delay = deleting
+      ? H.deleteMin + Math.random() * H.deleteJitter
+      : H.typeMin + Math.random() * H.typeJitter;
     setTimeout(tick, delay);
   };
 
-  setTimeout(tick, 850);
+  setTimeout(tick, H.startDelay);
 }
 
+/* ------------------------------------------------------------------ *
+ *  CURSOR GLOW + STARS (unchanged behaviour)
+ * ------------------------------------------------------------------ */
 function initCursorGlow() {
   if (isMob() || !DOM.glow) return;
 
@@ -111,39 +222,28 @@ function initCursorGlow() {
 
     const life = 0.7 + Math.random() * 0.9;
     stars.push({
-      el: s,
-      x,
-      y,
+      el: s, x, y,
       vx: (Math.random() - 0.5) * 0.9,
       vy: (Math.random() - 0.5) * 0.9,
-      alpha: 1,
-      life,
-      maxLife: life,
+      alpha: 1, life, maxLife: life,
       scale: 0.7 + Math.random() * 1.3
     });
   }
 
   function spawnBurst(x, y) {
     for (let i = 0; i < 16; i++) {
-      spawnStar(
-        x + (Math.random() - 0.5) * 18,
-        y + (Math.random() - 0.5) * 18
-      );
+      spawnStar(x + (Math.random() - 0.5) * 18, y + (Math.random() - 0.5) * 18);
     }
   }
 
   document.addEventListener('pointermove', (e) => {
     mx = e.clientX;
     my = e.clientY;
-
     if (!vis) {
       DOM.glow.style.opacity = '1';
       vis = true;
     }
-
-    if (Math.random() < 0.32) {
-      spawnStar(mx, my);
-    }
+    if (Math.random() < 0.32) spawnStar(mx, my);
   }, { passive: true });
 
   document.addEventListener('pointerleave', () => {
@@ -151,14 +251,11 @@ function initCursorGlow() {
     vis = false;
   });
 
-  document.addEventListener('pointerdown', (e) => {
-    spawnBurst(e.clientX, e.clientY);
-  });
+  document.addEventListener('pointerdown', (e) => spawnBurst(e.clientX, e.clientY));
 
   const tick = () => {
-    gx += (mx - gx) * 0.08;
-    gy += (my - gy) * 0.08;
-
+    gx += (mx - gx) * CFG.glow.lerp;
+    gy += (my - gy) * CFG.glow.lerp;
     DOM.glow.style.transform = `translate(${gx - 210}px, ${gy - 210}px)`;
 
     for (let i = stars.length - 1; i >= 0; i--) {
@@ -169,24 +266,295 @@ function initCursorGlow() {
       s.el.style.opacity = String(s.alpha);
       s.el.style.transform = `translate(${s.x - 4}px, ${s.y - 4}px) scale(${(0.3 + s.alpha) * s.scale})`;
       s.life -= 0.025;
-
       if (s.life <= 0) {
         s.el.remove();
         stars.splice(i, 1);
       }
     }
-
     requestAnimationFrame(tick);
   };
-
   requestAnimationFrame(tick);
 }
 
+/* ------------------------------------------------------------------ *
+ *  DNS (DNS-over-HTTPS, runs fully in the browser, no backend)
+ * ------------------------------------------------------------------ */
+const DNS = {
+  types: { A: 1, NS: 2, CNAME: 5, SOA: 6, PTR: 12, MX: 15, TXT: 16, AAAA: 28, SRV: 33, CAA: 257 },
+  names: { 1: 'A', 2: 'NS', 5: 'CNAME', 6: 'SOA', 12: 'PTR', 15: 'MX', 16: 'TXT', 28: 'AAAA', 33: 'SRV', 257: 'CAA' },
+  rcodes: ['NOERROR', 'FORMERR', 'SERVFAIL', 'NXDOMAIN', 'NOTIMP', 'REFUSED'],
+  provider: 'cloudflare'
+};
+
+const HOST_RE = /^(?=.{1,253}$)(?:[a-z0-9_](?:[a-z0-9_-]{0,61}[a-z0-9_])?\.)+[a-z0-9-]{2,63}$/;
+
+function normalizeHost(raw) {
+  let s = String(raw || '').trim().toLowerCase();
+  s = s.replace(/^[a-z]+:\/\//, '').split(/[/?#]/)[0].replace(/^[^@]*@/, '').replace(/:\d+$/, '').replace(/\.$/, '');
+  if (!s) return null;
+  try { s = new URL('http://' + s).hostname; } catch { return null; } // punycode for IDNs
+  return HOST_RE.test(s) ? s : null;
+}
+
+function ipv4ToPtr(ip) {
+  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(ip);
+  if (!m || m.slice(1).some((n) => Number(n) > 255)) return null;
+  return m.slice(1).reverse().join('.') + '.in-addr.arpa';
+}
+
+async function dohQuery(name, type) {
+  const base = CFG.dns.providers[DNS.provider];
+  const url = `${base}?name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}`;
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), CFG.dns.timeoutMs);
+  const t0 = performance.now();
+  try {
+    const res = await fetch(url, { headers: { Accept: 'application/dns-json' }, signal: ctrl.signal });
+    if (!res.ok) throw new Error(`resolver returned HTTP ${res.status}`);
+    const json = await res.json();
+    return { json, ms: Math.round(performance.now() - t0) };
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error('query timed out');
+    throw err;
+  } finally {
+    clearTimeout(to);
+  }
+}
+
+function formatRecord(r) {
+  const t = DNS.names[r.type] || `TYPE${r.type}`;
+  let data = String(r.data ?? '');
+  if (t === 'TXT') {
+    // resolvers return TXT chunks wrapped in quotes; join them back together
+    const parts = data.match(/"((?:[^"\\]|\\.)*)"/g);
+    data = parts ? parts.map((p) => p.slice(1, -1)).join('') : data.replace(/^"|"$/g, '');
+    data = `"${data}"`;
+  }
+  return `${r.name.replace(/\.$/, '')}.\t${r.TTL}\tIN\t${t}\t${data}`;
+}
+
+/* ------------------------------------------------------------------ *
+ *  TERMINAL
+ * ------------------------------------------------------------------ */
+function initTerminal() {
+  const out = DOM.termOut;
+  const form = DOM.termForm;
+  const input = DOM.termIn;
+  if (!out || !form || !input) return;
+
+  const history = [];
+  let hIdx = 0;
+  let busy = false;
+
+  const print = (text = '', cls = '') => {
+    const line = document.createElement('div');
+    line.className = 'term-line' + (cls ? ' ' + cls : '');
+    line.textContent = text; // always textContent: lookups echo remote data
+    out.appendChild(line);
+    out.scrollTop = out.scrollHeight;
+    return line;
+  };
+  const printBlock = (lines, cls) => lines.forEach((l) => print(l, cls));
+
+  const promptStr = () => `${CFG.github.user}@portfolio:~$`;
+  if (DOM.termPrompt) DOM.termPrompt.textContent = promptStr();
+
+  async function lookup(type, rawHost) {
+    let name = null;
+    let qtype = type;
+
+    if (type === 'PTR') {
+      name = ipv4ToPtr(String(rawHost || '').trim());
+      if (!name) return print('usage: ptr <ipv4-address>', 'term-err');
+    } else {
+      name = normalizeHost(rawHost);
+      if (!name) return print(`invalid domain: "${String(rawHost || '').slice(0, 60)}"`, 'term-err');
+    }
+
+    print(`; <<>> DoH (${DNS.provider}) <<>> ${name} ${qtype}`, 'term-dim');
+    busy = true;
+    try {
+      const { json, ms } = await dohQuery(name, qtype);
+      const status = DNS.rcodes[json.Status] || `RCODE ${json.Status}`;
+      const answers = Array.isArray(json.Answer) ? json.Answer : [];
+
+      print(`;; status: ${status}, answers: ${answers.length}, time: ${ms} ms`, 'term-dim');
+      if (json.AD) print(';; flags: ad (DNSSEC validated)', 'term-dim');
+
+      if (answers.length) {
+        print(';; ANSWER SECTION:', 'term-dim');
+        answers.forEach((r) => print(formatRecord(r), 'term-ok'));
+      } else if (Array.isArray(json.Authority) && json.Authority.length) {
+        print(`;; no ${qtype} records. Authority:`, 'term-warn');
+        json.Authority.slice(0, 3).forEach((r) => print(formatRecord(r), 'term-dim'));
+      } else {
+        print(`;; no ${qtype} records found`, 'term-warn');
+      }
+    } catch (err) {
+      print(`lookup failed: ${err.message}`, 'term-err');
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function lookupAll(rawHost) {
+    const host = normalizeHost(rawHost);
+    if (!host) return print(`invalid domain: "${String(rawHost || '').slice(0, 60)}"`, 'term-err');
+    for (const t of ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT']) {
+      await lookup(t, host);
+      print('');
+    }
+  }
+
+  const COMMANDS = {
+    help() {
+      printBlock([
+        'Available commands:',
+        '  dig <domain> [type]     query any record type (default A)',
+        '  a | aaaa | cname | txt | mx | ns | soa | caa <domain>',
+        '  ptr <ipv4>              reverse lookup',
+        '  all <domain>            A, AAAA, CNAME, MX, NS and TXT in one go',
+        '  resolver [cloudflare|google]   show or switch DNS resolver',
+        '  whoami | about | skills | links | date | echo <text>',
+        '  history | clear         (Ctrl+L also clears)',
+        '',
+        'Tip: Up/Down for history, Tab to autocomplete.'
+      ]);
+    },
+    clear() { out.textContent = ''; },
+    whoami() { print(CFG.github.user); },
+    about() {
+      printBlock([
+        'zurai02: Creator | Innovator | Optimizer | Script Coder',
+        'Roblox / Luau systems, tooling and performance work.'
+      ]);
+    },
+    skills() {
+      printBlock([
+        'Luau        ██████████ systems, modules, optimization',
+        'JavaScript  ████████░░ tooling, sites, automation',
+        'Security    ███████░░░ recon, DNS, hardening mindset'
+      ]);
+    },
+    links() { print(`github.com/${CFG.github.user}`); },
+    date() { print(new Date().toString()); },
+    echo(args) { print(args.join(' ')); },
+    history() { history.forEach((h, i) => print(`${String(i + 1).padStart(3)}  ${h}`)); },
+    resolver(args) {
+      const choice = (args[0] || '').toLowerCase();
+      if (!choice) return print(`current resolver: ${DNS.provider} (options: ${Object.keys(CFG.dns.providers).join(', ')})`);
+      if (!CFG.dns.providers[choice]) return print(`unknown resolver "${choice.slice(0, 30)}"`, 'term-err');
+      DNS.provider = choice;
+      print(`resolver set to ${choice}`, 'term-ok');
+    },
+    async dig(args) {
+      if (!args[0]) return print('usage: dig <domain> [A|AAAA|CNAME|TXT|MX|NS|SOA|CAA|PTR]', 'term-err');
+      const type = (args[1] || 'A').toUpperCase();
+      if (!DNS.types[type]) return print(`unsupported type "${type.slice(0, 12)}". Try: ${Object.keys(DNS.types).join(', ')}`, 'term-err');
+      await lookup(type, args[0]);
+    },
+    async all(args) {
+      if (!args[0]) return print('usage: all <domain>', 'term-err');
+      await lookupAll(args[0]);
+    },
+    sudo() { print('nice try. permission denied.', 'term-warn'); }
+  };
+
+  // shortcut commands: `a example.com`, `txt example.com`, ...
+  ['a', 'aaaa', 'cname', 'txt', 'mx', 'ns', 'soa', 'caa', 'ptr'].forEach((t) => {
+    COMMANDS[t] = async (args) => {
+      if (!args[0]) return print(`usage: ${t} ${t === 'ptr' ? '<ipv4>' : '<domain>'}`, 'term-err');
+      await lookup(t.toUpperCase(), args[0]);
+    };
+  });
+  COMMANDS.lookup = COMMANDS.dig;
+  COMMANDS.host = COMMANDS.dig;
+
+  async function run(raw) {
+    const line = raw.trim().slice(0, 300);
+    if (!line) return;
+
+    const echo = print(`${promptStr()} ${line}`, 'term-cmd');
+    echo.dataset.cmd = '1';
+
+    if (history[history.length - 1] !== line) history.push(line);
+    if (history.length > 100) history.shift();
+    hIdx = history.length;
+
+    const [cmd, ...args] = line.split(/\s+/);
+    const fn = COMMANDS[cmd.toLowerCase()];
+    if (!fn) return print(`${cmd.slice(0, 40)}: command not found. Type "help".`, 'term-err');
+
+    if (busy) return print('still working on the previous lookup...', 'term-warn');
+    try { await fn(args); } catch (err) { print(`error: ${err.message}`, 'term-err'); }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = input.value;
+    input.value = '';
+    run(v);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') {
+      if (!history.length) return;
+      e.preventDefault();
+      hIdx = Math.max(0, hIdx - 1);
+      input.value = history[hIdx] || '';
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      hIdx = Math.min(history.length, hIdx + 1);
+      input.value = history[hIdx] || '';
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const v = input.value.trim().toLowerCase();
+      if (!v || v.includes(' ')) return;
+      const hits = Object.keys(COMMANDS).filter((c) => c.startsWith(v));
+      if (hits.length === 1) input.value = hits[0] + ' ';
+      else if (hits.length > 1) print(hits.join('  '), 'term-dim');
+    } else if (e.key === 'l' && e.ctrlKey) {
+      e.preventDefault();
+      COMMANDS.clear();
+    }
+  });
+
+  // clicking the terminal focuses the input (unless selecting text)
+  out.addEventListener('click', () => {
+    if (!String(window.getSelection())) input.focus();
+  });
+
+  // quick-run chips: <button data-term-cmd="dig example.com TXT">
+  document.querySelectorAll('[data-term-cmd]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      input.value = '';
+      run(btn.dataset.termCmd);
+    });
+  });
+
+  printBlock([
+    'Welcome to the portfolio terminal.',
+    'Run real DNS lookups from your browser, e.g.:',
+    '  dig github.com AAAA',
+    '  txt google.com',
+    '  all example.com',
+    'Type "help" for everything.',
+    ''
+  ], 'term-dim');
+}
+
+/* ------------------------------------------------------------------ *
+ *  INIT
+ * ------------------------------------------------------------------ */
 function init() {
   if (DOM.year) DOM.year.textContent = new Date().getFullYear();
 
   initHeroTypewriter();
   initCursorGlow();
+  initTerminal();
+
+  // GitHub data loads in the background; the next typewriter cycle picks it up
+  loadGithubContext();
 }
 
 document.addEventListener('DOMContentLoaded', init);
