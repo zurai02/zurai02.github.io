@@ -241,7 +241,7 @@ const WasmEngine = (() => {
   }
 
   async function loadEngine() {
-    const rustModuleUrl = new URL("pkg/particle_engine.js", BASE);
+    const rustModuleUrl = new URL("particle_engine.js", BASE);
     const rustBuildExists = await fileExists(rustModuleUrl);
 
     // 1) Rust / wasm-bindgen build, used automatically if pkg/ has been built
