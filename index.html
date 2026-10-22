@@ -2,15 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>zurai02</title>
     <meta
       name="description"
       content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling."
     />
-    <meta name="theme-color" content="#0b0f17" />
+    <meta name="theme-color" content="#ff6b35" />
+    <link rel="canonical" href="https://zurai02.is-a.dev/" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="zurai02" />
+    <meta property="og:description" content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling." />
+    <meta property="og:url" content="https://zurai02.is-a.dev/" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Sends zurai02.github.io (and any other host) to the canonical domain -->
+    <script src="redirect.js"></script>
+
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="desktop-hover.css" />
   </head>
   <body>
     <div id="cursor-glow" aria-hidden="true"></div>
@@ -20,7 +40,7 @@
     <div class="page">
       <header class="topbar">
         <div class="nav-shell">
-          <a href="#" class="brand" aria-label="zurai02 home">
+          <a href="#home" class="brand" aria-label="zurai02 home">
             <span class="brand-mark"></span>
             <span>zurai02</span>
           </a>
@@ -34,7 +54,7 @@
         </div>
       </header>
 
-      <main class="hero">
+      <main id="home" class="hero">
         <div class="hero-copy">
           <div class="eyebrow">Available for work</div>
 
@@ -73,8 +93,121 @@
           <input id="term-in" type="text" autocomplete="off" spellcheck="false" aria-label="DNS command" placeholder="Try: dig github.com AAAA" />
         </form>
       </section>
+
+      <section id="about" class="section" aria-labelledby="about-h">
+        <h2 id="about-h">About</h2>
+        <p>
+          Roblox scripting and engine optimization: fast, resilient systems and Luau tooling,
+          with a focus on cutting latency and keeping client-side performance sharp.
+        </p>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Luau</h3>
+            <p>Systems, modules and optimization.</p>
+          </div>
+          <div class="card">
+            <h3>JavaScript</h3>
+            <p>Tooling, sites and automation.</p>
+          </div>
+          <div class="card">
+            <h3>Security</h3>
+            <p>Recon, DNS and a hardening mindset.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="section" aria-labelledby="work-h">
+        <h2 id="work-h">Work</h2>
+        <p>Examples of scripting work, tooling and open-source projects.</p>
+        <div class="card-grid">
+          <a class="card card-link" href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer">
+            <h3>Scripting portfolio ↗</h3>
+            <p>Custom tweening modules, a Signal library, object pooling and network batching systems.</p>
+          </a>
+          <a class="card card-link" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">
+            <h3>GitHub ↗</h3>
+            <p>Public repositories and tooling.</p>
+          </a>
+          <a class="card card-link" href="https://zurai02.is-a.dev/Blog">
+            <h3>Blog ↗</h3>
+            <p>Write-ups and notes.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="contact" class="section" aria-labelledby="contact-h">
+        <h2 id="contact-h">Contact</h2>
+        <p>The quickest way to reach me is Discord. You can also find me on DevForum and Roblox.</p>
+        <div class="contact-row">
+          <button id="copy-discord" class="btn primary copy-btn" type="button" data-copy="lol066351">Copy Discord: lol066351</button>
+          <a class="btn secondary" href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer">DevForum</a>
+          <a class="btn secondary" href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer">Roblox</a>
+          <a class="btn secondary" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </section>
+
+      <footer class="footer">© <span id="yr"></span> zurai02</footer>
     </div>
 
+    <div id="copy-toast" role="status" aria-live="polite"></div>
+
+    <!-- Order matters: wasm.js draws the particles, tapfx.js draws on top, site.js wires the page -->
+    <script src="wasm.js" defer></script>
+    <script src="tapfx.js" defer></script>
+    <script src="desktop-hover.js" defer></script>
+    <script src="chatbot.js" defer></script>
     <script src="site.js" defer></script>
+
+    <script>
+      (function () {
+        // Copy button + toast
+        var toast = document.getElementById('copy-toast');
+        var timer;
+        function showToast(msg) {
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+        var btn = document.getElementById('copy-discord');
+        if (btn) btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-copy');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+              function () { showToast('Discord copied: ' + text); },
+              function () { showToast('Discord: ' + text); }
+            );
+          } else {
+            showToast('Discord: ' + text);
+          }
+        });
+
+        // Highlight the nav link of the section in view
+        var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+        var map = {};
+        links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+        if ('IntersectionObserver' in window) {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              links.forEach(function (a) { a.classList.remove('active'); });
+              if (map[e.target.id]) map[e.target.id].classList.add('active');
+            });
+          }, { rootMargin: '-40% 0px -55% 0px' });
+          Object.keys(map).forEach(function (id) {
+            var s = document.getElementById(id);
+            if (s) io.observe(s);
+          });
+        }
+
+        // Offline support / caching (sw.js)
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
