@@ -177,8 +177,13 @@ function initHeroTypewriter() {
 function initCursorGlow() {
   if (isMob() || !DOM.glow) return;
 
-  const starLayer = document.getElementById('cursor-star-layer');
-  if (!starLayer) return;
+  let starLayer = document.getElementById('cursor-star-layer');
+  if (!starLayer) {
+    starLayer = document.createElement('div');
+    starLayer.id = 'cursor-star-layer';
+    starLayer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(starLayer);
+  }
 
   let mx = window.innerWidth / 2;
   let my = window.innerHeight / 2;
@@ -214,21 +219,26 @@ function initCursorGlow() {
     }
   }
 
-  document.addEventListener('pointermove', (e) => {
-    mx = e.clientX;
-    my = e.clientY;
+  const updatePointer = (x, y) => {
+    mx = x;
+    my = y;
     if (!vis) {
       DOM.glow.style.opacity = '1';
       vis = true;
     }
     if (Math.random() < 0.32) spawnStar(mx, my);
-  }, { passive: true });
+  };
 
-  document.addEventListener('pointerleave', () => {
+  document.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY), { passive: true });
+  document.addEventListener('pointerenter', (e) => updatePointer(e.clientX, e.clientY), { passive: true });
+  window.addEventListener('pointerleave', () => {
     DOM.glow.style.opacity = '0';
     vis = false;
   });
-
+  window.addEventListener('mouseleave', () => {
+    DOM.glow.style.opacity = '0';
+    vis = false;
+  });
   document.addEventListener('pointerdown', (e) => spawnBurst(e.clientX, e.clientY));
 
   const tick = () => {
@@ -251,6 +261,8 @@ function initCursorGlow() {
     }
     requestAnimationFrame(tick);
   };
+
+  updatePointer(mx, my);
   requestAnimationFrame(tick);
 }
 
@@ -278,22 +290,46 @@ function ipv4ToPtr(ip) {
 }
 
 async function dohQuery(name, type) {
-  const base = CFG.dns.providers[DNS.provider];
-  const url = `${base}?name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}`;
-  const ctrl = new AbortController();
-  const to = setTimeout(() => ctrl.abort(), CFG.dns.timeoutMs);
-  const t0 = performance.now();
-  try {
-    const res = await fetch(url, { headers: { Accept: 'application/dns-json' }, signal: ctrl.signal });
-    if (!res.ok) throw new Error(`resolver returned HTTP ${res.status}`);
-    const json = await res.json();
-    return { json, ms: Math.round(performance.now() - t0) };
-  } catch (err) {
-    if (err.name === 'AbortError') throw new Error('query timed out');
-    throw err;
-  } finally {
-    clearTimeout(to);
+  const providers = [DNS.provider, ...Object.keys(CFG.dns.providers).filter((providerName) => providerName !== DNS.provider)];
+  let lastError = null;
+
+  for (const providerName of providers) {
+    const base = CFG.dns.providers[providerName];
+    if (!base) continue;
+
+    const url = new URL(base);
+    url.searchParams.set('name', name);
+    url.searchParams.set('type', type);
+
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), CFG.dns.timeoutMs);
+    const t0 = performance.now();
+
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: 'application/dns-json' },
+        signal: ctrl.signal,
+        cache: 'no-store'
+      });
+
+      if (!res.ok) {
+        throw new Error(`resolver returned HTTP ${res.status}`);
+      }
+
+      const json = await res.json();
+      if (!json || typeof json !== 'object' || !Number.isInteger(json.Status)) {
+        throw new Error('resolver returned an invalid response');
+      }
+
+      return { provider: providerName, json, ms: Math.round(performance.now() - t0) };
+    } catch (err) {
+      lastError = err;
+    } finally {
+      clearTimeout(to);
+    }
   }
+
+  throw lastError || new Error('DNS lookup failed');
 }
 
 function formatRecord(r) {
@@ -345,7 +381,8 @@ function initTerminal() {
     print(`; <<>> DoH (${DNS.provider}) <<>> ${name} ${qtype}`, 'term-dim');
     busy = true;
     try {
-      const { json, ms } = await dohQuery(name, qtype);
+      const { json, ms, provider } = await dohQuery(name, qtype);
+      DNS.provider = provider;
       const status = DNS.rcodes[json.Status] || `RCODE ${json.Status}`;
       const answers = Array.isArray(json.Answer) ? json.Answer : [];
 
