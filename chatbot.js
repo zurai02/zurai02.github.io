@@ -329,6 +329,8 @@
     form.autocomplete = 'off';
     var input = el('input', 'zc-input');
     input.type = 'text';
+    input.id = 'zc-input';
+    input.name = 'zc-question';
     input.maxLength = 200;
     input.placeholder = 'Ask a question…';
     input.setAttribute('aria-label', 'Your question');
