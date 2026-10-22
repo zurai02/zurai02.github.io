@@ -29,6 +29,8 @@
     <!-- Sends zurai02.github.io (and any other host) to the canonical domain -->
     <script src="redirect.js"></script>
 
+    <!-- Applies saved light/dark, link and contrast settings before first paint -->
+    <script src="settings.js"></script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="desktop-hover.css" />
   </head>
@@ -45,12 +47,45 @@
             <span>zurai02</span>
           </a>
 
-          <nav id="nav" class="nav" aria-label="Main navigation">
-            <a href="#home" class="active">Home</a>
-            <a href="#about">About</a>
-            <a href="#work">Work</a>
-            <a href="#contact">Contact</a>
-          </nav>
+          <div class="nav-end">
+            <nav id="nav" class="nav" aria-label="Main navigation">
+              <a href="#home" class="active">Home</a>
+              <a href="#about">About</a>
+              <a href="#work">Work</a>
+              <a href="#contact">Contact</a>
+            </nav>
+
+            <button id="settings-btn" class="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div id="settings-panel" class="settings-panel" role="group" aria-labelledby="settings-title" hidden>
+            <h2 id="settings-title">Settings</h2>
+
+            <label class="setting" for="set-light">
+              <span class="setting-text">Light mode<small>Switch between dark and light colors</small></span>
+              <input id="set-light" name="set-light" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <label class="setting" for="set-links">
+              <span class="setting-text">Underline links<small>Don't rely on color to spot links</small></span>
+              <input id="set-links" name="set-links" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <label class="setting" for="set-contrast">
+              <span class="setting-text">High contrast<small>Stronger text and border contrast</small></span>
+              <input id="set-contrast" name="set-contrast" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <button id="settings-reset" class="settings-reset" type="button">Reset to defaults</button>
+          </div>
         </div>
       </header>
 
