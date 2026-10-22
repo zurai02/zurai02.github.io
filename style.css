@@ -13,6 +13,11 @@
   --green: #5fe3a1;
   --red: #ff5d6c;
   --amber: #ffcb6b;
+  --soft: rgba(255, 255, 255, 0.04);
+  --surface: rgba(10, 13, 20, 0.97);
+  --topbar-from: rgba(7, 9, 14, 0.92);
+  --topbar-to: rgba(7, 9, 14, 0);
+  --on-orange: #1a0d05;
   --radius: 16px;
   --mono: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -47,6 +52,100 @@ a { color: inherit; text-decoration: none; }
 
 .hidden, [hidden] { display: none !important; }
 
+/* ── 1b. THEMES & ACCESSIBILITY SETTINGS (set by settings.js) ── */
+:root[data-theme="light"] {
+  --bg: #f7f4f0;
+  --bg-2: #ffffff;
+  --panel: rgba(255, 255, 255, 0.88);
+  --line: rgba(26, 20, 16, 0.16);
+  --line-orange: rgba(194, 65, 12, 0.5);
+  --text: #1a1410;
+  --muted: #5b4f46;
+  --orange: #c2410c;
+  --orange-2: #cf4a0d;
+  --orange-3: #a63a0a;
+  --green: #0f7a4a;
+  --red: #b4232f;
+  --amber: #8a5a00;
+  --soft: rgba(26, 20, 16, 0.05);
+  --surface: rgba(255, 255, 255, 0.98);
+  --topbar-from: rgba(247, 244, 240, 0.94);
+  --topbar-to: rgba(247, 244, 240, 0);
+  --on-orange: #ffffff;
+  color-scheme: light;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(1100px 600px at 80% -10%, rgba(255, 107, 53, 0.14), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(255, 138, 80, 0.10), transparent 60%),
+    var(--bg);
+}
+
+:root[data-theme="light"] ::selection { background: rgba(194, 65, 12, 0.25); color: #1a1410; }
+:root[data-theme="light"] #bg-canvas { opacity: 0.55; }
+:root[data-theme="light"] .cursor-star { mix-blend-mode: normal; }
+:root[data-theme="light"] .nav-shell { box-shadow: 0 8px 30px rgba(26, 20, 16, 0.12); }
+:root[data-theme="light"] .btn.primary,
+:root[data-theme="light"] .btn-primary { box-shadow: 0 8px 22px rgba(194, 65, 12, 0.28); }
+:root[data-theme="light"] .avatar::after { text-shadow: none; }
+
+/* The DNS terminal stays dark in both themes, like a real terminal */
+.dns-panel {
+  --text: #e9edf5;
+  --muted: #9aa4b6;
+  --line: rgba(255, 255, 255, 0.10);
+  --orange: #ff6b35;
+  --orange-3: #ffb27a;
+  --green: #5fe3a1;
+  --red: #ff6b78;
+  --amber: #ffcb6b;
+  --soft: rgba(255, 255, 255, 0.04);
+}
+
+/* High contrast: pure black/white text, stronger borders, calmer background */
+:root[data-contrast="high"] {
+  --text: #ffffff;
+  --muted: #e3e8f0;
+  --line: rgba(255, 255, 255, 0.55);
+  --line-orange: #ffb27a;
+  --orange-3: #ffc999;
+  --panel: rgba(0, 0, 0, 0.92);
+  --surface: #000000;
+}
+
+:root[data-contrast="high"][data-theme="light"] {
+  --bg: #ffffff;
+  --text: #000000;
+  --muted: #1f1f1f;
+  --line: rgba(0, 0, 0, 0.7);
+  --line-orange: #7a2504;
+  --orange: #9a3412;
+  --orange-2: #9a3412;
+  --orange-3: #7a2504;
+  --panel: #ffffff;
+  --surface: #ffffff;
+}
+
+:root[data-contrast="high"] #bg-canvas { opacity: 0.18; }
+:root[data-contrast="high"] .hero-sub,
+:root[data-contrast="high"] .section p { color: var(--text); }
+:root[data-contrast="high"] .accent { -webkit-text-fill-color: var(--orange-3); color: var(--orange-3); background: none; }
+:root[data-contrast="high"] .nav a.active { box-shadow: inset 0 0 0 2px var(--orange-3); }
+
+/* Links: always underline links inside running text; the setting underlines every link */
+p a, .zc-bubble a, .footer a, .zc-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+:root[data-links="underline"] a {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 /* ── 2. LAYOUT ── */
 .page {
   position: relative;
@@ -61,7 +160,7 @@ a { color: inherit; text-decoration: none; }
   top: 0;
   z-index: 20;
   padding: 14px 0;
-  background: linear-gradient(to bottom, rgba(7, 9, 14, 0.92), rgba(7, 9, 14, 0));
+  background: linear-gradient(to bottom, var(--topbar-from), var(--topbar-to));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -106,7 +205,7 @@ a { color: inherit; text-decoration: none; }
   transition: color 0.2s ease, background 0.2s ease;
 }
 
-.nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+.nav a:hover { color: var(--text); background: var(--soft); }
 
 .nav a.active {
   color: var(--orange-3);
@@ -134,9 +233,9 @@ a { color: inherit; text-decoration: none; }
   height: 420px;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(255, 140, 70, 0.20) 0%,
-    rgba(255, 107, 53, 0.13) 22%,
-    rgba(255, 90, 30, 0.05) 42%,
+    rgba(255, 140, 70, 0.30) 0%,
+    rgba(255, 107, 53, 0.20) 22%,
+    rgba(255, 90, 30, 0.08) 42%,
     transparent 68%);
   opacity: 0;
   will-change: transform, opacity;
@@ -163,15 +262,15 @@ a { color: inherit; text-decoration: none; }
   border-radius: 50%;
   pointer-events: none;
   background: radial-gradient(circle,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 236, 214, 0.95) 18%,
-    rgba(255, 178, 122, 0.9) 38%,
-    rgba(255, 107, 53, 0.45) 62%,
-    rgba(255, 107, 53, 0) 100%);
+    rgba(255, 244, 228, 1) 0%,
+    rgba(255, 190, 120, 0.95) 22%,
+    rgba(255, 120, 50, 0.9) 45%,
+    rgba(255, 90, 20, 0.45) 68%,
+    rgba(255, 90, 20, 0) 100%);
   box-shadow:
-    0 0 10px rgba(255, 220, 180, 0.9),
-    0 0 18px rgba(255, 138, 80, 0.8),
-    0 0 28px rgba(255, 107, 53, 0.5);
+    0 0 8px rgba(255, 170, 90, 0.95),
+    0 0 16px rgba(255, 120, 40, 0.85),
+    0 0 30px rgba(255, 90, 20, 0.6);
   opacity: 0;
   mix-blend-mode: screen;
   will-change: transform, opacity;
@@ -190,13 +289,13 @@ a { color: inherit; text-decoration: none; }
 .cursor-star::before {
   width: 12px;
   height: 2px;
-  background: linear-gradient(90deg, rgba(255, 220, 180, 0), rgba(255, 244, 232, 0.95), rgba(255, 220, 180, 0));
+  background: linear-gradient(90deg, rgba(255, 150, 70, 0), rgba(255, 200, 140, 0.95), rgba(255, 150, 70, 0));
 }
 
 .cursor-star::after {
   width: 2px;
   height: 12px;
-  background: linear-gradient(180deg, rgba(255, 220, 180, 0), rgba(255, 244, 232, 0.95), rgba(255, 220, 180, 0));
+  background: linear-gradient(180deg, rgba(255, 150, 70, 0), rgba(255, 200, 140, 0.95), rgba(255, 150, 70, 0));
 }
 
 /* ── 4. HERO ── */
@@ -287,7 +386,7 @@ a { color: inherit; text-decoration: none; }
 .btn:active { transform: translateY(0); }
 
 .btn.primary {
-  color: #1a0d05;
+  color: var(--on-orange);
   background: linear-gradient(135deg, var(--orange), var(--orange-2));
   box-shadow: 0 8px 26px rgba(255, 107, 53, 0.35);
 }
@@ -296,7 +395,7 @@ a { color: inherit; text-decoration: none; }
 
 .btn.secondary {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--soft);
   border-color: var(--line);
 }
 
@@ -376,7 +475,7 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   padding: 11px 18px;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--soft);
   color: var(--muted);
   font-size: 0.78rem;
   letter-spacing: 0.04em;
@@ -416,7 +515,7 @@ a { color: inherit; text-decoration: none; }
   gap: 10px;
   padding: 12px 18px;
   border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--soft);
 }
 
 .term-prompt { color: var(--orange); font-size: 0.86rem; white-space: nowrap; font-weight: 700; }
@@ -434,7 +533,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.86rem;
 }
 
-#term-in::placeholder { color: rgba(139, 149, 167, 0.6); }
+#term-in::placeholder { color: var(--muted); opacity: 0.8; }
 
 /* ── 6. OPTIONAL SECTIONS, FOOTER & TOAST (for #about / #work / #contact) ── */
 .section { padding: 72px 0 8px; }
@@ -485,7 +584,7 @@ a { color: inherit; text-decoration: none; }
   padding: 10px 18px;
   border-radius: 999px;
   border: 1px solid var(--line-orange);
-  background: rgba(14, 18, 27, 0.95);
+  background: var(--surface);
   color: var(--orange-3);
   font-size: 0.85rem;
   opacity: 0;
@@ -523,7 +622,7 @@ a { color: inherit; text-decoration: none; }
   place-items: center;
   border: 0;
   border-radius: 50%;
-  color: #1a0d05;
+  color: var(--on-orange);
   background: linear-gradient(135deg, var(--orange), var(--orange-2));
   box-shadow: 0 10px 30px rgba(255, 107, 53, 0.45);
   cursor: pointer;
@@ -540,7 +639,7 @@ a { color: inherit; text-decoration: none; }
   max-height: min(560px, calc(100vh - 120px));
   border: 1px solid var(--line-orange);
   border-radius: var(--radius);
-  background: rgba(10, 13, 20, 0.97);
+  background: var(--surface);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   animation: zc-pop 0.22s ease both;
@@ -615,13 +714,13 @@ a { color: inherit; text-decoration: none; }
 .zc-bubble p + p { margin-top: 6px; }
 
 .zc-user .zc-bubble {
-  color: #1a0d05;
+  color: var(--on-orange);
   background: linear-gradient(135deg, var(--orange), var(--orange-2));
   border-bottom-right-radius: 4px;
 }
 
 .zc-bot .zc-bubble {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--soft);
   border: 1px solid var(--line);
   border-bottom-left-radius: 4px;
 }
@@ -669,7 +768,7 @@ a { color: inherit; text-decoration: none; }
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--soft);
   color: var(--muted);
   font: inherit;
   font-size: 0.78rem;
@@ -688,7 +787,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--line);
   border-radius: 999px;
   outline: 0;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--soft);
   color: var(--text);
   caret-color: var(--orange);
   font: inherit;
@@ -696,7 +795,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .zc-input:focus { border-color: var(--line-orange); }
-.zc-input::placeholder { color: rgba(139, 149, 167, 0.7); }
+.zc-input::placeholder { color: var(--muted); opacity: 0.85; }
 
 .zc-send {
   flex: none;
@@ -706,7 +805,7 @@ a { color: inherit; text-decoration: none; }
   place-items: center;
   border: 0;
   border-radius: 50%;
-  color: #1a0d05;
+  color: var(--on-orange);
   background: linear-gradient(135deg, var(--orange), var(--orange-2));
   cursor: pointer;
 }
@@ -792,7 +891,7 @@ a { color: inherit; text-decoration: none; }
 
 /* 404.html uses .btn-primary / .btn-ghost; alias them to the .btn variants */
 .btn-primary {
-  color: #1a0d05;
+  color: var(--on-orange);
   background: linear-gradient(135deg, var(--orange), var(--orange-2));
   box-shadow: 0 8px 26px rgba(255, 107, 53, 0.35);
 }
@@ -801,13 +900,122 @@ a { color: inherit; text-decoration: none; }
 
 .btn-ghost {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--soft);
   border-color: var(--line);
 }
 
 .btn-ghost:hover { border-color: var(--line-orange); background: rgba(255, 107, 53, 0.08); }
 .btn-arrow { margin-left: 8px; transition: transform 0.2s ease; }
 .btn:hover .btn-arrow { transform: translateX(3px); }
+
+/* ── 6e. SETTINGS (gear button + panel + switches) ── */
+.nav-shell { position: relative; }
+.nav-end { display: flex; align-items: center; gap: 6px; }
+
+.settings-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.3s ease;
+}
+
+.settings-btn:hover { border-color: var(--line-orange); background: rgba(255, 107, 53, 0.1); }
+.settings-btn[aria-expanded="true"] { border-color: var(--line-orange); transform: rotate(60deg); }
+.settings-btn svg { width: 19px; height: 19px; }
+
+.settings-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 40;
+  width: min(330px, calc(100vw - 32px));
+  padding: 8px;
+  border: 1px solid var(--line-orange);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: zc-pop 0.2s ease both;
+}
+
+.settings-panel h2 {
+  margin: 0;
+  padding: 10px 12px 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.setting:hover { background: var(--soft); }
+.setting-text { display: block; font-size: 0.95rem; font-weight: 600; }
+.setting-text small { display: block; margin-top: 2px; font-weight: 400; font-size: 0.8rem; color: var(--muted); }
+
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border: 2px solid var(--muted);
+  border-radius: 999px;
+  background: transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--muted);
+  transform: translateY(-50%);
+  transition: left 0.2s ease, background 0.2s ease;
+}
+
+.switch-input:checked + .switch { background: var(--orange); border-color: var(--orange); }
+.switch-input:checked + .switch::after { left: 23px; background: var(--on-orange); }
+.switch-input:focus-visible + .switch { outline: 2px solid var(--orange-3); outline-offset: 3px; }
+
+.settings-reset {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 10px 10px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.settings-reset:hover { color: var(--text); }
 
 /* ── 7. ANIMATIONS ── */
 @keyframes blink   { 50% { opacity: 0; } }
@@ -844,8 +1052,9 @@ a { color: inherit; text-decoration: none; }
   .dns-header { font-size: 0.72rem; }
 }
 
-/* no custom cursor effects on touch devices */
-@media (hover: none), (pointer: coarse) {
+/* no custom cursor effects on touch-only devices (a finger has no hover).
+   "and", not a comma: laptops with a touchscreen still report a fine pointer. */
+@media (hover: none) and (pointer: coarse) {
   #cursor-glow, #cursor-star-layer { display: none !important; }
 }
 
