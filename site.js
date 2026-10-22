@@ -175,7 +175,16 @@ function initHeroTypewriter() {
 }
 
 function initCursorGlow() {
-  if (isMob() || !DOM.glow) return;
+  let glow = DOM.glow || document.getElementById('cursor-glow');
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.id = 'cursor-glow';
+    glow.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(glow);
+  }
+  DOM.glow = glow;
+
+  if (isMob()) return;
 
   let starLayer = document.getElementById('cursor-star-layer');
   if (!starLayer) {
