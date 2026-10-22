@@ -1,5 +1,39 @@
 User-agent: *
+
 Allow: /
+Allow: /index.html
+Allow: /style.css
+Allow: /desktop-hover.css
+Allow: /site.js
+Allow: /wasm.js
+Allow: /engine.wasm
+Allow: /tapfx.js
+Allow: /chatbot.js
+Allow: /redirect.js
+Allow: /transformer.js
+Allow: /desktop-hover.js
+Allow: /sw.js
+Allow: /manifest.json
+Allow: /favicon.svg
+Allow: /icons.svg
+Allow: /sitemap.xml
+Allow: /.well-known/security.txt
+
 Disallow: /404.html
+
+Disallow: /site.ts
+Disallow: /server.ts
+Disallow: /lib.rs
+Disallow: /cargo.toml
+Disallow: /engine.wat
+Disallow: /particle.glsl
+Disallow: /site_optimizer.lz
+Disallow: /maintenance.js
+Disallow: /package.json
+Disallow: /tsconfig.json
+Disallow: /deploy.sh
+Disallow: /README.md
+Disallow: /CNAME
+Disallow: /.github/
 
 Sitemap: https://zurai02.is-a.dev/sitemap.xml
