@@ -13,17 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed so git log can see the last content change
 
       - name: Push the Expires date 180 days ahead
         run: |
           NEW=$(date -u -d "+180 days" +"%Y-%m-%dT00:00:00.000Z")
           sed -i "s/^Expires:.*/Expires: $NEW/" .well-known/security.txt
 
-      - name: Commit the change
+      - name: Update sitemap lastmod
+        run: |
+          # Date of the last commit that changed real site content
+          # (ignores the sitemap, security.txt and workflow files themselves)
+          LAST=$(git log -1 --format=%cs -- . ':!sitemap.xml' ':!.well-known' ':!.github')
+          sed -i -E "s#<lastmod>[0-9]{4}-[0-9]{2}-[0-9]{2}</lastmod>#<lastmod>$LAST</lastmod>#" sitemap.xml
+
+      - name: Commit the changes
         run: |
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -am "Renew security.txt expiry"
+            git commit -am "Renew security.txt expiry and sitemap lastmod"
             git push
           fi
