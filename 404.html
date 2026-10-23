@@ -19,6 +19,25 @@
   <!-- Shared styles (root-relative so this works at any 404 path) -->
   <script src="/settings.js"></script>
   <link rel="stylesheet" href="/style.css" />
+
+  <!-- Flicker fixes, scoped to this page only (style.css is shared with the home page).
+       - The card used backdrop-filter, which re-blurs the area behind it every frame while the
+         particle canvas animates there; many GPUs/browsers flicker or shimmer on that. The panel
+         colour is ~78% opaque already, so it is layered over a solid colour instead (same look).
+       - The entrance slid the card 18px while fading; the moving text can shimmer on a blurred
+         backdrop. Fade only. -->
+  <style>
+    .page-404 .nf-card {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: linear-gradient(var(--panel), var(--panel)), var(--bg-2);
+      animation: nf-fade 0.4s ease both;
+    }
+    @keyframes nf-fade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .page-404 .nf-card, .page-404 .nf-dot { animation: none; }
+    }
+  </style>
 </head>
 <body class="page-404">
 
