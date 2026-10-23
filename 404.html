@@ -66,9 +66,8 @@
   <!-- Tap/click burst effect (same order as index.html: wasm.js, tapfx.js, site.js) -->
   <script src="/tapfx.js" defer></script>
 
-  <!-- Shared script, compiled from site.ts (npx tsc --project tsconfig.json).
-       Runs initNotFound() because body has .page-404.
-       If your tsconfig outputs somewhere other than the site root, change this path (e.g. /dist/site.js). -->
-  <script src="/site.js" defer></script>
+  <!-- 404 logic (repo resolver + cursor glow). Plain JS, served as-is: GitHub Pages deploys
+       the repo root without a build, and site.js is the home page's script (no 404 handling). -->
+  <script src="/notfound.js" defer></script>
 </body>
 </html>
