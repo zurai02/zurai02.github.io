@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var CFG = { user: 'zurai02', redirectTimeout: 3500, glowLerp: 0.12 };
+  var CFG = { user: 'zurai02', redirectTimeout: 3500, glowLerp: 0.12, fontWait: 700 };
 
   function $(id) { return document.getElementById(id); }
 
@@ -56,13 +56,40 @@
 
     var user = CFG.user;
 
+    /* The card is display:none until now, so its web fonts (Inter / JetBrains Mono,
+       font-display: swap) haven't been requested yet. Revealing it straight away shows
+       the text in a fallback font that then visibly re-renders when the real font
+       arrives, which reads as flicker. So: load exactly the fonts the card uses
+       (read from its computed styles), then reveal it once. Capped so a slow or blocked
+       font host can never keep the error hidden. */
+    function loadCardFonts() {
+      if (!document.fonts || !document.fonts.load) return Promise.resolve();
+      var seen = {}, jobs = [];
+      var els = [card].concat(Array.prototype.slice.call(card.querySelectorAll('*')));
+      els.forEach(function (el) {
+        var cs = getComputedStyle(el);
+        var spec = cs.fontStyle + ' ' + cs.fontWeight + ' 16px ' + cs.fontFamily;
+        if (seen[spec]) return;
+        seen[spec] = true;
+        jobs.push(document.fonts.load(spec).catch(function () {}));
+      });
+      return Promise.all(jobs);
+    }
+
+    function revealCard() {
+      var shown = false;
+      function go() { if (shown) return; shown = true; card.hidden = false; }
+      setTimeout(go, CFG.fontWait);
+      loadCardFonts().then(go, go);
+    }
+
     function showError(errTitle, tag, buildMsg) {
       title.textContent = errTitle;
       badge.textContent = tag;
       msg.textContent = '';
       buildMsg(msg);
       document.title = errTitle + ' — ' + user;
-      card.hidden = false;
+      revealCard();
     }
 
     var segments = location.pathname.split('/').filter(Boolean);
