@@ -15,7 +15,7 @@
   var L = {
     portfolio: { label: 'DevForum portfolio', href: 'https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442' },
     devforum:  { label: 'DevForum profile',   href: 'https://devforum.roblox.com/u/zurai02' },
-    blog:      { label: 'Blog',               href: 'https://zurai02.is-a.dev/Blog' },
+    blog:      { label: 'Blog',               href: 'https://zurai02.is-a.dev/blog' },
     github:    { label: 'GitHub',             href: 'https://github.com/zurai02' },
     roblox:    { label: 'Roblox profile',     href: 'https://www.roblox.com/users/5674181802/profile' }
   };
