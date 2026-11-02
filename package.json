@@ -11,6 +11,7 @@
     "check": "tsc --project tsconfig.json --noEmit",
     "start": "node dist/server.js",
     "deploy": "gh-pages -d .",
+    "minify": "bash ./scripts/minify-assets.sh",
     "ai:train": "node ai.js train",
     "ai:serve": "node ai.js serve"
   },
