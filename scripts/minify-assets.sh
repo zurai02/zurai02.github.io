@@ -12,13 +12,17 @@ fi
 minify_js() {
   local src="$1"
   local out="$2"
-  npx --yes terser "$src" -c -m -o "$out"
+  if [[ -f "$src" ]]; then
+    npx --yes terser "$src" -c -m --module -o "$out"
+  fi
 }
 
 minify_css() {
   local src="$1"
   local out="$2"
-  npx --yes cleancss -o "$out" "$src"
+  if [[ -f "$src" ]]; then
+    npx --yes cleancss -o "$out" "$src"
+  fi
 }
 
 minify_js "site.js" "site.min.js"
@@ -35,4 +39,4 @@ minify_js "wasm.js" "wasm.min.js"
 minify_css "style.css" "style.min.css"
 minify_css "desktop-hover.css" "desktop-hover.min.css"
 
-echo "Minified JS and CSS assets written to the repository root."
+echo "Minified JS and CSS assets were generated in the repo root."

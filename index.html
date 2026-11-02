@@ -26,13 +26,10 @@
       rel="stylesheet"
     />
 
-    <!-- Sends zurai02.github.io (and any other host) to the canonical domain -->
-    <script src="redirect.js"></script>
-
-    <!-- Applies saved light/dark, link and contrast settings before first paint -->
-    <script src="settings.js"></script>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="desktop-hover.css" />
+    <script src="redirect.min.js"></script>
+    <script src="settings.min.js"></script>
+    <link rel="stylesheet" href="style.min.css" />
+    <link rel="stylesheet" href="desktop-hover.min.css" />
   </head>
   <body>
     <div id="cursor-glow" aria-hidden="true"></div>
@@ -58,7 +55,7 @@
             <button id="settings-btn" class="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51" />
               </svg>
             </button>
           </div>
@@ -186,16 +183,14 @@
 
     <div id="copy-toast" role="status" aria-live="polite"></div>
 
-    <!-- Order matters: wasm.js draws the particles, tapfx.js draws on top, site.js wires the page -->
-    <script src="wasm.js" defer></script>
-    <script src="tapfx.js" defer></script>
-    <script src="desktop-hover.js" defer></script>
-    <script src="chatbot.js" defer></script>
-    <script src="site.js" defer></script>
+    <script src="wasm.min.js" defer></script>
+    <script src="tapfx.min.js" defer></script>
+    <script src="desktop-hover.min.js" defer></script>
+    <script src="chatbot.min.js" defer></script>
+    <script src="site.min.js" defer></script>
 
     <script>
       (function () {
-        // Copy button + toast
         var toast = document.getElementById('copy-toast');
         var timer;
         function showToast(msg) {
@@ -218,7 +213,6 @@
           }
         });
 
-        // Highlight the nav link of the section in view
         var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
         var map = {};
         links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
@@ -236,7 +230,6 @@
           });
         }
 
-        // Offline support / caching (sw.js)
         if ('serviceWorker' in navigator && location.protocol === 'https:') {
           window.addEventListener('load', function () {
             navigator.serviceWorker.register('/sw.js').catch(function () {});
