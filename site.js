@@ -1,3 +1,4 @@
+(() => {
 'use strict';
 
 const CFG = {
@@ -573,3 +574,4 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+})();
