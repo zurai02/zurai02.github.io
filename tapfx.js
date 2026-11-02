@@ -1,153 +1,269 @@
-/**
- * tapfx.js — Tap/click burst particles for zurai02.github.io
- * Add to index.html: <script src="tapfx.js" defer></script>
- */
+(function () {
+  'use strict';
 
-(() => {
-  const CANVAS_ID    = "bg-canvas";
-  const COLOR        = [255, 107, 53];   // #ff6b35
-  const BURST_COUNT  = 18;               // particles per tap
-  const SPEED        = 4.5;
-  const SIZE_MAX     = 4.5;
-  const LIFE         = 0.7;              // seconds until fully faded
-  const TRAIL        = 0.92;             // motion blur trail (lower = longer)
-
-  let canvas, ctx;
-  const bursts = [];   // active tap particles
-
-  // ── Particle ───────────────────────────────────────────────────────────────
-  class TapParticle {
-    constructor(x, y) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * SPEED + 1;
-      this.x     = x;
-      this.y     = y;
-      this.vx    = Math.cos(angle) * speed;
-      this.vy    = Math.sin(angle) * speed;
-      this.size  = Math.random() * SIZE_MAX + 1.5;
-      this.life  = 1.0;   // 1 = full, 0 = dead
-      this.decay = (Math.random() * 0.5 + 0.7) / (LIFE * 60);
+  const scheduleIdle = (fn) => {
+    const run = () => { try { fn(); } catch (err) { console.warn('[chatbot] init failed', err); } };
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(run, { timeout: 1200 });
+    } else {
+      window.setTimeout(run, 350);
     }
+  };
 
-    update() {
-      this.x    += this.vx;
-      this.y    += this.vy;
-      this.vx   *= 0.92;   // drag
-      this.vy   *= 0.92;
-      this.vy   += 0.08;   // gravity
-      this.life -= this.decay;
-      this.size *= 0.97;
-    }
+  /* ── Public links (edit freely) ───────────────────────────────────────── */
+  var L = {
+    portfolio: { label: 'DevForum portfolio', href: 'https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442/' },
+    devforum:  { label: 'DevForum profile',   href: 'https://devforum.roblox.com/u/zurai02/' },
+    blog:      { label: 'Blog',               href: 'https://zurai02.is-a.dev/blog' },
+    github:    { label: 'GitHub',             href: 'https://github.com/zurai02/' },
+    roblox:    { label: 'Roblox profile',     href: 'https://www.roblox.com/users/5674181802/profile/' }
+  };
 
-    draw(ctx) {
-      const alpha = Math.max(0, this.life);
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${COLOR[0]},${COLOR[1]},${COLOR[2]},${alpha.toFixed(3)})`;
-      ctx.fill();
-    }
+  var DISCORD = 'lol066351';
+
+  var KB = [
+    { id: 'about', keys: ['about', 'intro', 'introduce', 'bio', 'background', 'specialist', 'developer', 'scripter', 'programmer', 'roblox', 'luau', 'profession', 'job', 'occupation', 'doing', 'creator'], phrases: ['who is', 'what do', 'tell me about', 'what does', 'what is zurai02', 'what is he', 'what is she'], answer: 'zurai02 is a Roblox Scripting & Engine Optimization Specialist. They write Luau and focus on squeezing out every frame and byte: client-side performance, lightweight networking and resilient systems.', links: [L.portfolio] },
+    { id: 'skills', keys: ['skill', 'specialize', 'specialise', 'expertise', 'good', 'strength', 'capable', 'ability', 'speciality', 'specialty', 'offer', 'expert'], phrases: ['what can', 'good at', 'key skills', 'areas of'], answer: 'Three main areas:\n\n1. Client-side optimization: custom tweening modules that bypass TweenService limits.\n2. Performance analysis: MicroProfiler, StreamingEnabled setups and leak-resistant systems.\n3. Systems design: networking, pooling and robust architecture.', links: [L.portfolio] },
+    { id: 'contact', keys: ['contact', 'reach', 'message', 'dm', 'touch', 'talk', 'speak', 'chat', 'social', 'socials', 'where', 'find', 'discord', 'username', 'tag', 'add'], phrases: ['get in touch', 'how do i', 'how can i', 'find you', 'find them', 'your discord', 'their discord'], answer: 'The quickest way is Discord: ' + DISCORD + ' (there\'s a tap-to-copy button on the site). You can also reach them through DevForum.', links: [L.devforum, L.portfolio, L.github] },
+    { id: 'help', keys: ['help', 'ask', 'topics', 'options', 'menu', 'commands'], phrases: ['what can i ask', 'what can you do', 'what can you tell'], answer: 'You can ask me about zurai02\'s skills, tech stack, projects, blog, or how to get in touch. Tap a suggestion below, or type your own question.', links: [] }
+  ];
+
+  var SMALLTALK = [
+    { test: /^(hi|hello|hey|heya|hiya|yo|sup|hola|salam|assalam[a-z ]*|good (morning|afternoon|evening)|greetings)\b/, answer: 'Hey! Ask me anything about zurai02: what they do, their skills, their tech stack, or how to get in touch.' },
+    { test: /^(thanks|thank you|thx|ty|cheers|appreciate)\b/, answer: 'You\'re welcome! Anything else you\'d like to know?' },
+    { test: /^(bye|goodbye|cya|see ya|later|gn|good night)\b/, answer: 'See you around!' }
+  ];
+
+  var FALLBACK = 'I don\'t have an answer for that. I only know what\'s on zurai02\'s portfolio. Try asking about their skills, tech stack or how to get in touch.';
+  var SUGGESTIONS = ['What do you do?', 'Skills', 'Tech stack', 'See their work', 'Contact'];
+
+  var STOP = {};
+  ('a an the is are was were be been am do does did can could would should will you your yours he she they them their his her him it its i me my we our us ' +
+   'of in on at to for with from by as and or but if so this that these those there here what whats who whos how hows when where why which tell please any ' +
+   'has have had get know want about zurai zurai02 s t just really also very much more some').split(' ').forEach(function (w) { STOP[w] = 1; });
+
+  function normalize(s) {
+    return String(s).toLowerCase().replace(/[‘’]/g, "'").replace(/'/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
-  // ── Spawn burst ────────────────────────────────────────────────────────────
-  // The overlay canvas is only shown while a burst is playing. A permanent
-  // full-screen canvas on top of the page costs GPU time on phones for nothing.
-  let layerOn = false;
-  function showLayer() {
-    // size it now (not on every resize event): assigning width clears the canvas
-    // and fires constantly while the mobile address bar slides in and out
-    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    if (!layerOn) { canvas.style.display = "block"; layerOn = true; }
-  }
-  function hideLayer() {
-    if (!layerOn) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.style.display = "none";
-    layerOn = false;
+  function stem(w) {
+    if (w.length > 5 && /ing$/.test(w)) return w.slice(0, -3);
+    if (w.length > 4 && /ed$/.test(w)) return w.slice(0, -2);
+    if (w.length > 4 && /es$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+    return w;
   }
 
-  function spawnBurst(x, y) {
-    showLayer();
-    for (let i = 0; i < BURST_COUNT; i++) {
-      bursts.push(new TapParticle(x, y));
-    }
-    // Ring flash
-    bursts.push({ ring: true, x, y, r: 2, life: 1.0 });
+  function tokens(norm) {
+    return norm.split(' ').filter(function (w) { return w && !STOP[w]; }).map(stem);
   }
 
-  // ── Draw ring flash ────────────────────────────────────────────────────────
-  function drawRing(ctx, p) {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(${COLOR[0]},${COLOR[1]},${COLOR[2]},${(p.life * 0.8).toFixed(3)})`;
-    ctx.lineWidth   = 1.5;
-    ctx.stroke();
-    p.r    += 3.5;
-    p.life -= 0.07;
-  }
+  function answer(input) {
+    var norm = normalize(input);
+    if (!norm) return null;
 
-  // ── Animation loop ─────────────────────────────────────────────────────────
-  let lastTime = performance.now();
-
-  function loop(now) {
-    requestAnimationFrame(loop);
-    if (!bursts.length) { hideLayer(); return; }
-
-    // Only clear/redraw the tap layer if there are active particles.
-    // We draw on top of the existing bg-canvas (bg particles are drawn first by wasm.js).
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = bursts.length - 1; i >= 0; i--) {
-      const p = bursts[i];
-      if (p.ring) {
-        drawRing(ctx, p);
-        if (p.life <= 0) bursts.splice(i, 1);
-      } else {
-        p.update();
-        p.draw(ctx);
-        if (p.life <= 0) bursts.splice(i, 1);
+    if (norm.split(' ').length <= 5) {
+      for (var i = 0; i < SMALLTALK.length; i++) {
+        if (SMALLTALK[i].test.test(norm)) return { text: SMALLTALK[i].answer, links: [], id: 'smalltalk' };
       }
     }
+
+    var best = null, bestScore = 0;
+    for (var j = 0; j < KB.length; j++) {
+      var toks = tokens(norm);
+      var score = 0;
+      if ((" " + norm + " ").indexOf(' ' + KB[j].phrases[0] + ' ') !== -1) score += 3;
+      if (KB[j].keys.some((k) => norm.indexOf(k) !== -1)) score += 2;
+      if (score > bestScore) { best = KB[j]; bestScore = score; }
+    }
+
+    if (best && bestScore >= 2) return { text: best.answer, links: best.links, id: best.id };
+    return { text: FALLBACK, links: [], id: 'fallback', chips: true };
   }
 
-  // ── Setup ──────────────────────────────────────────────────────────────────
-  function setup() {
-    // Create a dedicated overlay canvas so we don't fight with wasm.js
-    const overlay       = document.createElement("canvas");
-    overlay.id          = "tap-canvas";
-    overlay.style.cssText = `
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      display: none;
-    `;
-    overlay.width  = window.innerWidth;
-    overlay.height = window.innerHeight;
-    document.body.appendChild(overlay);
+  if (typeof document === 'undefined') return;
 
-    canvas = overlay;
-    ctx    = canvas.getContext("2d");
+  var SVGNS = 'http://www.w3.org/2000/svg';
 
-    // (no resize listener: the canvas is resized lazily in showLayer())
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
 
-    // Tap + click
-    window.addEventListener("pointerdown", e => {
-      spawnBurst(e.clientX, e.clientY);
+  function icon(paths) {
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', '22');
+    svg.setAttribute('height', '22');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    paths.forEach(function (d) {
+      var p = document.createElementNS(SVGNS, 'path');
+      p.setAttribute('d', d);
+      svg.appendChild(p);
+    });
+    return svg;
+  }
+
+  function init() {
+    if (document.getElementById('zc-root')) return;
+
+    var root = el('div', 'zc-root'); root.id = 'zc-root';
+    var toggle = el('button', 'zc-toggle');
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Ask about zurai02');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', 'zc-panel');
+    toggle.appendChild(icon(['M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z']));
+
+    var panel = el('div', 'zc-panel');
+    panel.id = 'zc-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Chat about zurai02');
+    panel.hidden = true;
+
+    var head = el('div', 'zc-head');
+    var titleWrap = el('div', 'zc-title');
+    titleWrap.appendChild(el('span', 'zc-dot'));
+    var tt = el('div');
+    tt.appendChild(el('strong', null, 'Ask about zurai02'));
+    tt.appendChild(el('small', null, 'Answers from the public portfolio'));
+    titleWrap.appendChild(tt);
+    var closeBtn = el('button', 'zc-icon-btn');
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close chat');
+    closeBtn.appendChild(icon(['M18 6 6 18', 'm6 6 12 12']));
+    head.appendChild(titleWrap);
+    head.appendChild(closeBtn);
+
+    var log = el('div', 'zc-log');
+    log.setAttribute('role', 'log');
+    log.setAttribute('aria-live', 'polite');
+    log.setAttribute('aria-label', 'Conversation');
+
+    var chips = el('div', 'zc-chips');
+
+    var form = el('form', 'zc-form');
+    form.autocomplete = 'off';
+    var input = el('input', 'zc-input');
+    input.type = 'text';
+    input.id = 'zc-input';
+    input.name = 'zc-question';
+    input.maxLength = 200;
+    input.placeholder = 'Ask a question…';
+    input.setAttribute('aria-label', 'Your question');
+    var send = el('button', 'zc-send');
+    send.type = 'submit';
+    send.setAttribute('aria-label', 'Send');
+    send.appendChild(icon(['M22 2 11 13', 'M22 2 15 22l-4-9-9-4 20-7z']));
+    form.appendChild(input);
+    form.appendChild(send);
+
+    panel.appendChild(head);
+    panel.appendChild(log);
+    panel.appendChild(chips);
+    panel.appendChild(form);
+    root.appendChild(panel);
+    root.appendChild(toggle);
+    document.body.appendChild(root);
+
+    function scrollDown() { log.scrollTop = log.scrollHeight; }
+    function addUser(text) {
+      var row = el('div', 'zc-msg zc-user');
+      row.appendChild(el('div', 'zc-bubble', text));
+      log.appendChild(row);
+      scrollDown();
+    }
+    function addBot(res) {
+      var row = el('div', 'zc-msg zc-bot');
+      var b = el('div', 'zc-bubble');
+      res.text.split('\n').forEach(function (line) { if (line.trim()) b.appendChild(el('p', null, line)); });
+      if (res.links && res.links.length) {
+        var wrap = el('div', 'zc-links');
+        res.links.forEach(function (l) {
+          var a = el('a', 'zc-link', l.label + ' ↗');
+          a.href = l.href;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          wrap.appendChild(a);
+        });
+        b.appendChild(wrap);
+      }
+      row.appendChild(b);
+      log.appendChild(row);
+      scrollDown();
+    }
+    function typing() {
+      var row = el('div', 'zc-msg zc-bot zc-typing');
+      var b = el('div', 'zc-bubble');
+      b.setAttribute('aria-label', 'zurai02 assistant is typing');
+      for (var i = 0; i < 3; i++) b.appendChild(el('span', 'zc-tdot'));
+      row.appendChild(b);
+      log.appendChild(row);
+      scrollDown();
+      return row;
+    }
+    function ask(q) {
+      q = q.trim();
+      if (!q) return;
+      addUser(q);
+      var res = answer(q);
+      if (!res) return;
+      var t = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? null : typing();
+      window.setTimeout(function () {
+        if (t) t.remove();
+        addBot(res);
+      }, window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 350 + Math.min(res.text.length * 3, 500));
+    }
+
+    SUGGESTIONS.forEach(function (s) {
+      var c = el('button', 'zc-chip', s);
+      c.type = 'button';
+      c.addEventListener('click', function () { ask(s); input.focus(); });
+      chips.appendChild(c);
     });
 
-    requestAnimationFrame(loop);
-    console.log("[tapfx] tap particles ready.");
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = input.value;
+      input.value = '';
+      ask(v);
+    });
+
+    var greeted = false;
+    function open() {
+      panel.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      root.classList.add('zc-open');
+      if (!greeted) {
+        greeted = true;
+        addBot({ text: 'Hi! I\'m a small assistant for zurai02\'s portfolio. Ask me about their work, skills or how to get in touch.', links: [] });
+      }
+      window.setTimeout(function () { input.focus(); }, 30);
+    }
+    function close() {
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      root.classList.remove('zc-open');
+      toggle.focus();
+    }
+
+    toggle.addEventListener('click', function () { panel.hidden ? open() : close(); });
+    closeBtn.addEventListener('click', close);
+    panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setup);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      scheduleIdle(init);
+    });
   } else {
-    setup();
+    scheduleIdle(init);
   }
-
 })();
