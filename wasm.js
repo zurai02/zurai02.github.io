@@ -1,10 +1,9 @@
 /**
  * wasm.js — background particle canvas for zurai02.github.io
  *
- * Engine load order (first one that works wins, all share one interface):
- *   1. Rust / wasm-bindgen build   ./pkg/particle_engine.js   (only if you built it)
- *   2. engine.wat                  compiled in the browser by the tiny assembler below
- *   3. plain JavaScript            always available
+ * Engine load order:
+ *   1. engine.wat                  compiled in the browser by the tiny assembler below
+ *   2. plain JavaScript            always available
  *
  * Interface every engine provides:
  *   set_particle(i,x,y,vx,vy,alpha,size)  update(w,h,dt)
@@ -44,19 +43,6 @@ const WasmEngine = (() => {
   const rand     = (mn, mx) => mn + Math.random() * (mx - mn);
   const randSign = ()        => Math.random() < 0.5 ? 1 : -1;
 
-  async function fileExists(url) {
-    try {
-      const res = await fetch(url, {
-        method: "HEAD",
-        cache: "no-store",
-        credentials: "omit",
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  }
-
   // ── Minimal WAT -> WASM assembler ────────────────────────────────────────
   // Supports the folded-instruction subset used by engine.wat (i32/f32 maths,
   // locals, memory load/store, if/else, block/loop/br/br_if, call).
@@ -83,7 +69,6 @@ const WasmEngine = (() => {
     const nameB   = s => { const b = Array.from(new TextEncoder().encode(s)); return [...uleb(b.length), ...b]; };
     const f32b    = v => { const dv = new DataView(new ArrayBuffer(4)); dv.setFloat32(0, v, true); return Array.from(new Uint8Array(dv.buffer)); };
 
-    // tokenise + parse into nested arrays
     const clean = src.replace(/;;[^\n]*/g, "");
     if (clean.includes("(;")) throw new SyntaxError("block comments not supported");
     const toks = clean.match(/\(|\)|"(?:[^"\\]|\\.)*"|[^\s()";]+/g) || [];
@@ -241,25 +226,9 @@ const WasmEngine = (() => {
   }
 
   async function loadEngine() {
-    const rustModuleUrl = new URL("particle_engine.js", BASE);
-    const rustBuildExists = await fileExists(rustModuleUrl);
-
-    // 1) Rust / wasm-bindgen build, used automatically if pkg/ has been built
-    if (rustBuildExists) {
-      try {
-        const mod = await import(rustModuleUrl.href);
-        await mod.default();
-        engine = new mod.ParticleEngine(PARTICLE_COUNT);
-        console.log("[wasm] Rust engine loaded.");
-        return;
-      } catch (err) {
-        console.warn("[wasm] Rust engine import failed, falling back to WAT/JS.", err);
-      }
-    } else {
-      console.info("[wasm] Rust build not present, trying engine.wat.");
-    }
-
-    // 2) engine.wat, compiled right here in the browser
+    // Only try the in-browser WAT engine. Do not attempt to fetch a nonexistent
+    // Rust module from /particle_engine.js; that file is not shipped here and it
+    // produces a 404 on every page load.
     try {
       const res = await fetch(new URL("engine.wat", BASE));
       if (!res.ok) throw new Error("engine.wat HTTP " + res.status);
@@ -277,10 +246,9 @@ const WasmEngine = (() => {
       console.log("[wasm] engine.wat compiled in-browser: particle engine running natively.");
       return;
     } catch (err) {
-      console.warn("[wasm] fallback to JS.", err);
+      console.warn("[wasm] falling back to JS.", err);
     }
 
-    // 3) plain JavaScript
     engine = makeJSEngine();
   }
 
@@ -304,7 +272,6 @@ const WasmEngine = (() => {
     engine.update(w, h, dt * 60);
     ctx.clearRect(0, 0, w, h);
 
-    // connection lines: grouped into a few opacity levels, one path + one stroke each
     for (const b of lineBuckets) b.length = 0;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const xi = engine.get_x(i), yi = engine.get_y(i);
@@ -324,7 +291,6 @@ const WasmEngine = (() => {
       ctx.stroke();
     }
 
-    // dots: grouped by opacity, one path + one fill each
     for (const b of dotBuckets) b.length = 0;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const lvl = Math.max(0, Math.min(DOT_LEVELS - 1, (((engine.get_alpha(i) - 0.3) / 0.6) * DOT_LEVELS) | 0));
@@ -340,9 +306,6 @@ const WasmEngine = (() => {
     }
   }
 
-  // ── Canvas sizing ────────────────────────────────────────────────────────
-  // Assigning canvas.width clears and reallocates the canvas, so only do it
-  // when it is really needed (see the performance notes at the top).
   function sizeCanvas(c) {
     const w = window.innerWidth, h = window.innerHeight;
     if (w === c.width && Math.abs(h - c.height) <= RESIZE_TOL) return;
@@ -352,7 +315,7 @@ const WasmEngine = (() => {
   async function init(canvas) {
     if (!canvas || running) return;
     running = true;
-    window.__wasmParticlesActive = true;   // tells site.ts's fallback not to draw on this canvas
+    window.__wasmParticlesActive = true;
 
     const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -363,10 +326,10 @@ const WasmEngine = (() => {
     });
 
     await loadEngine();
-    if (!running) return;                  // stop() was called while loading
+    if (!running) return;
     seedParticles(canvas.width, canvas.height);
 
-    if (REDUCED) { draw(ctx, canvas.width, canvas.height, 0); return; }   // one still frame
+    if (REDUCED) { draw(ctx, canvas.width, canvas.height, 0); return; }
 
     let last = performance.now();
     function frame(now) {
