@@ -12,7 +12,7 @@
 
 'use strict';
 
-const VERSION       = 'v6';
+const VERSION       = 'v7';
 const SHELL_CACHE   = `zurai02-shell-${VERSION}`;
 const FONT_CACHE    = `zurai02-fonts-${VERSION}`;
 const IMAGE_CACHE   = `zurai02-images-${VERSION}`;
