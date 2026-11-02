@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Cache and build outputs
+.cache/
+dist/
+pkg/
+target/
+
+# OS files
+.DS_Store
+Thumbs.db
