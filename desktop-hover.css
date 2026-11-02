@@ -1,0 +1,62 @@
+@media (hover: none), (pointer: coarse) {
+  #cursor-glow,
+  #tap-canvas,
+  #back-to-top,
+  #copy-toast {
+    display: none !important;
+  }
+
+  .btn,
+  .btn:hover,
+  .badge,
+  .badge:hover,
+  .skill-card,
+  .skill-card:hover,
+  .link-card,
+  .link-card:hover,
+  .nav-links a,
+  .nav-links a:hover,
+  .nav-links a.active {
+    transform: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  .btn::before,
+  .skill-card::before,
+  .skill-card::after,
+  .link-card::before,
+  .link-card::after {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  .skill-card:hover .skill-icon,
+  .link-card:hover .link-icon,
+  .skill-card:hover,
+  .link-card:hover,
+  .badge:hover,
+  .btn:hover,
+  .nav-links a:hover {
+    transform: none !important;
+    scale: 1 !important;
+  }
+
+  .reveal,
+  .reveal.visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn,
+  .skill-card,
+  .link-card,
+  .badge,
+  .nav-links a {
+    will-change: transform, box-shadow;
+  }
+}

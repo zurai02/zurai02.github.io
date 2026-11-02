@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>zurai02</title>
+    <meta
+      name="description"
+      content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling."
+    />
+    <meta name="theme-color" content="#ff6b35" />
+    <link rel="canonical" href="https://zurai02.is-a.dev/" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="zurai02" />
+    <meta property="og:description" content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling." />
+    <meta property="og:url" content="https://zurai02.is-a.dev/" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="redirect.min.js"></script>
+    <script src="settings.min.js"></script>
+    <link rel="stylesheet" href="style.min.css" />
+    <link rel="stylesheet" href="desktop-hover.min.css" />
+  </head>
+  <body>
+    <div id="cursor-glow" aria-hidden="true"></div>
+    <div id="cursor-star-layer" aria-hidden="true"></div>
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <div class="page">
+      <header class="topbar">
+        <div class="nav-shell">
+          <a href="#home" class="brand" aria-label="zurai02 home">
+            <span class="brand-mark"></span>
+            <span>zurai02</span>
+          </a>
+
+          <div class="nav-end">
+            <nav id="nav" class="nav" aria-label="Main navigation">
+              <a href="#home" class="active">Home</a>
+              <a href="#about">About</a>
+              <a href="#work">Work</a>
+              <a href="#contact">Contact</a>
+            </nav>
+
+            <button id="settings-btn" class="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51" />
+              </svg>
+            </button>
+          </div>
+
+          <div id="settings-panel" class="settings-panel" role="group" aria-labelledby="settings-title" hidden>
+            <h2 id="settings-title">Settings</h2>
+
+            <label class="setting" for="set-light">
+              <span class="setting-text">Light mode<small>Switch between dark and light colors</small></span>
+              <input id="set-light" name="set-light" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <label class="setting" for="set-links">
+              <span class="setting-text">Underline links<small>Don't rely on color to spot links</small></span>
+              <input id="set-links" name="set-links" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <label class="setting" for="set-contrast">
+              <span class="setting-text">High contrast<small>Stronger text and border contrast</small></span>
+              <input id="set-contrast" name="set-contrast" class="switch-input" type="checkbox" role="switch" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <button id="settings-reset" class="settings-reset" type="button">Reset to defaults</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="home" class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Available for work</div>
+
+          <h1 class="hero-title">
+            <span>Hi, I’m</span><br />
+            <span class="accent">zurai02</span>
+          </h1>
+
+          <p id="hero-sub" class="hero-sub"></p>
+
+          <div class="cta-row">
+            <a href="#about" class="btn primary">About Me</a>
+            <a href="#contact" class="btn secondary">Get in Touch</a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="avatar-ring">
+            <div class="avatar"></div>
+          </div>
+        </div>
+      </main>
+
+      <div class="dns-toggle-wrap">
+        <button id="dns-toggle" class="dns-toggle" type="button" aria-expanded="true">Hide DNS Terminal</button>
+      </div>
+
+      <section id="dns-panel" class="dns-panel open" aria-label="DNS lookup terminal">
+        <div class="dns-header">
+          <span>DNS Lookup</span>
+          <span>DoH • browser-side</span>
+        </div>
+        <div id="term-out" class="term-output" aria-live="polite"></div>
+        <form id="term-form" class="term-form">
+          <span id="term-prompt" class="term-prompt">zurai02@portfolio:~$</span>
+          <input id="term-in" type="text" autocomplete="off" spellcheck="false" aria-label="DNS command" placeholder="Try: dig github.com AAAA" />
+        </form>
+      </section>
+
+      <section id="about" class="section" aria-labelledby="about-h">
+        <h2 id="about-h">About</h2>
+        <p>
+          Roblox scripting and engine optimization: fast, resilient systems and Luau tooling,
+          with a focus on cutting latency and keeping client-side performance sharp.
+        </p>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Luau</h3>
+            <p>Systems, modules and optimization.</p>
+          </div>
+          <div class="card">
+            <h3>JavaScript</h3>
+            <p>Tooling, sites and automation.</p>
+          </div>
+          <div class="card">
+            <h3>Security</h3>
+            <p>Recon, DNS and a hardening mindset.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="section" aria-labelledby="work-h">
+        <h2 id="work-h">Work</h2>
+        <p>Examples of scripting work, tooling and open-source projects.</p>
+        <div class="card-grid">
+          <a class="card card-link" href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer">
+            <h3>Scripting portfolio ↗</h3>
+            <p>Custom tweening modules, a Signal library, object pooling and network batching systems.</p>
+          </a>
+          <a class="card card-link" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">
+            <h3>GitHub ↗</h3>
+            <p>Public repositories and tooling.</p>
+          </a>
+          <a class="card card-link" href="https://zurai02.is-a.dev/blog/">
+            <h3>Blog ↗</h3>
+            <p>Write-ups and notes.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="contact" class="section" aria-labelledby="contact-h">
+        <h2 id="contact-h">Contact</h2>
+        <p>The quickest way to reach me is Discord. You can also find me on DevForum and Roblox.</p>
+        <div class="contact-row">
+          <button id="copy-discord" class="btn primary copy-btn" type="button" data-copy="lol066351">Copy Discord: lol066351</button>
+          <a class="btn secondary" href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer">DevForum</a>
+          <a class="btn secondary" href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer">Roblox</a>
+          <a class="btn secondary" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </section>
+
+      <footer class="footer">© <span id="yr"></span> zurai02</footer>
+    </div>
+
+    <div id="copy-toast" role="status" aria-live="polite"></div>
+
+    <script src="wasm.min.js" defer></script>
+    <script src="tapfx.min.js" defer></script>
+    <script src="desktop-hover.min.js" defer></script>
+    <script src="chatbot.min.js" defer></script>
+    <script src="site.min.js" defer></script>
+
+    <script>
+      (function () {
+        var toast = document.getElementById('copy-toast');
+        var timer;
+        function showToast(msg) {
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+        var btn = document.getElementById('copy-discord');
+        if (btn) btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-copy');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+              function () { showToast('Discord copied: ' + text); },
+              function () { showToast('Discord: ' + text); }
+            );
+          } else {
+            showToast('Discord: ' + text);
+          }
+        });
+
+        var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+        var map = {};
+        links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+        if ('IntersectionObserver' in window) {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              links.forEach(function (a) { a.classList.remove('active'); });
+              if (map[e.target.id]) map[e.target.id].classList.add('active');
+            });
+          }, { rootMargin: '-40% 0px -55% 0px' });
+          Object.keys(map).forEach(function (id) {
+            var s = document.getElementById(id);
+            if (s) io.observe(s);
+          });
+        }
+
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

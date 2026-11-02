@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#ff6b35" />
+  <title>404 — zurai02</title>
+
+  <!-- Fonts matching zurai02.is-a.dev -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Canonical host redirect (synchronous, root-relative so it works at any 404 path) -->
+  <script src="/redirect.js"></script>
+
+  <!-- Shared styles (root-relative so this works at any 404 path) -->
+  <script src="/settings.js"></script>
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- Flicker fixes, scoped to this page only (style.css is shared with the home page).
+       - The card used backdrop-filter, which re-blurs the area behind it every frame while the
+         particle canvas animates there; many GPUs/browsers flicker or shimmer on that. The panel
+         colour is ~78% opaque already, so it is layered over a solid colour instead (same look).
+       - The entrance slid the card 18px while fading; the moving text can shimmer on a blurred
+         backdrop. Fade only. -->
+  <style>
+    .page-404 .nf-card {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: linear-gradient(var(--panel), var(--panel)), var(--bg-2);
+      animation: nf-fade 0.4s ease both;
+    }
+    @keyframes nf-fade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .page-404 .nf-card, .page-404 .nf-dot { animation: none; }
+    }
+  </style>
+</head>
+<body class="page-404">
+
+  <!-- Particle background (same canvas index.html uses; wasm.js draws into it) -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="nf-glow" aria-hidden="true"></div>
+  <div id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- Hidden while validating repo existence -->
+  <main class="nf-card" id="nf-card" hidden>
+    <div class="nf-badge-row">
+      <span class="nf-tag">
+        <span class="nf-dot"></span>
+        <span id="nf-badge-text">404 // NOT_FOUND</span>
+      </span>
+    </div>
+    <h1 id="nf-title">Repository Not Found</h1>
+    <p id="nf-msg"></p>
+    <div class="nf-actions">
+      <a href="https://github.com/zurai02?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        Browse Repositories <span class="btn-arrow">→</span>
+      </a>
+      <a href="/" class="btn btn-ghost">Home</a>
+    </div>
+  </main>
+
+  <noscript>
+    <main class="nf-card">
+      <div class="nf-badge-row">
+        <span class="nf-tag">404 // JAVASCRIPT_REQUIRED</span>
+      </div>
+      <h1>JavaScript Required</h1>
+      <p>Please enable JavaScript to allow repository resolution and redirection.</p>
+      <div class="nf-actions">
+        <a href="https://github.com/zurai02?tab=repositories" class="btn btn-primary">View Repositories →</a>
+        <a href="/" class="btn btn-ghost">Home</a>
+      </div>
+    </main>
+  </noscript>
+
+  <!-- Particle engine (same script and order as index.html: wasm.js before site.js) -->
+  <script src="/wasm.js" defer></script>
+
+  <!-- Tap/click burst effect (same order as index.html: wasm.js, tapfx.js, site.js) -->
+  <script src="/tapfx.js" defer></script>
+
+  <!-- 404 logic (repo resolver + cursor glow). Plain JS, served as-is: GitHub Pages deploys
+       the repo root without a build, and site.js is the home page's script (no 404 handling). -->
+  <script src="/notfound.js" defer></script>
+</body>
+</html>
