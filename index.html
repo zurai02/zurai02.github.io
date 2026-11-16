@@ -1,222 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <title>zurai02</title>
-    <meta
-      name="description"
-      content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling."
-    />
-    <meta name="theme-color" content="#7c3aed" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0d10" />
+    <meta name="description" content="Roblox and Luau scripting, custom systems, and engine optimization by zurai02." />
     <link rel="canonical" href="https://zurai02.is-a.dev/" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="manifest.json" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="zurai02" />
-    <meta property="og:description" content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling." />
-    <meta property="og:url" content="https://zurai02.is-a.dev/" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>zurai02 — Roblox &amp; Luau engineering</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="site.js" defer></script>
   </head>
   <body>
-    <div class="bg-orb orb-one"></div>
-    <div class="bg-orb orb-two"></div>
-    <div class="bg-grid" aria-hidden="true"></div>
-
-    <div class="page-shell">
+    <div class="page">
       <header class="topbar">
-        <div class="nav-shell glass">
-          <a href="#home" class="brand" aria-label="zurai02 home">
-            <span class="brand-mark"></span>
-            <span>zurai02</span>
-          </a>
-
-          <nav id="nav" class="nav" aria-label="Main navigation">
-            <a href="#home" class="active">Home</a>
-            <a href="#about">About</a>
-            <a href="#work">Work</a>
-            <a href="#contact">Contact</a>
-          </nav>
-
-          <button id="settings-btn" class="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1 1.51V21Z"/>
-            </svg>
-          </button>
-        </div>
+        <a class="brand magnetic" href="#home" aria-label="zurai02, home">
+          <span class="brand-mark" aria-hidden="true">z</span>
+          <span>zurai02</span>
+        </a>
+        <button class="menu-toggle magnetic" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
+          <span></span><span></span>
+        </button>
+        <nav class="nav" id="site-nav" aria-label="Main navigation">
+          <a class="magnetic active" href="#home">Home</a>
+          <a class="magnetic" href="#about">About</a>
+          <a class="magnetic" href="#work">Work</a>
+          <a class="magnetic" href="#contact">Contact</a>
+        </nav>
       </header>
 
-      <main id="home" class="hero hero-shell glass">
-        <div class="hero-copy">
-          <div class="eyebrow">Available for work</div>
-          <h1 class="hero-title">
-            <span>Hi, I’m</span><br />
-            <span class="accent">zurai02</span>
-          </h1>
-          <p id="hero-sub" class="hero-sub"></p>
-          <div class="cta-row">
-            <a href="#about" class="btn primary">About Me</a>
-            <a href="#contact" class="btn secondary">Get in Touch</a>
+      <main>
+        <section class="hero" id="home" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Roblox · Luau · Performance</p>
+            <h1 id="hero-title">Roblox systems, built to run <span>lean.</span></h1>
+            <p class="hero-intro">I build Luau modules and client-side systems focused on responsiveness, efficient networking, and reliable performance.</p>
+            <div class="actions">
+              <a class="button primary magnetic" href="#work">Explore my work</a>
+              <a class="button secondary magnetic" href="#contact">Get in touch</a>
+            </div>
           </div>
-          <div class="trust-row" aria-label="Core focus">
-            <span>Luau</span>
-            <span>Roblox</span>
-            <span>JavaScript</span>
-            <span>Security</span>
-          </div>
-        </div>
 
-        <div class="hero-visual" aria-hidden="true">
-          <div class="avatar-card glass">
-            <div class="avatar-orb">
-              <div class="avatar-mark">Z</div>
-            </div>
-            <div class="mini-stats">
-              <div>
-                <strong>9+</strong>
-                <span>years crafting systems</span>
-              </div>
-              <div>
-                <strong>∞</strong>
-                <span>performance focus</span>
-              </div>
-            </div>
+          <aside class="code-panel" aria-label="Example Luau module">
+            <div class="code-topline"><span>Luau</span><span>Signal.lua</span></div>
+            <pre><code><span class="code-muted">-- lightweight event signal</span>
+<span class="code-keyword">local</span> Signal = {}
+Signal.__index = Signal
+
+<span class="code-keyword">function</span> Signal.new()
+  <span class="code-keyword">return</span> <span class="code-keyword">setmetatable</span>({
+    listeners = {},
+  }, Signal)
+<span class="code-keyword">end</span>
+
+<span class="code-keyword">function</span> Signal:Connect(callback)
+  <span class="code-keyword">local</span> connection = {
+    Connected = <span class="code-value">true</span>,
+    Callback = callback,
+  }
+  <span class="code-keyword">table.insert</span>(self.listeners, connection)
+  <span class="code-keyword">return</span> connection
+<span class="code-keyword">end</span></code></pre>
+            <div class="code-caption"><span class="status-dot" aria-hidden="true"></span> Signals without BindableEvent overhead</div>
+          </aside>
+        </section>
+
+        <section class="section" id="about" aria-labelledby="about-title">
+          <div class="section-heading">
+            <p class="section-label">About</p>
+            <h2 id="about-title">Practical engineering for Roblox</h2>
           </div>
-        </div>
+          <p class="section-intro">I focus on the parts of an experience players feel: responsive controls, stable systems, and less wasted work each frame.</p>
+          <div class="capabilities">
+            <article class="capability">
+              <span class="capability-index">01</span>
+              <div><h3>Luau systems</h3><p>Reusable modules, signals, tweening, and object pooling.</p></div>
+            </article>
+            <article class="capability">
+              <span class="capability-index">02</span>
+              <div><h3>Performance</h3><p>Client-side profiling and engine-aware optimization.</p></div>
+            </article>
+            <article class="capability">
+              <span class="capability-index">03</span>
+              <div><h3>Networking</h3><p>Efficient batching and reliable communication patterns.</p></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="work" aria-labelledby="work-title">
+          <div class="section-heading">
+            <p class="section-label">Selected work</p>
+            <h2 id="work-title">Tools and systems</h2>
+          </div>
+          <div class="work-list">
+            <a class="work-item magnetic" href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer">
+              <span class="work-type">Roblox development</span>
+              <span class="work-name">Scripting portfolio</span>
+              <span class="work-description">Custom tweening, Signal, object pooling, and network batching modules</span>
+              <span class="work-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="work-item magnetic" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">
+              <span class="work-type">Code</span>
+              <span class="work-name">GitHub</span>
+              <span class="work-description">Open-source projects and development tools</span>
+              <span class="work-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="work-item magnetic" href="https://zurai02.is-a.dev/blog/" target="_blank" rel="noopener noreferrer">
+              <span class="work-type">Writing</span>
+              <span class="work-name">Blog</span>
+              <span class="work-description">Technical notes and project write-ups</span>
+              <span class="work-arrow" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="contact section" id="contact" aria-labelledby="contact-title">
+          <div>
+            <p class="section-label">Contact</p>
+            <h2 id="contact-title">Have a project in mind?</h2>
+            <p class="contact-copy">Reach out on Discord or find me on the platforms below.</p>
+          </div>
+          <div class="contact-actions">
+            <button class="button primary magnetic" id="copy-discord" type="button" data-copy="lol066351">Copy Discord</button>
+            <a class="button secondary magnetic" href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer">DevForum</a>
+            <a class="button secondary magnetic" href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer">Roblox</a>
+            <a class="button secondary magnetic" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </section>
       </main>
 
-      <section id="dns-panel" class="dns-shell glass" aria-label="DNS lookup terminal">
-        <div class="dns-header">
-          <span>DNS Lookup</span>
-          <span>DoH • browser-side</span>
-        </div>
-        <div id="term-out" class="term-output" aria-live="polite"></div>
-        <form id="term-form" class="term-form">
-          <span id="term-prompt" class="term-prompt">zurai02@portfolio:~$</span>
-          <input id="term-in" type="text" autocomplete="off" spellcheck="false" aria-label="DNS command" placeholder="Try: dig github.com AAAA" />
-        </form>
-      </section>
-
-      <section id="about" class="section">
-        <div class="section-heading">
-          <p class="kicker">About</p>
-          <h2>Fast systems, cleaner abstractions.</h2>
-        </div>
-        <p class="section-copy">
-          Roblox scripting and engine optimization: fast, resilient systems and Luau tooling, with a focus on cutting latency and keeping client-side performance sharp.
-        </p>
-        <div class="card-grid">
-          <article class="info-card glass">
-            <span class="card-icon">⚙️</span>
-            <h3>Luau</h3>
-            <p>Systems, modules, and optimization for complex client/server behavior.</p>
-          </article>
-          <article class="info-card glass">
-            <span class="card-icon">🧩</span>
-            <h3>JavaScript</h3>
-            <p>Tooling, sites, and automation that move from idea to delivery quickly.</p>
-          </article>
-          <article class="info-card glass">
-            <span class="card-icon">🛡️</span>
-            <h3>Security</h3>
-            <p>Recon, DNS, and a hardening mindset built around reliability and resilience.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="work" class="section">
-        <div class="section-heading">
-          <p class="kicker">Work</p>
-          <h2>Designing tools that feel deliberate.</h2>
-        </div>
-        <div class="card-grid projects">
-          <a class="project-card glass" href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer">
-            <div class="project-tag">Roblox</div>
-            <h3>Scripting portfolio</h3>
-            <p>Custom tweening modules, a Signal library, object pooling, and network batching systems.</p>
-          </a>
-          <a class="project-card glass" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">
-            <div class="project-tag">GitHub</div>
-            <h3>Open source</h3>
-            <p>Public repositories, tooling, and practical systems built to solve real-world problems.</p>
-          </a>
-          <a class="project-card glass" href="https://zurai02.is-a.dev/blog/" target="_blank" rel="noopener noreferrer">
-            <div class="project-tag">Writing</div>
-            <h3>Blog</h3>
-            <p>Notes, experiments, and write-ups focused on engineering decisions and tradeoffs.</p>
-          </a>
-        </div>
-      </section>
-
-      <section id="contact" class="section">
-        <div class="section-heading">
-          <p class="kicker">Contact</p>
-          <h2>Let’s build something sharp.</h2>
-        </div>
-        <div class="contact-row">
-          <button id="copy-discord" class="btn primary copy-btn" type="button" data-copy="lol066351">Copy Discord: lol066351</button>
-          <a class="btn secondary" href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer">DevForum</a>
-          <a class="btn secondary" href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer">Roblox</a>
-          <a class="btn secondary" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </section>
-
-      <footer class="footer">© <span id="yr"></span> zurai02</footer>
+      <footer class="footer"><span>© <span id="year"></span> zurai02</span><span>Roblox &amp; Luau engineering</span></footer>
     </div>
-
-    <div id="copy-toast" role="status" aria-live="polite"></div>
-
-    <script src="site.js" defer></script>
-    <script>
-      (function () {
-        var toast = document.getElementById('copy-toast');
-        var timer;
-        function showToast(msg) {
-          if (!toast) return;
-          toast.textContent = msg;
-          toast.classList.add('show');
-          clearTimeout(timer);
-          timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
-        }
-        var btn = document.getElementById('copy-discord');
-        if (btn) {
-          btn.addEventListener('click', function () {
-            var text = btn.getAttribute('data-copy');
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(text).then(
-                function () { showToast('Discord copied: ' + text); },
-                function () { showToast('Discord: ' + text); }
-              );
-            } else {
-              showToast('Discord: ' + text);
-            }
-          });
-        }
-
-        var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
-        var map = {};
-        links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
-
-        if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-              if (!entry.isIntersecting) return;
-              links.forEach(function (a) { a.classList.remove('active'); });
-              if (map[entry.target.id]) map[entry.target.id].classList.add('active');
-            });
-          }, { rootMargin: '-35% 0px -50% 0px' });
-
-          Object.keys(map).forEach(function (id) {
-            var section = document.getElementById(id);
-            if (section) io.observe(section);
-          });
-        }
-      })();
-    </script>
+    <div class="toast" id="copy-toast" role="status" aria-live="polite"></div>
   </body>
 </html>
