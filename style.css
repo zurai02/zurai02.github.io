@@ -1,234 +1,649 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <title>zurai02</title>
-    <meta
-      name="description"
-      content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling."
-    />
-    <meta name="theme-color" content="#ff6b35" />
-    <link rel="canonical" href="https://zurai02.is-a.dev/" />
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="manifest" href="manifest.json" />
+/* Modern portfolio styling inspired by the unslop aesthetic */
+:root {
+  --bg: #0a0718;
+  --bg-2: #120d25;
+  --panel: rgba(18, 15, 32, 0.7);
+  --panel-strong: rgba(24, 20, 38, 0.92);
+  --line: rgba(168, 139, 250, 0.18);
+  --line-strong: rgba(196, 181, 253, 0.32);
+  --text: #eff2ff;
+  --muted: #b8b2d7;
+  --purple: #8b5cf6;
+  --purple-2: #a78bfa;
+  --blue: #60a5fa;
+  --cyan: #67e8f9;
+  --pink: #f472b6;
+  --success: #34d399;
+  --shadow: rgba(10, 8, 20, 0.7);
+  --radius: 28px;
+  --container: 1180px;
+}
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="zurai02" />
-    <meta property="og:description" content="Roblox Scripting & Engine Optimization — building fast, resilient systems and Luau tooling." />
-    <meta property="og:url" content="https://zurai02.is-a.dev/" />
+* { box-sizing: border-box; }
 
-    <script src="redirect.min.js"></script>
-    <script src="settings.min.js"></script>
-    <link rel="stylesheet" href="style.min.css" />
-    <link rel="stylesheet" href="desktop-hover.min.css" />
-  </head>
-  <body>
-    <div id="cursor-glow" aria-hidden="true"></div>
-    <div id="cursor-star-layer" aria-hidden="true"></div>
-    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+}
 
-    <div class="page">
-      <header class="topbar">
-        <div class="nav-shell">
-          <a href="#home" class="brand" aria-label="zurai02 home">
-            <span class="brand-mark"></span>
-            <span>zurai02</span>
-          </a>
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.28), transparent 32%),
+    radial-gradient(circle at 86% 18%, rgba(96, 165, 250, 0.22), transparent 32%),
+    linear-gradient(180deg, #090714 0%, #100d1d 38%, #090714 100%);
+  color: var(--text);
+  overflow-x: hidden;
+}
 
-          <div class="nav-end">
-            <nav id="nav" class="nav" aria-label="Main navigation">
-              <a href="#home" class="active">Home</a>
-              <a href="#about">About</a>
-              <a href="#work">Work</a>
-              <a href="#contact">Contact</a>
-            </nav>
+img { max-width: 100%; }
 
-            <button id="settings-btn" class="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings-panel">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-.33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-.33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-.33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 3.6 19.4z"></path>
-              </svg>
-            </button>
-          </div>
+a { color: inherit; text-decoration: none; }
 
-          <div id="settings-panel" class="settings-panel" role="group" aria-labelledby="settings-title" hidden>
-            <h2 id="settings-title">Settings</h2>
+button, input { font: inherit; }
 
-            <label class="setting" for="set-light">
-              <span class="setting-text">Light mode<small>Switch between dark and light colors</small></span>
-              <input id="set-light" name="set-light" class="switch-input" type="checkbox" role="switch" />
-              <span class="switch" aria-hidden="true"></span>
-            </label>
+::selection {
+  background: rgba(167, 139, 250, 0.4);
+  color: white;
+}
 
-            <label class="setting" for="set-links">
-              <span class="setting-text">Underline links<small>Don't rely on color to spot links</small></span>
-              <input id="set-links" name="set-links" class="switch-input" type="checkbox" role="switch" />
-              <span class="switch" aria-hidden="true"></span>
-            </label>
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 0;
+}
 
-            <label class="setting" for="set-contrast">
-              <span class="setting-text">High contrast<small>Stronger text and border contrast</small></span>
-              <input id="set-contrast" name="set-contrast" class="switch-input" type="checkbox" role="switch" />
-              <span class="switch" aria-hidden="true"></span>
-            </label>
+.orb-one {
+  width: 420px;
+  height: 420px;
+  left: 6%;
+  top: 8%;
+  background: rgba(139, 92, 246, 0.25);
+}
 
-            <button id="settings-reset" class="settings-reset" type="button">Reset to defaults</button>
-          </div>
-        </div>
-      </header>
+.orb-two {
+  width: 520px;
+  height: 520px;
+  right: 10%;
+  top: 18%;
+  background: rgba(96, 165, 250, 0.18);
+}
 
-      <main id="home" class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow">Available for work</div>
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(196, 181, 253, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196, 181, 253, 0.06) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 90%);
+  pointer-events: none;
+  z-index: 0;
+}
 
-          <h1 class="hero-title">
-            <span>Hi, I’m</span><br />
-            <span class="accent">zurai02</span>
-          </h1>
+.page-shell {
+  position: relative;
+  z-index: 1;
+  width: min(var(--container), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 64px;
+}
 
-          <p id="hero-sub" class="hero-sub"></p>
+.glass {
+  background: rgba(20, 17, 31, 0.64);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 60px rgba(6, 5, 15, 0.38);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
 
-          <div class="cta-row">
-            <a href="#about" class="btn primary">About Me</a>
-            <a href="#contact" class="btn secondary">Get in Touch</a>
-          </div>
-        </div>
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding-bottom: 22px;
+}
 
-        <div class="hero-visual">
-          <div class="avatar-ring">
-            <div class="avatar"></div>
-          </div>
-        </div>
-      </main>
+.nav-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 18px 14px 20px;
+  border-radius: 999px;
+}
 
-      <div class="dns-toggle-wrap">
-        <button id="dns-toggle" class="dns-toggle" type="button" aria-expanded="true">Hide DNS Terminal</button>
-      </div>
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: white;
+}
 
-      <section id="dns-panel" class="dns-panel open" aria-label="DNS lookup terminal">
-        <div class="dns-header">
-          <span>DNS Lookup</span>
-          <span>DoH • browser-side</span>
-        </div>
-        <div id="term-out" class="term-output" aria-live="polite"></div>
-        <form id="term-form" class="term-form">
-          <span id="term-prompt" class="term-prompt">zurai02@portfolio:~$</span>
-          <input id="term-in" type="text" autocomplete="off" spellcheck="false" aria-label="DNS command" placeholder="Try: dig github.com AAAA" />
-        </form>
-      </section>
+.brand-mark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--purple) 0%, var(--cyan) 100%);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.8);
+  transform: rotate(45deg);
+}
 
-      <section id="about" class="section" aria-labelledby="about-h">
-        <h2 id="about-h">About</h2>
-        <p>
-          Roblox scripting and engine optimization: fast, resilient systems and Luau tooling,
-          with a focus on cutting latency and keeping client-side performance sharp.
-        </p>
-        <div class="card-grid">
-          <div class="card">
-            <h3>Luau</h3>
-            <p>Systems, modules and optimization.</p>
-          </div>
-          <div class="card">
-            <h3>JavaScript</h3>
-            <p>Tooling, sites and automation.</p>
-          </div>
-          <div class="card">
-            <h3>Security</h3>
-            <p>Recon, DNS and a hardening mindset.</p>
-          </div>
-        </div>
-      </section>
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-      <section id="work" class="section" aria-labelledby="work-h">
-        <h2 id="work-h">Work</h2>
-        <p>Examples of scripting work, tooling and open-source projects.</p>
-        <div class="card-grid">
-          <a class="card card-link" href="https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442" target="_blank" rel="noopener noreferrer">
-            <h3>Scripting portfolio ↗</h3>
-            <p>Custom tweening modules, a Signal library, object pooling and network batching systems.</p>
-          </a>
-          <a class="card card-link" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">
-            <h3>GitHub ↗</h3>
-            <p>Public repositories and tooling.</p>
-          </a>
-          <a class="card card-link" href="https://zurai02.is-a.dev/blog/">
-            <h3>Blog ↗</h3>
-            <p>Write-ups and notes.</p>
-          </a>
-        </div>
-      </section>
+.nav a {
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: var(--muted);
+  transition: all 0.2s ease;
+  font-size: 0.93rem;
+  font-weight: 600;
+}
 
-      <section id="contact" class="section" aria-labelledby="contact-h">
-        <h2 id="contact-h">Contact</h2>
-        <p>The quickest way to reach me is Discord. You can also find me on DevForum and Roblox.</p>
-        <div class="contact-row">
-          <button id="copy-discord" class="btn primary copy-btn" type="button" data-copy="lol066351">Copy Discord: lol066351</button>
-          <a class="btn secondary" href="https://devforum.roblox.com/u/zurai02" target="_blank" rel="noopener noreferrer">DevForum</a>
-          <a class="btn secondary" href="https://www.roblox.com/users/5674181802/profile" target="_blank" rel="noopener noreferrer">Roblox</a>
-          <a class="btn secondary" href="https://github.com/zurai02" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </section>
+.nav a:hover,
+.nav a.active {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.25);
+}
 
-      <footer class="footer">© <span id="yr"></span> zurai02</footer>
-    </div>
+.settings-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
 
-    <div id="copy-toast" role="status" aria-live="polite"></div>
+.settings-btn:hover {
+  transform: rotate(40deg);
+  border-color: var(--line-strong);
+}
 
-    <script src="wasm.js" defer></script>
-    <script src="tapfx.js" defer></script>
-    <script src="desktop-hover.min.js" defer></script>
-    <script src="chatbot.js" defer></script>
-    <script src="site.js" defer></script>
+.settings-btn svg {
+  width: 18px;
+  height: 18px;
+}
 
-    <script>
-      (function () {
-        var toast = document.getElementById('copy-toast');
-        var timer;
-        function showToast(msg) {
-          if (!toast) return;
-          toast.textContent = msg;
-          toast.classList.add('show');
-          clearTimeout(timer);
-          timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
-        }
-        var btn = document.getElementById('copy-discord');
-        if (btn) btn.addEventListener('click', function () {
-          var text = btn.getAttribute('data-copy');
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(
-              function () { showToast('Discord copied: ' + text); },
-              function () { showToast('Discord: ' + text); }
-            );
-          } else {
-            showToast('Discord: ' + text);
-          }
-        });
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 32px;
+  align-items: center;
+  padding: clamp(26px, 4vw, 52px);
+  border-radius: var(--radius);
+  margin-top: 12px;
+}
 
-        var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
-        var map = {};
-        links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
-        if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) {
-              if (!e.isIntersecting) return;
-              links.forEach(function (a) { a.classList.remove('active'); });
-              if (map[e.target.id]) map[e.target.id].classList.add('active');
-            });
-          }, { rootMargin: '-40% 0px -55% 0px' });
-          Object.keys(map).forEach(function (id) {
-            var s = document.getElementById(id);
-            if (s) io.observe(s);
-          });
-        }
+.hero-copy {
+  padding: 12px 6px;
+}
 
-        if ('serviceWorker' in navigator && location.protocol === 'https:') {
-          window.addEventListener('load', function () {
-            navigator.serviceWorker.register('/sw.js').catch(function () {});
-          });
-        }
-      })();
-    </script>
-  </body>
-</html>
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border: 1px solid rgba(103, 232, 249, 0.3);
+  border-radius: 999px;
+  background: rgba(103, 232, 249, 0.06);
+  color: #dffafe;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.9);
+}
+
+.hero-title {
+  margin: 24px 0 18px;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.hero-title span:first-child {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.accent {
+  display: inline-block;
+  background: linear-gradient(135deg, #f9a8d4 0%, #a78bfa 35%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-sub {
+  max-width: 36rem;
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 2vw, 1.4rem);
+  line-height: 1.7;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 24px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
+  box-shadow: 0 18px 38px rgba(139, 92, 246, 0.42);
+  color: white;
+}
+
+.btn.secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.btn.secondary:hover {
+  border-color: var(--line-strong);
+}
+
+.trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.trust-row span {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  background: rgba(139, 92, 246, 0.06);
+  color: #d9d0ff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-card {
+  width: min(100%, 410px);
+  padding: 22px;
+  border-radius: 30px;
+}
+
+.avatar-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 290px);
+  aspect-ratio: 1;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgba(255,255,255,0.7), rgba(167, 139, 250, 0.16) 18%, rgba(96,165,250,0.1) 45%, rgba(17,11,30,0.9) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  box-shadow: inset 0 0 34px rgba(139, 92, 246, 0.2), 0 30px 50px rgba(17, 11, 30, 0.55);
+}
+
+.avatar-orb::before,
+.avatar-orb::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.avatar-orb::before {
+  inset: 16px;
+  border: 1px solid rgba(136, 224, 255, 0.18);
+}
+
+.avatar-orb::after {
+  inset: -14px;
+  border: 1px solid rgba(167, 139, 250, 0.15);
+}
+
+.avatar-mark {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(4.5rem, 13vw, 7rem);
+  line-height: 1;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fdf2f8 0%, #c4b5fd 30%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(167, 139, 250, 0.25);
+}
+
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mini-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line);
+}
+
+.mini-stats strong {
+  font-size: 1.4rem;
+}
+
+.mini-stats span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.dns-shell,
+.section {
+  margin-top: 28px;
+}
+
+.dns-shell {
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.dns-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.dns-header span:first-child {
+  color: #ddd6fe;
+  font-weight: 700;
+}
+
+.term-output {
+  height: 260px;
+  padding: 18px;
+  overflow-y: auto;
+  background: rgba(9, 7, 20, 0.7);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #e5e7eb;
+}
+
+.term-output::-webkit-scrollbar { width: 8px; }
+.term-output::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.45); border-radius: 10px; }
+
+.term-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.term-prompt {
+  color: #a78bfa;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#term-in {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+#term-in::placeholder {
+  color: rgba(184, 178, 215, 0.7);
+}
+
+.section {
+  padding: 28px 0 0;
+}
+
+.section-heading {
+  margin-bottom: 20px;
+}
+
+.kicker {
+  margin: 0 0 10px;
+  color: #c4b5fd;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.section-copy {
+  max-width: 42rem;
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 1.06rem;
+  line-height: 1.7;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.info-card,
+.project-card {
+  display: block;
+  padding: 22px 20px;
+  border-radius: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover,
+.project-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(167, 139, 250, 0.32);
+  box-shadow: 0 28px 50px rgba(11, 8, 19, 0.45);
+}
+
+.card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(167, 139, 250, 0.12);
+  margin-bottom: 14px;
+  font-size: 1.2rem;
+}
+
+.info-card h3,
+.project-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+}
+
+.info-card p,
+.project-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.project-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 7px 10px;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.07);
+  color: #ddd6fe;
+  font-size: 0.7rem;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.footer {
+  margin-top: 42px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+#copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 12px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(18, 15, 32, 0.9);
+  color: #e9d5ff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 50;
+}
+
+#copy-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(var(--container), calc(100% - 22px));
+  }
+
+  .nav-shell {
+    border-radius: 24px;
+    padding-inline: 14px;
+  }
+
+  .hero {
+    padding: 24px 18px;
+  }
+
+  .hero-title {
+    line-height: 1;
+  }
+
+  .cta-row,
+  .contact-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .mini-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
