@@ -7,55 +7,46 @@
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#ff6b35" />
   <title>404 — zurai02</title>
-
   <!-- Instant Custom Shortlink Redirects (case-insensitive) -->
   <script>
   (function() {
     var REDIRECTS = {
-      'github': 'https://github.com/zurai02',
-      'repositories': 'https://github.com/zurai02?tab=repositories',
-      'repos': 'https://github.com/zurai02?tab=repositories',
-      'stars': 'https://github.com/zurai02?tab=stars',
-      'portfolio': 'https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442',
-      'devforum': 'https://devforum.roblox.com/u/zurai02',
-      'discord': 'https://discord.com/users/1460949263650652200'
+      "github": "https://github.com/zurai02",
+      "repositories": "https://github.com/zurai02?tab=repositories",
+      "repos": "https://github.com/zurai02?tab=repositories",
+      "stars": "https://github.com/zurai02?tab=stars",
+      "portfolio": "https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442",
+      "devforum": "https://devforum.roblox.com/u/zurai02",
+      "discord": "https://discord.com/users/1460949263650652200"
     };
-    try {
-      var segs = (window.location.pathname || '').replace(/^\/+|\/+$/g, '').split('/');
-      var key = (segs[0] || '').toLowerCase();
-      if (REDIRECTS[key]) {
-        window.location.replace(REDIRECTS[key]);
-        return;
-      }
-      var host = window.location.hostname;
-      if (host && host !== 'zurai02.is-a.dev' && host.indexOf('localhost') === -1) {
-        window.location.replace('https://zurai02.is-a.dev' + window.location.pathname + window.location.search + window.location.hash);
-      }
-    } catch (e) {}
+    var path = window.location.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
+    if (REDIRECTS[path]) {
+      window.location.replace(REDIRECTS[path]);
+    }
   })();
   </script>
 
+
+  <!-- Fonts matching zurai02.is-a.dev -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
 
-  <style>
-    body.page-404 {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: var(--page);
-      color: var(--text);
-      font: 400 16px/1.6 var(--sans);
-    }
-  </style>
+  <!-- Canonical host redirect (synchronous, root-relative so it works at any 404 path) -->
+  <script src="/redirect.js"></script>
+
+  <!-- Shared styles (root-relative so this works at any 404 path) -->
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="page-404">
-  <div class="nf-glow" aria-hidden="true"></div>
 
+  <!-- Particle background (same canvas index.html uses; wasm.js draws into it) -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="nf-glow" aria-hidden="true"></div>
+  <div id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- Hidden while validating repo existence -->
   <main class="nf-card" id="nf-card" hidden>
     <div class="nf-badge-row">
       <span class="nf-tag">
@@ -66,27 +57,36 @@
     <h1 id="nf-title">Repository Not Found</h1>
     <p id="nf-msg"></p>
     <div class="nf-actions">
-      <a href="https://github.com/zurai02?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-primary magnetic">
+      <a href="https://github.com/zurai02?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
         Browse Repositories <span class="btn-arrow">→</span>
       </a>
-      <a href="/" class="btn btn-ghost magnetic">Back Home</a>
+      <a href="/" class="btn btn-ghost">Home</a>
     </div>
   </main>
 
   <noscript>
     <main class="nf-card">
       <div class="nf-badge-row">
-        <span class="nf-tag"><span class="nf-dot"></span> 404 // NOT_FOUND</span>
+        <span class="nf-tag">404 // JAVASCRIPT_REQUIRED</span>
       </div>
-      <h1>Page Not Found</h1>
-      <p>The requested page or repository was not found.</p>
+      <h1>JavaScript Required</h1>
+      <p>Please enable JavaScript to allow repository resolution and redirection.</p>
       <div class="nf-actions">
-        <a href="https://github.com/zurai02?tab=repositories" class="btn btn-primary">Browse Repositories →</a>
-        <a href="/" class="btn btn-ghost">Back Home</a>
+        <a href="https://github.com/zurai02?tab=repositories" class="btn btn-primary">View Repositories →</a>
+        <a href="/" class="btn btn-ghost">Home</a>
       </div>
     </main>
   </noscript>
 
-  <script src="/notfound.js" defer></script>
+  <!-- Particle engine (same script and order as index.html: wasm.js before site.js) -->
+  <script src="/wasm.js" defer></script>
+
+  <!-- Tap/click burst effect (same order as index.html: wasm.js, tapfx.js, site.js) -->
+  <script src="/tapfx.js" defer></script>
+
+  <!-- Shared script, compiled from site.ts (npx tsc --project tsconfig.json).
+       Runs initNotFound() because body has .page-404.
+       If your tsconfig outputs somewhere other than the site root, change this path (e.g. /dist/site.js). -->
+  <script src="/site.js" defer></script>
 </body>
 </html>
