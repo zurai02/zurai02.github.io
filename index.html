@@ -282,7 +282,7 @@
            target="_blank" rel="noopener noreferrer" class="btn btn-primary">
           DevForum Portfolio <span aria-hidden="true">→</span>
         </a>
-        <a href="https://zurai02.is-a.dev/Blog"
+        <a href="https://zurai02.is-a.dev/blog"
            target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
           Blog
         </a>
@@ -402,7 +402,7 @@
       <h2 class="section-title reveal rd1" id="blog-heading">From the blog</h2>
       <p class="section-sub reveal rd2">
         Thoughts on Luau, systems programming, and squeezing frames.
-        <a href="https://zurai02.is-a.dev/Blog" target="_blank" rel="noopener noreferrer" class="blog-cta">View all posts →</a>
+        <a href="https://zurai02.is-a.dev/blog" target="_blank" rel="noopener noreferrer" class="blog-cta">View all posts →</a>
       </p>
 
       <div id="blog-container" class="blog-grid reveal rd3">
@@ -433,11 +433,11 @@
           <span class="link-name">DevForum Profile</span>
           <span class="link-label">@zurai02</span>
         </a>
-        <a href="https://zurai02.is-a.dev/Blog"
+        <a href="https://zurai02.is-a.dev/blog"
            target="_blank" rel="noopener noreferrer" class="link-card reveal rd1">
           <svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg>
           <span class="link-name">Blog</span>
-          <span class="link-label">zurai02.is-a.dev/Blog</span>
+          <span class="link-label">zurai02.is-a.dev/blog</span>
         </a>
         <a href="https://zurai02.is-a.dev/github"
            target="_blank" rel="noopener noreferrer" class="link-card reveal rd2">
@@ -518,89 +518,118 @@
 
     // Helper function to eliminate duplicated blog card rendering HTML logic
     function renderBlogCard(post, defaultUrl) {
-      var link = post.link || (defaultUrl + '/post.html?id=' + encodeURIComponent(post.id));
-      var excerpt = post.description || (post.content ? post.content.replace(/```[\s\S]*?```/g, '[code]').replace(/[#*_`]/g, '').substring(0, 140) + '...' : '');
+      var base = defaultUrl.replace(/\/+$/, "");
+      var link = post.link || (base + "/post.html?id=" + encodeURIComponent(post.id));
+      var excerpt = post.description || (post.content ? post.content.replace(/```[\s\S]*?```/g, "[code]").replace(/[#*_`~>\[\]]/g, "").replace(/\s+/g, " ").trim().substring(0, 150) + "..." : "");
       var tags = post.tags || [];
 
       var tagsHtml = tags.map(function(tag) {
-        return '<span class="tag">' + escapeHtml(tag) + '</span>';
-      }).join('');
+        return "<span class=\"tag\">" + escapeHtml(tag) + "</span>";
+      }).join("");
 
-      return '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer" class="blog-card">' +
-        '<h3>' + escapeHtml(post.title) + '</h3>' +
-        (excerpt ? '<p>' + escapeHtml(excerpt) + '</p>' : '') +
-        '<div class="blog-meta">' +
-          (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
+      return "<a href=\"" + escapeHtml(link) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"blog-card\" data-magnetic>" +
+        "<h3>" + escapeHtml(post.title || "Untitled Post") + "</h3>" +
+        (excerpt ? "<p>" + escapeHtml(excerpt) + "</p>" : "") +
+        "<div class=\"blog-meta\">" +
+          (post.date ? "<span>" + escapeHtml(post.date) + "</span>" : "") +
           tagsHtml +
-          '<span style="margin-left:auto;color:#ff6b35;">Read →</span>' +
-        '</div>' +
-      '</a>';
+          "<span style=\"margin-left:auto;color:#ff6b35;font-weight:600;\">Read →</span>" +
+        "</div>" +
+      "</a>";
     }
 
-    // Blog fetcher — dynamically loads latest posts from zurai02.is-a.dev/Blog
+    // Blog crawler & loader — dynamically loads latest posts from zurai02.is-a.dev/blog
     (function loadBlogPosts() {
-      var container = document.getElementById('blog-container');
-      var blogUrl = 'https://zurai02.is-a.dev/Blog';
-      var postsJsonUrl = 'https://zurai02.is-a.dev/Blog/posts.json';
+      var container = document.getElementById("blog-container");
+      if (!container) return;
 
-      fetch(postsJsonUrl, { 
-        mode: 'cors',
-        headers: { 'Accept': 'application/json' }
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('posts.json unavailable');
-        return r.json();
-      })
-      .then(function(posts) {
-        if (!Array.isArray(posts) || posts.length === 0) {
-          throw new Error('No posts found');
+      var blogUrl = "https://zurai02.is-a.dev/blog";
+      var candidateSources = [
+        "https://zurai02.is-a.dev/blog/posts.json",
+        "/blog/posts.json",
+        "https://raw.githubusercontent.com/zurai02/blog/main/posts.json"
+      ];
+
+      function trySource(index) {
+        if (index >= candidateSources.length) {
+          fallbackHtmlFetch(container, blogUrl);
+          return;
         }
 
-        posts.sort(function(a, b) {
-          return new Date(b.date) - new Date(a.date);
-        });
+        var sourceUrl = candidateSources[index];
+        fetch(sourceUrl, {
+          mode: "cors",
+          headers: { "Accept": "application/json" }
+        })
+        .then(function(r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(function(posts) {
+          if (!Array.isArray(posts) || posts.length === 0) {
+            throw new Error("No posts found in JSON payload");
+          }
 
-        container.innerHTML = posts.slice(0, 6).map(function(post) {
-          return renderBlogCard(post, blogUrl);
-        }).join('');
-      })
-      .catch(function(err) {
-        console.warn('Blog JSON fetch failed:', err);
-        fallbackHtmlFetch(container, blogUrl);
-      });
+          var validPosts = posts.filter(function(p) {
+            return p && typeof p === "object" && !p.draft;
+          });
+
+          if (validPosts.length === 0) {
+            validPosts = posts;
+          }
+
+          validPosts.sort(function(a, b) {
+            return new Date(b.date || 0) - new Date(a.date || 0);
+          });
+
+          container.innerHTML = validPosts.slice(0, 6).map(function(post) {
+            return renderBlogCard(post, blogUrl);
+          }).join("");
+
+          if (typeof window.initMagnetic === "function") {
+            window.initMagnetic();
+          }
+        })
+        .catch(function(err) {
+          console.warn("Blog source failed (" + sourceUrl + "):", err);
+          trySource(index + 1);
+        });
+      }
+
+      trySource(0);
     })();
 
     function fallbackHtmlFetch(container, blogUrl) {
       fetch(blogUrl, { 
-        mode: 'cors',
-        headers: { 'Accept': 'text/html' }
+        mode: "cors",
+        headers: { "Accept": "text/html" }
       })
       .then(function(r) {
-        if (!r.ok) throw new Error('Blog unavailable');
+        if (!r.ok) throw new Error("Blog unavailable: HTTP " + r.status);
         return r.text();
       })
       .then(function(html) {
         var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
+        var doc = parser.parseFromString(html, "text/html");
         var posts = [];
 
-        var cards = doc.querySelectorAll('.post-card, [class*="post-card"]');
+        var cards = doc.querySelectorAll(".post-card, [class*=\"post-card\"], article");
 
         if (cards.length > 0) {
           cards.forEach(function(card, idx) {
             if (idx >= 6) return;
 
-            var titleEl = card.querySelector('.post-card-title, h1, h2, h3, .title');
-            var linkEl = card.closest('a') || card.querySelector('a');
-            var descEl = card.querySelector('.post-card-excerpt, p, .excerpt');
-            var dateEl = card.querySelector('.post-card-date, time, .date');
-            var tagEls = card.querySelectorAll('.tag');
+            var titleEl = card.querySelector(".post-card-title, h1, h2, h3, .title");
+            var linkEl = card.closest("a") || card.querySelector("a");
+            var descEl = card.querySelector(".post-card-excerpt, p, .excerpt");
+            var dateEl = card.querySelector(".post-card-date, time, .date");
+            var tagEls = card.querySelectorAll(".tag");
 
             posts.push({
-              title: titleEl ? titleEl.textContent.trim() : 'Blog Post',
+              title: titleEl ? titleEl.textContent.trim() : "Blog Post",
               link: linkEl ? linkEl.href : blogUrl,
-              description: descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '',
-              date: dateEl ? dateEl.textContent.trim() : '',
+              description: descEl ? descEl.textContent.trim().substring(0, 200) + "..." : "",
+              date: dateEl ? dateEl.textContent.trim() : "",
               tags: Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(Boolean)
             });
           });
@@ -609,29 +638,33 @@
         if (posts.length > 0) {
           container.innerHTML = posts.map(function(post) {
             return renderBlogCard(post, blogUrl);
-          }).join('');
+          }).join("");
+
+          if (typeof window.initMagnetic === "function") {
+            window.initMagnetic();
+          }
         } else {
           showBlogFallback(container, blogUrl);
         }
       })
       .catch(function(err) {
-        console.warn('Blog HTML fetch failed:', err);
+        console.warn("Blog HTML fetch failed:", err);
         showBlogFallback(container, blogUrl);
       });
     }
 
     function showBlogFallback(container, blogUrl) {
       container.innerHTML = 
-        '<div class="blog-error" style="grid-column:1/-1;">' +
-          '<p>Unable to load blog posts directly.</p>' +
-          '<p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/Blog →</a></p>' +
-          '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>' +
-        '</div>';
+        "<div class=\"blog-error\" style=\"grid-column:1/-1;\">" +
+          "<p>Unable to load blog posts directly.</p>" +
+          "<p><a href=\"" + blogUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color:#ff6b35;\">Visit zurai02.is-a.dev/blog →</a></p>" +
+          "<iframe src=\"" + blogUrl + "\" class=\"blog-embed\" title=\"zurai02 Blog\" loading=\"lazy\" style=\"margin-top:1.5rem;\"></iframe>" +
+        "</div>";
     }
 
     function escapeHtml(text) {
-      var div = document.createElement('div');
-      div.textContent = text;
+      var div = document.createElement("div");
+      div.textContent = text == null ? "" : String(text);
       return div.innerHTML;
     }
   </script>

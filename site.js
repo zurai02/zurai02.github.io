@@ -264,8 +264,9 @@ function initCardTilt() {
 
 /* ═══ 11b. MAGNETIC HOVER ═════════════════════════════════════════════════ */
 function initMagnetic() {
+  window.initMagnetic = initMagnetic;
   if (isMob() || noMot()) return;
-  const targets = document.querySelectorAll(".btn, .badge, .link-card, .nav-link, .zc-toggle, .magnetic, .nav-logo");
+  const targets = document.querySelectorAll(".btn, .badge, .link-card, .nav-link, .zc-toggle, .magnetic, .nav-logo, .blog-card, [data-magnetic]");
   targets.forEach(el => {
     el.addEventListener("mousemove", e => {
       const r = el.getBoundingClientRect();
