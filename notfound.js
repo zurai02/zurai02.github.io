@@ -1,86 +1,40 @@
-/* notfound.js — logic for 404.html (plain JS, no build step).
- *
- * A single-segment path like /my-repo is checked against the GitHub API and
- * redirected to github.com/<user>/my-repo if that repo exists. Anything else
- * reveals the error card.
- *
- * This is deliberately separate from site.js, which is the home page's script
- * and has no 404 handling. GitHub Pages is deployed straight from the repo
- * root (no build), so this file is served exactly as written here.
- */
+/* notfound.js — logic for 404.html */
 (function () {
   'use strict';
 
-  var CFG = { user: 'zurai02', redirectTimeout: 3500, glowLerp: 0.12, fontWait: 700 };
+  var REDIRECTS = {
+    'github': 'https://github.com/zurai02',
+    'repositories': 'https://github.com/zurai02?tab=repositories',
+    'repos': 'https://github.com/zurai02?tab=repositories',
+    'stars': 'https://github.com/zurai02?tab=stars',
+    'portfolio': 'https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442',
+    'devforum': 'https://devforum.roblox.com/u/zurai02',
+    'discord': 'https://discord.com/users/1460949263650652200'
+  };
 
+  var CFG = { user: 'zurai02', redirectTimeout: 3500, fontWait: 400 };
   function $(id) { return document.getElementById(id); }
 
-  /* ── Soft cursor glow (desktop only; style.css hides it on touch devices) ── */
-  function initCursorGlow() {
-    var glow = $('cursor-glow');
-    if (!glow) return;
-    if (window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    var gx = mx, gy = my;
-    var visible = false;
-
-    function show(x, y) {
-      mx = x; my = y;
-      if (!visible) { glow.style.opacity = '1'; visible = true; }
-    }
-    function hide() { glow.style.opacity = '0'; visible = false; }
-
-    document.addEventListener('pointermove', function (e) { show(e.clientX, e.clientY); }, { passive: true });
-    document.addEventListener('pointerenter', function (e) { show(e.clientX, e.clientY); }, { passive: true });
-    window.addEventListener('pointerleave', hide);
-    window.addEventListener('mouseleave', hide);
-
-    (function tick() {
-      gx += (mx - gx) * CFG.glowLerp;
-      gy += (my - gy) * CFG.glowLerp;
-      // #cursor-glow is 420px wide/tall; centre it on the pointer
-      glow.style.transform = 'translate(' + (gx - 210) + 'px,' + (gy - 210) + 'px)';
-      requestAnimationFrame(tick);
-    })();
-  }
-
-  /* ── Repo resolver ── */
   function initNotFound() {
-    var card  = $('nf-card');
+    var card = $('nf-card');
     var title = $('nf-title');
-    var msg   = $('nf-msg');
+    var msg = $('nf-msg');
     var badge = $('nf-badge-text');
     if (!card || !title || !msg || !badge) return;
 
     var user = CFG.user;
+    var segments = location.pathname.split('/').filter(Boolean);
+    var repoName = segments[0] || '';
+    var key = repoName.toLowerCase();
 
-    /* The card is display:none until now, so its web fonts (Inter / JetBrains Mono,
-       font-display: swap) haven't been requested yet. Revealing it straight away shows
-       the text in a fallback font that then visibly re-renders when the real font
-       arrives, which reads as flicker. So: load exactly the fonts the card uses
-       (read from its computed styles), then reveal it once. Capped so a slow or blocked
-       font host can never keep the error hidden. */
-    function loadCardFonts() {
-      if (!document.fonts || !document.fonts.load) return Promise.resolve();
-      var seen = {}, jobs = [];
-      var els = [card].concat(Array.prototype.slice.call(card.querySelectorAll('*')));
-      els.forEach(function (el) {
-        var cs = getComputedStyle(el);
-        var spec = cs.fontStyle + ' ' + cs.fontWeight + ' 16px ' + cs.fontFamily;
-        if (seen[spec]) return;
-        seen[spec] = true;
-        jobs.push(document.fonts.load(spec).catch(function () {}));
-      });
-      return Promise.all(jobs);
+    // Check custom shortlink redirects first
+    if (REDIRECTS[key]) {
+      location.replace(REDIRECTS[key]);
+      return;
     }
 
     function revealCard() {
-      var shown = false;
-      function go() { if (shown) return; shown = true; card.hidden = false; }
-      setTimeout(go, CFG.fontWait);
-      loadCardFonts().then(go, go);
+      card.hidden = false;
     }
 
     function showError(errTitle, tag, buildMsg) {
@@ -92,10 +46,7 @@
       revealCard();
     }
 
-    var segments = location.pathname.split('/').filter(Boolean);
-    var repoName = segments[0] || '';
-
-    // Only single-segment, safe-looking paths can be repos
+    // Only single-segment, valid-looking names can be repos
     if (
       segments.length !== 1 ||
       !/^[A-Za-z0-9_.-]+$/.test(repoName) ||
@@ -116,7 +67,6 @@
       location.replace(targetUrl);
     }
 
-    // If the GitHub API is slow, forward anyway rather than leaving a blank page
     var timer = setTimeout(redirect, CFG.redirectTimeout);
 
     fetch('https://api.github.com/repos/' + user + '/' + encodeURIComponent(repoName))
@@ -132,7 +82,7 @@
           });
           return null;
         }
-        if (!res.ok) { redirect(); return null; } // rate limit / API hiccup: forward anyway
+        if (!res.ok) { redirect(); return null; }
         return res.json();
       })
       .then(function (data) {
@@ -143,11 +93,6 @@
       .catch(redirect);
   }
 
-  function init() {
-    initCursorGlow();
-    initNotFound();
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNotFound);
+  else initNotFound();
 })();

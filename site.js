@@ -55,27 +55,48 @@
     }
   });
 
+  /* ── Enhanced Magnetic Physics for all interactive elements ── */
   const canMagnet = matchMedia('(hover: hover) and (pointer: fine)').matches
     && !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (canMagnet) {
-    $$('.magnetic').forEach((element) => {
-      let frame = 0;
-      element.addEventListener('pointermove', (event) => {
-        if (frame) cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-          const rect = element.getBoundingClientRect();
-          const x = (event.clientX - rect.left - rect.width / 2) / rect.width;
-          const y = (event.clientY - rect.top - rect.height / 2) / rect.height;
-          element.style.setProperty('--magnet-x', `${x * 6}px`);
-          element.style.setProperty('--magnet-y', `${y * 5}px`);
-        });
-      });
-      element.addEventListener('pointerleave', () => {
-        if (frame) cancelAnimationFrame(frame);
-        element.style.setProperty('--magnet-x', '0px');
-        element.style.setProperty('--magnet-y', '0px');
+
+  function bindMagnet(element) {
+    if (!element || element.__hasMagnet) return;
+    element.__hasMagnet = true;
+    let frame = 0;
+
+    element.addEventListener('pointermove', (event) => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = element.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const x = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+        const y = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+        
+        // Intensity scaling: small buttons up to 10px, cards 5-7px
+        const maxDim = Math.max(rect.width, rect.height);
+        const pull = maxDim < 100 ? 10 : (maxDim < 260 ? 8 : 5);
+        element.style.setProperty('--magnet-x', `${(x * pull).toFixed(2)}px`);
+        element.style.setProperty('--magnet-y', `${(y * pull).toFixed(2)}px`);
       });
     });
+
+    element.addEventListener('pointerleave', () => {
+      if (frame) cancelAnimationFrame(frame);
+      element.style.setProperty('--magnet-x', '0px');
+      element.style.setProperty('--magnet-y', '0px');
+    });
+  }
+
+  if (canMagnet) {
+    $$('.magnetic').forEach(bindMagnet);
+
+    // Watch for dynamically inserted elements (like the chatbot toggle)
+    if ('MutationObserver' in window) {
+      const observer = new MutationObserver(() => {
+        $$('.magnetic').forEach(bindMagnet);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {

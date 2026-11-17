@@ -8,50 +8,54 @@
   <meta name="theme-color" content="#ff6b35" />
   <title>404 — zurai02</title>
 
-  <!-- Fonts matching zurai02.is-a.dev -->
+  <!-- Instant Custom Shortlink Redirects (case-insensitive) -->
+  <script>
+  (function() {
+    var REDIRECTS = {
+      'github': 'https://github.com/zurai02',
+      'repositories': 'https://github.com/zurai02?tab=repositories',
+      'repos': 'https://github.com/zurai02?tab=repositories',
+      'stars': 'https://github.com/zurai02?tab=stars',
+      'portfolio': 'https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442',
+      'devforum': 'https://devforum.roblox.com/u/zurai02',
+      'discord': 'https://discord.com/users/1460949263650652200'
+    };
+    try {
+      var segs = (window.location.pathname || '').replace(/^\/+|\/+$/g, '').split('/');
+      var key = (segs[0] || '').toLowerCase();
+      if (REDIRECTS[key]) {
+        window.location.replace(REDIRECTS[key]);
+        return;
+      }
+      var host = window.location.hostname;
+      if (host && host !== 'zurai02.is-a.dev' && host.indexOf('localhost') === -1) {
+        window.location.replace('https://zurai02.is-a.dev' + window.location.pathname + window.location.search + window.location.hash);
+      }
+    } catch (e) {}
+  })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Canonical host redirect (synchronous, root-relative so it works at any 404 path) -->
-  <script>
-!function(){const o="zurai02.is-a.dev";if("undefined"!=typeof window&&window.location)try{const n=window.location.hostname;if(!n||n===o)return;const i="https://"+o+window.location.pathname+window.location.search+window.location.hash;window.location.replace(i)}catch(o){try{console.warn("redirect.js failed:",o)}catch(o){}}}();
-</script>
-
-  <!-- Shared styles (root-relative so this works at any 404 path) -->
-  <script>
-!function(){var t="zs-settings-v1",e=document.documentElement;function n(){var t=function(t){try{return window.matchMedia(t).matches}catch(t){return!1}};return{theme:t("(prefers-color-scheme: light)")?"light":"dark",links:!1,contrast:t("(prefers-contrast: more)")}}function c(e){try{localStorage.setItem(t,JSON.stringify(e))}catch(t){}}function a(t){e.setAttribute("data-theme",t.theme),t.links?e.setAttribute("data-links","underline"):e.removeAttribute("data-links"),t.contrast?e.setAttribute("data-contrast","high"):e.removeAttribute("data-contrast")}var i=function(){var e=n();try{var c=JSON.parse(localStorage.getItem(t)||"null");c&&"object"==typeof c&&("light"!==c.theme&&"dark"!==c.theme||(e.theme=c.theme),"boolean"==typeof c.links&&(e.links=c.links),"boolean"==typeof c.contrast&&(e.contrast=c.contrast))}catch(t){}return e}();function d(){var e=document.getElementById("settings-btn"),d=document.getElementById("settings-panel");if(e&&d){var r=document.getElementById("set-light"),o=document.getElementById("set-links"),s=document.getElementById("set-contrast"),u=document.getElementById("settings-reset");e.addEventListener("click",function(){d.hidden?(d.hidden=!1,e.setAttribute("aria-expanded","true"),r.focus()):h(!1)}),r.addEventListener("change",function(){i.theme=r.checked?"light":"dark",a(i),c(i)}),o.addEventListener("change",function(){i.links=o.checked,a(i),c(i)}),s.addEventListener("change",function(){i.contrast=s.checked,a(i),c(i)}),u.addEventListener("click",function(){!function(){try{localStorage.removeItem(t)}catch(t){}}(),a(i=n()),l()}),document.addEventListener("keydown",function(t){"Escape"!==t.key||d.hidden||h(!0)}),document.addEventListener("click",function(t){d.hidden||d.contains(t.target)||e.contains(t.target)||h(!1)}),l()}function l(){r.checked="light"===i.theme,o.checked=i.links,s.checked=i.contrast}function h(t){d.hidden=!0,e.setAttribute("aria-expanded","false"),t&&e.focus()}}a(i),"loading"===document.readyState?document.addEventListener("DOMContentLoaded",d):d()}();
-</script>
   <link rel="stylesheet" href="/style.css" />
 
-  <!-- Flicker fixes, scoped to this page only (style.css is shared with the home page).
-       - The card used backdrop-filter, which re-blurs the area behind it every frame while the
-         particle canvas animates there; many GPUs/browsers flicker or shimmer on that. The panel
-         colour is ~78% opaque already, so it is layered over a solid colour instead (same look).
-       - The entrance slid the card 18px while fading; the moving text can shimmer on a blurred
-         backdrop. Fade only. -->
   <style>
-    .page-404 .nf-card {
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      background: linear-gradient(var(--panel), var(--panel)), var(--bg-2);
-      animation: nf-fade 0.4s ease both;
-    }
-    @keyframes nf-fade { from { opacity: 0; } to { opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) {
-      .page-404 .nf-card, .page-404 .nf-dot { animation: none; }
+    body.page-404 {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--page);
+      color: var(--text);
+      font: 400 16px/1.6 var(--sans);
     }
   </style>
 </head>
 <body class="page-404">
-
-  <!-- Particle background (same canvas index.html uses; wasm.js draws into it) -->
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
-
   <div class="nf-glow" aria-hidden="true"></div>
-  <div id="cursor-glow" aria-hidden="true"></div>
 
-  <!-- Hidden while validating repo existence -->
   <main class="nf-card" id="nf-card" hidden>
     <div class="nf-badge-row">
       <span class="nf-tag">
@@ -62,35 +66,27 @@
     <h1 id="nf-title">Repository Not Found</h1>
     <p id="nf-msg"></p>
     <div class="nf-actions">
-      <a href="https://github.com/zurai02?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+      <a href="https://github.com/zurai02?tab=repositories" target="_blank" rel="noopener noreferrer" class="btn btn-primary magnetic">
         Browse Repositories <span class="btn-arrow">→</span>
       </a>
-      <a href="/" class="btn btn-ghost">Home</a>
+      <a href="/" class="btn btn-ghost magnetic">Back Home</a>
     </div>
   </main>
 
   <noscript>
     <main class="nf-card">
       <div class="nf-badge-row">
-        <span class="nf-tag">404 // JAVASCRIPT_REQUIRED</span>
+        <span class="nf-tag"><span class="nf-dot"></span> 404 // NOT_FOUND</span>
       </div>
-      <h1>JavaScript Required</h1>
-      <p>Please enable JavaScript to allow repository resolution and redirection.</p>
+      <h1>Page Not Found</h1>
+      <p>The requested page or repository was not found.</p>
       <div class="nf-actions">
-        <a href="https://github.com/zurai02?tab=repositories" class="btn btn-primary">View Repositories →</a>
-        <a href="/" class="btn btn-ghost">Home</a>
+        <a href="https://github.com/zurai02?tab=repositories" class="btn btn-primary">Browse Repositories →</a>
+        <a href="/" class="btn btn-ghost">Back Home</a>
       </div>
     </main>
   </noscript>
 
-  <!-- Particle engine (same script and order as index.html: wasm.js before site.js) -->
-  <script src="/wasm.js" defer></script>
-
-  <!-- Tap/click burst effect (same order as index.html: wasm.js, tapfx.js, site.js) -->
-  <script src="/tapfx.js" defer></script>
-
-  <!-- 404 logic (repo resolver + cursor glow). Plain JS, served as-is: GitHub Pages deploys
-       the repo root without a build, and site.js is the home page's script (no 404 handling). -->
   <script src="/notfound.js" defer></script>
 </body>
 </html>
