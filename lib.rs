@@ -1,4 +1,4 @@
-// src/lib.rs — Particle engine for zurai02.github.io
+// src/lib.rs — Particle engine for zurai02.is-a.dev
 //
 // Compiled to WebAssembly via:  wasm-pack build --target web --out-dir pkg
 //

@@ -63,5 +63,5 @@ app.get("*", (_req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n zurai02.github.io running at http://localhost:${PORT}\n`);
+  console.log(`\n zurai02.is-a.dev running at http://localhost:${PORT}\n`);
 });

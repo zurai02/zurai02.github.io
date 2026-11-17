@@ -1,5 +1,5 @@
 /**
- * tapfx.js — Tap/click burst particles for zurai02.github.io
+ * tapfx.js — Tap/click burst particles for zurai02.is-a.dev
  * Add to index.html: <script src="tapfx.js" defer></script>
  */
 
@@ -88,7 +88,7 @@
     p.life -= 0.07;
   }
 
-  // ── Animation loop ─────────────────────────────────────────────────────────
+  // ── Animation loop ────────────────────────────────────────────────────────
   let lastTime = performance.now();
 
   function loop(now) {
@@ -112,7 +112,7 @@
     }
   }
 
-  // ── Setup ──────────────────────────────────────────────────────────────────
+  // ── Setup ────────────────────────────────────────────────────────────────
   function setup() {
     // Create a dedicated overlay canvas so we don't fight with wasm.js
     const overlay       = document.createElement("canvas");

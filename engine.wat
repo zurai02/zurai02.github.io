@@ -1,4 +1,4 @@
-;; engine.wat — High-performance particle engine for zurai02.github.io
+;; engine.wat — High-performance particle engine for zurai02.is-a.dev
 ;;
 ;; Runs the background canvas particle simulation at near-native speed.
 ;; Compiled to engine.wasm via: npm run build:wasm
@@ -98,94 +98,12 @@
         ;; write back
         (f32.store offset=0 (local.get $b) (local.get $x))
         (f32.store offset=4 (local.get $b) (local.get $y))
+        (f32.store offset=8 (local.get $b) (local.get $vx))
+        (f32.store offset=12 (local.get $b) (local.get $vy))
 
         (local.set $i (i32.add (local.get $i) (i32.const 1)))
         (br $lp)
       )
     )
   )
-
-  ;; ── dist_sq ─────────────────────────────────────────────────────────────────
-  ;; Squared Euclidean distance between particles i and j.
-  ;; Used by JS to decide whether to draw a connection line.
-  ;; Returning squared distance avoids a sqrt — compare against threshold^2.
-  ;;
-  ;; dist_sq(i: i32, j: i32) -> f32
-  (func (export "dist_sq")
-    (param $i i32)
-    (param $j i32)
-    (result f32)
-    (local $bi i32)
-    (local $bj i32)
-    (local $dx f32)
-    (local $dy f32)
-
-    (local.set $bi (i32.mul (local.get $i) (i32.const 24)))
-    (local.set $bj (i32.mul (local.get $j) (i32.const 24)))
-
-    (local.set $dx (f32.sub
-      (f32.load offset=0 (local.get $bi))
-      (f32.load offset=0 (local.get $bj))
-    ))
-    (local.set $dy (f32.sub
-      (f32.load offset=4 (local.get $bi))
-      (f32.load offset=4 (local.get $bj))
-    ))
-
-    (f32.add
-      (f32.mul (local.get $dx) (local.get $dx))
-      (f32.mul (local.get $dy) (local.get $dy))
-    )
-  )
-
-  ;; ── connection_alpha ────────────────────────────────────────────────────────
-  ;; Returns line opacity for a pair of particles based on distance.
-  ;; 1.0 when close, fades to 0.0 at threshold. Returns 0 if beyond threshold.
-  ;;
-  ;; connection_alpha(i: i32, j: i32, threshold: f32) -> f32
-  (func (export "connection_alpha")
-    (param $i  i32)
-    (param $j  i32)
-    (param $th f32)
-    (result f32)
-    (local $dsq f32)
-    (local $tsq f32)
-
-    (local.set $tsq (f32.mul (local.get $th) (local.get $th)))
-    (local.set $dsq (call $dist_sq_internal (local.get $i) (local.get $j)))
-
-    (if (result f32) (f32.ge (local.get $dsq) (local.get $tsq))
-      (then (f32.const 0.0))
-      (else
-        ;; alpha = 1 - (dsq / tsq)
-        (f32.sub
-          (f32.const 1.0)
-          (f32.div (local.get $dsq) (local.get $tsq))
-        )
-      )
-    )
-  )
-
-  ;; internal (unexported) dist_sq used by connection_alpha
-  (func $dist_sq_internal
-    (param $i i32) (param $j i32)
-    (result f32)
-    (local $bi i32) (local $bj i32)
-    (local $dx f32) (local $dy f32)
-    (local.set $bi (i32.mul (local.get $i) (i32.const 24)))
-    (local.set $bj (i32.mul (local.get $j) (i32.const 24)))
-    (local.set $dx (f32.sub
-      (f32.load offset=0 (local.get $bi))
-      (f32.load offset=0 (local.get $bj))
-    ))
-    (local.set $dy (f32.sub
-      (f32.load offset=4 (local.get $bi))
-      (f32.load offset=4 (local.get $bj))
-    ))
-    (f32.add
-      (f32.mul (local.get $dx) (local.get $dx))
-      (f32.mul (local.get $dy) (local.get $dy))
-    )
-  )
-
 )
