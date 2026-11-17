@@ -1,53 +1,23 @@
+/* Keep mouse-only cursor decoration disabled on touch, but leave tap effects and
+   interactive UI available. Touch browsers can still use :active feedback. */
 @media (hover: none), (pointer: coarse) {
-  #cursor-glow,
-  #tap-canvas,
-  #back-to-top,
-  #copy-toast {
+  #cursor-glow {
     display: none !important;
   }
 
-  .btn,
-  .btn:hover,
-  .badge,
-  .badge:hover,
-  .skill-card,
-  .skill-card:hover,
-  .link-card,
-  .link-card:hover,
-  .nav-links a,
-  .nav-links a:hover,
-  .nav-links a.active {
-    transform: none !important;
-    transition: none !important;
-    box-shadow: none !important;
-    animation: none !important;
+  .btn:active,
+  .badge:active,
+  .skill-card:active,
+  .link-card:active,
+  .nav-links a:active {
+    transform: translateY(-2px);
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.18);
   }
 
-  .btn::before,
-  .skill-card::before,
-  .skill-card::after,
-  .link-card::before,
-  .link-card::after {
-    display: none !important;
-    opacity: 0 !important;
-  }
-
-  .skill-card:hover .skill-icon,
-  .link-card:hover .link-icon,
-  .skill-card:hover,
-  .link-card:hover,
-  .badge:hover,
-  .btn:hover,
-  .nav-links a:hover {
-    transform: none !important;
-    scale: 1 !important;
-  }
-
-  .reveal,
-  .reveal.visible {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
+  .skill-card:active,
+  .link-card:active {
+    border-color: rgba(255, 107, 53, 0.55);
   }
 }
 
