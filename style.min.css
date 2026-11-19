@@ -1118,7 +1118,12 @@ footer a:hover {
 }
 
 .zc-root *, .zc-root *::before, .zc-root *::after { box-sizing: border-box; }
-.zc-root [hidden] { display: none !important; }
+.zc-root [hidden],
+.zc-panel[hidden],
+.zc-panel.zc-hidden,
+.zc-root:not(.zc-open) .zc-panel {
+  display: none !important;
+}
 
 /* Floating button */
 .zc-toggle {
@@ -1205,7 +1210,8 @@ footer a:hover {
   transition: background .15s, color .15s;
 }
 .zc-icon-btn:hover { background: rgba(255, 255, 255, .07); color: var(--zc-text); }
-.zc-icon-btn svg { width: 18px; height: 18px; }
+.zc-icon-btn svg { width: 18px; height: 18px; pointer-events: none; }
+.zc-toggle svg { pointer-events: none; }
 
 /* Messages */
 .zc-log {
