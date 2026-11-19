@@ -36,7 +36,8 @@ minify_js "notfound.js" "notfound.min.js"
 minify_js "transformer.js" "transformer.min.js"
 minify_js "wasm.js" "wasm.min.js"
 
-minify_css "style.css" "style.min.css"
+# Keep the compiled base stylesheet intact: style.css imports it as its base.
+minify_css "style.css" "style.overrides.min.css"
 minify_css "desktop-hover.css" "desktop-hover.min.css"
 
 echo "Minified JS and CSS assets were generated in the repo root."

@@ -1,3 +1,7 @@
+/* The homepage already loads style.min.css before this file. Import the source
+   overrides here so the homepage uses style.css without duplicating HTML links. */
+@import url("./style.css");
+
 /* Keep mouse-only cursor decoration disabled on touch, but leave tap effects and
    interactive UI available. Touch browsers can still use :active feedback. */
 @media (hover: none), (pointer: coarse) {
