@@ -419,26 +419,61 @@
     });
 
     var greeted = false;
+
+    function setToggleIcon(isOpen) {
+      while (toggle.firstChild) toggle.removeChild(toggle.firstChild);
+      toggle.appendChild(icon(isOpen ? ICON_CLOSE : ICON_CHAT));
+      toggle.setAttribute('aria-label', isOpen ? 'Close chat' : 'Ask about zurai02');
+    }
+
     function open() {
       panel.hidden = false;
+      panel.classList.remove('zc-hidden');
+      panel.style.display = 'flex';
       toggle.setAttribute('aria-expanded', 'true');
       root.classList.add('zc-open');
+      setToggleIcon(true);
       if (!greeted) {
         greeted = true;
-        addBot({ text: 'Hi! I\'m a small assistant for zurai02\'s portfolio. Ask me about their work, skills or how to get in touch.', links: [] });
+        addBot({ text: "Hi! I'm a small assistant for zurai02's portfolio. Ask me about their work, skills or how to get in touch.", links: [] });
       }
       window.setTimeout(function () { input.focus(); }, 30);
     }
+
     function close() {
       panel.hidden = true;
+      panel.classList.add('zc-hidden');
+      panel.style.display = 'none';
       toggle.setAttribute('aria-expanded', 'false');
       root.classList.remove('zc-open');
+      setToggleIcon(false);
       toggle.focus();
     }
 
-    toggle.addEventListener('click', function () { panel.hidden ? open() : close(); });
-    closeBtn.addEventListener('click', close);
-    panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.hidden ? open() : close();
+    });
+
+    closeBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    });
+
+    // Close when tapping or clicking anywhere outside the chat window
+    document.addEventListener('pointerdown', function (e) {
+      if (!panel.hidden && !root.contains(e.target)) {
+        close();
+      }
+    });
+
+    // Close on Escape key globally across the document
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !panel.hidden) {
+        close();
+      }
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
