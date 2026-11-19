@@ -6,28 +6,7 @@
   <meta name="robots" content="noindex" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#ff6b35" />
-  <title>404 — zurai02</title>
-  <!-- Instant Custom Shortlink Redirects (case-insensitive) -->
-  <script>
-  (function() {
-    var REDIRECTS = {
-      "github": "https://github.com/zurai02",
-      "repositories": "https://github.com/zurai02?tab=repositories",
-      "repos": "https://github.com/zurai02?tab=repositories",
-      "repo": "https://zurai02.is-a.dev/repos",
-      "stars": "https://github.com/zurai02?tab=stars",
-      "portfolio": "https://devforum.roblox.com/t/zurai02-scripting-portfolio/4679442",
-      "devforum": "https://devforum.roblox.com/u/zurai02",
-      "discord": "https://discord.com/users/1460949263650652200",
-      "blog": "https://zurai02.is-a.dev/blog"
-    };
-    var path = window.location.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
-    if (REDIRECTS[path]) {
-      window.location.replace(REDIRECTS[path]);
-    }
-  })();
-  </script>
-
+  <title>404 — Page Not Found // zurai02</title>
 
   <!-- Fonts matching zurai02.is-a.dev -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,8 +16,8 @@
   <!-- Canonical host redirect (synchronous, root-relative so it works at any 404 path) -->
   <script src="/redirect.js"></script>
 
-  <!-- Shared styles (root-relative so this works at any 404 path) -->
-  <link rel="stylesheet" href="/style.css" />
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="/style.css?v=ui-v14" />
 </head>
 <body class="page-404">
 
@@ -48,47 +27,36 @@
   <div class="nf-glow" aria-hidden="true"></div>
   <div id="cursor-glow" aria-hidden="true"></div>
 
-  <!-- Hidden while validating repo existence -->
-  <main class="nf-card" id="nf-card" hidden>
+  <main class="nf-card" id="nf-card">
     <div class="nf-badge-row">
       <span class="nf-tag">
         <span class="nf-dot"></span>
         <span id="nf-badge-text">404 // NOT_FOUND</span>
       </span>
     </div>
-    <h1 id="nf-title">Repository Not Found</h1>
-    <p id="nf-msg"></p>
+    <div class="nf-number" aria-hidden="true">404</div>
+    <h1 id="nf-title">Page Not Found</h1>
+    <p id="nf-msg">The requested path <code class="nf-path" id="nf-path"></code> does not exist, has been moved, or is temporarily unavailable.</p>
     <div class="nf-actions">
-      <a href="https://zurai02.is-a.dev/repos" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-        Browse Repositories <span class="btn-arrow">→</span>
+      <a href="/" class="btn btn-primary">
+        Return Home <span class="btn-arrow">→</span>
       </a>
-      <a href="/" class="btn btn-ghost">Home</a>
+      <a href="/#skills" class="btn btn-ghost">View Skills</a>
+      <a href="javascript:history.back()" class="btn btn-ghost">Go Back</a>
     </div>
   </main>
 
   <noscript>
-    <main class="nf-card">
-      <div class="nf-badge-row">
-        <span class="nf-tag">404 // JAVASCRIPT_REQUIRED</span>
-      </div>
-      <h1>JavaScript Required</h1>
-      <p>Please enable JavaScript to allow repository resolution and redirection.</p>
-      <div class="nf-actions">
-        <a href="https://zurai02.is-a.dev/repos" class="btn btn-primary">View Repositories →</a>
-        <a href="/" class="btn btn-ghost">Home</a>
-      </div>
-    </main>
+    <style>#nf-path { display: none; }</style>
   </noscript>
 
   <!-- Particle engine (same script and order as index.html: wasm.js before site.js) -->
   <script src="/wasm.js" defer></script>
 
-  <!-- Tap/click burst effect (same order as index.html: wasm.js, tapfx.js, site.js) -->
+  <!-- Tap/click burst effect -->
   <script src="/tapfx.js" defer></script>
 
-  <!-- Shared script, compiled from site.ts (npx tsc --project tsconfig.json).
-       Runs initNotFound() because body has .page-404.
-       If your tsconfig outputs somewhere other than the site root, change this path (e.g. /dist/site.js). -->
-  <script src="/site.js" defer></script>
+  <!-- 404 logic (path display + cursor glow) -->
+  <script src="/notfound.js?v=ui-v14" defer></script>
 </body>
 </html>
