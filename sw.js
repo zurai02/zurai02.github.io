@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION = 'v14';
+const VERSION = 'v15';
 const CACHE = `zurai02-shell-${VERSION}`;
 const SHELL = ['/','/index.html','/style.css','/style.min.css','/desktop-hover.css','/site.js','/manifest.json'];
 
