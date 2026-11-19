@@ -1,5 +1,5 @@
 /* Base styles are shared with the homepage; desktop-hover.css imports this file. */
-@import url("./style.min.css");
+@import url("/style.min.css");
 
 /* Small-screen safety net for narrow phones and embedded browsers. */
 @media (max-width: 640px) {
@@ -61,7 +61,6 @@
   }
 }
 
-/* Clear keyboard focus and keep hover movement from affecting touch users. */
 :where(a, button, [tabindex]):focus-visible {
   outline: 2px solid var(--orange, #ff6b35);
   outline-offset: 4px;
