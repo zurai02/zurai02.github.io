@@ -1,8 +1,8 @@
 'use strict';
 
-const VERSION = 'v9';
+const VERSION = 'v11';
 const CACHE = `zurai02-shell-${VERSION}`;
-const SHELL = ['/', '/index.html', '/style.css', '/site.js', '/manifest.json'];
+const SHELL = ['/','/index.html','/style.css','/style.min.css','/desktop-hover.css','/site.js','/manifest.json'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
