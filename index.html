@@ -16,17 +16,13 @@
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://zurai02.is-a.dev https://raw.githubusercontent.com; frame-src https://zurai02.is-a.dev;" />
 
-  <!-- Canonical host redirect -->
   <script src="redirect.js"></script>
-
-  <!-- Open Graph -->
   <meta property="og:title" content="zurai02 — Roblox Scripting Specialist" />
   <meta property="og:description" content="Advanced client-side architecture and custom Luau modules that push Roblox performance to the limit." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://zurai02.is-a.dev" />
   <meta property="og:locale" content="en_US" />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta name="theme-color" content="#ff6b35" />
@@ -37,121 +33,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css?v=ui-fix-1" />
 
-  <!-- Direct asset loading avoids GitHub Pages path issues -->
-  <link rel="stylesheet" href="style.min.css" />
-  <link rel="stylesheet" href="desktop-hover.css" />
-
-  <!-- Critical inline styles for FCP -->
   <style>
-    html { scroll-behavior: smooth; }
-    body { margin: 0; opacity: 0; animation: fadeIn 0.3s ease forwards; }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    .blog-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    .blog-card:hover {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(255,107,53,0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    }
-    .blog-card h3 {
-      margin: 0 0 0.75rem 0;
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.4;
-    }
-    .blog-card p {
-      margin: 0 0 1rem 0;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.9rem;
-      line-height: 1.6;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .blog-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.35);
-      flex-wrap: wrap;
-    }
-    .blog-meta .tag {
-      background: rgba(255,107,53,0.15);
-      color: #ff6b35;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-    .blog-loading {
-      text-align: center;
-      padding: 3rem;
-      color: rgba(255,255,255,0.4);
-    }
-    .blog-loading .spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #ff6b35;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .blog-error {
-      text-align: center;
-      padding: 2rem;
-      color: rgba(255,255,255,0.4);
-    }
-    .blog-error a {
-      color: #ff6b35;
-      text-decoration: none;
-    }
-    .blog-error a:hover { text-decoration: underline; }
-    .blog-embed {
-      width: 100%;
-      height: 600px;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.02);
-      margin-top: 1.5rem;
-    }
-    .blog-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #ff6b35;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: gap 0.3s ease;
-    }
-    .blog-cta:hover {
-      gap: 0.75rem;
-    }
+    body { opacity: 0; animation: pageFadeIn .3s ease forwards; }
+    @keyframes pageFadeIn { to { opacity: 1; } }
+    .blog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:1rem; margin-top:1.5rem; }
+    .blog-card { display:block; padding:1.25rem; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(255,255,255,.03); color:inherit; text-decoration:none; transition:all .2s ease; }
+    .blog-card:hover { transform:translateY(-3px); border-color:rgba(255,107,53,.4); background:rgba(255,255,255,.055); }
+    .blog-card h3 { margin:0 0 .65rem; font-size:1.05rem; }
+    .blog-card p { margin:0 0 .9rem; color:#929cad; font-size:.84rem; line-height:1.6; }
+    .blog-meta { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; color:#818a9b; font-size:.72rem; }
+    .blog-meta .tag { padding:.15rem .5rem; border-radius:4px; background:rgba(255,107,53,.12); color:#ff6b35; }
+    .blog-loading,.blog-error { grid-column:1/-1; padding:2rem; text-align:center; color:#929cad; }
+    .blog-loading .spinner { width:22px; height:22px; margin:0 auto .8rem; border:2px solid rgba(255,255,255,.1); border-top-color:#ff6b35; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .blog-embed { width:100%; height:600px; margin-top:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(255,255,255,.02); }
+    .blog-cta { color:#ff6b35; text-decoration:none; }
+    .blog-cta:hover { text-decoration:underline; }
   </style>
-
   <script src="maintenance.js" defer></script>
 </head>
 
@@ -162,7 +62,9 @@
 
   <nav id="nav" aria-label="Main navigation">
     <a href="#" class="nav-logo" aria-label="zurai02 home">zurai02<span class="nav-cursor" aria-hidden="true"></span></a>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation">
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation" type="button">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
       <span class="nav-toggle-bar"></span>
     </button>
     <div class="nav-right" id="nav-menu">
@@ -180,82 +82,39 @@
     <header class="hero">
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="hero-glow2" aria-hidden="true"></div>
-
       <div class="status">
         <span class="status-dot" aria-hidden="true"></span>
-        <span>Active on DevForum</span>
-        <span aria-hidden="true">&nbsp;·&nbsp;</span>
+        <span>Active on DevForum</span><span aria-hidden="true">&nbsp;·&nbsp;</span>
         <span id="greeting" aria-live="polite"></span>
       </div>
-
-      <p class="hero-eyebrow">
-        Roblox Scripting Specialist <span aria-hidden="true">&nbsp;·&nbsp;</span>
-        <span class="tag-lang">Luau</span>
-      </p>
-
+      <p class="hero-eyebrow">Roblox Scripting Specialist <span aria-hidden="true">&nbsp;·&nbsp;</span><span class="tag-lang">Luau</span></p>
       <h1>Hi, I'm<br><span class="handle">zurai02</span></h1>
       <p class="hero-sub" id="hero-sub"></p>
-
       <div class="hero-actions">
         <a href="https://zurai02.is-a.dev/portfolio" target="_blank" rel="noopener noreferrer" class="btn btn-primary">DevForum Portfolio <span aria-hidden="true">→</span></a>
         <a href="https://zurai02.is-a.dev/blog" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Blog</a>
         <button class="btn btn-discord" id="discord-btn" data-clipboard="lol066351" type="button"><span id="dbt">Discord: lol066351</span></button>
       </div>
-
-      <div class="scroll-hint" aria-hidden="true">
-        <span>scroll</span>
-        <div class="sh-line"></div>
-      </div>
+      <div class="scroll-hint" aria-hidden="true"><span>scroll</span><div class="sh-line"></div></div>
     </header>
 
     <hr class="divider" />
-
     <section id="skills" aria-labelledby="skills-heading">
       <p class="section-label reveal">key_skills</p>
       <h2 class="section-title reveal rd1" id="skills-heading">What I specialize in</h2>
       <p class="section-sub reveal rd2">Deep focus on the parts of Roblox development most people treat as black boxes — squeezing out every frame and byte.</p>
-
       <div class="skill-grid">
-        <article class="skill-card reveal rd1">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-client"/></svg>
-          <span class="skill-num" aria-hidden="true">01</span>
-          <h3>Client-Side Optimization</h3>
-          <p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p>
-        </article>
-        <article class="skill-card reveal rd2">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-perf"/></svg>
-          <span class="skill-num" aria-hidden="true">02</span>
-          <h3>Performance Analysis</h3>
-          <p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p>
-        </article>
-        <article class="skill-card reveal rd3">
-          <svg class="skill-icon" aria-hidden="true"><use href="#icon-network"/></svg>
-          <span class="skill-num" aria-hidden="true">03</span>
-          <h3>Networking</h3>
-          <p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p>
-        </article>
+        <article class="skill-card reveal rd1"><svg class="skill-icon" aria-hidden="true"><use href="#icon-client"/></svg><span class="skill-num" aria-hidden="true">01</span><h3>Client-Side Optimization</h3><p>Custom tweening modules that bypass TweenService limitations — direct control over interpolation, easing, and cancellation without the overhead.</p></article>
+        <article class="skill-card reveal rd2"><svg class="skill-icon" aria-hidden="true"><use href="#icon-perf"/></svg><span class="skill-num" aria-hidden="true">02</span><h3>Performance Analysis</h3><p>Micro-profiling with the MicroProfiler, streaming enabled configurations, and memory management that prevents leaks before they ship.</p></article>
+        <article class="skill-card reveal rd3"><svg class="skill-icon" aria-hidden="true"><use href="#icon-network"/></svg><span class="skill-num" aria-hidden="true">03</span><h3>Networking</h3><p>Lightweight RemoteEvent structures designed to mitigate packet loss — batching, rate-limiting, and reliability layers built in Luau.</p></article>
       </div>
-
-      <div class="stat-row reveal rd2">
-        <div class="stat">
-          <span class="stat-val" data-count="100" aria-label="100 percent">0</span>
-          <span class="stat-lbl">% client-side focus</span>
-        </div>
-      </div>
-
-      <div class="verification-block">
-        <strong>Verification</strong> — Contact via Discord:
-        <code class="mono">lol066351</code>
-        (ID: <code class="mono">1460949263650652200</code>)
-      </div>
+      <div class="stat-row reveal rd2"><div class="stat"><span class="stat-val" data-count="100" aria-label="100 percent">0</span><span class="stat-lbl">% client-side focus</span></div></div>
+      <div class="verification-block"><strong>Verification</strong> — Contact via Discord: <code class="mono">lol066351</code> (ID: <code class="mono">1460949263650652200</code>)</div>
     </section>
 
     <hr class="divider" />
-
     <section id="stack" aria-labelledby="stack-heading">
-      <p class="section-label reveal">tech_stack</p>
-      <h2 class="section-title reveal rd1" id="stack-heading">Tools &amp; platform</h2>
-      <p class="section-sub reveal rd2">Everything I work in day-to-day.</p>
+      <p class="section-label reveal">tech_stack</p><h2 class="section-title reveal rd1" id="stack-heading">Tools &amp; platform</h2><p class="section-sub reveal rd2">Everything I work in day-to-day.</p>
       <div class="stack-row reveal rd3" role="list">
         <span class="badge b-luau" role="listitem"><svg class="badge-icon" aria-hidden="true"><use href="#icon-luau"/></svg>Luau</span>
         <span class="badge b-rblx" role="listitem"><svg class="badge-icon" aria-hidden="true"><use href="#icon-roblox"/></svg>Roblox Studio</span>
@@ -271,22 +130,15 @@
     </section>
 
     <hr class="divider" />
-
     <section id="blog" aria-labelledby="blog-heading">
-      <p class="section-label reveal">latest_writing</p>
-      <h2 class="section-title reveal rd1" id="blog-heading">From the blog</h2>
+      <p class="section-label reveal">latest_writing</p><h2 class="section-title reveal rd1" id="blog-heading">From the blog</h2>
       <p class="section-sub reveal rd2">Thoughts on Luau, systems programming, and squeezing frames. <a href="https://zurai02.is-a.dev/blog" target="_blank" rel="noopener noreferrer" class="blog-cta">View all posts →</a></p>
-      <div id="blog-container" class="blog-grid reveal rd3">
-        <div class="blog-loading"><div class="spinner"></div><span>Fetching latest posts...</span></div>
-      </div>
+      <div id="blog-container" class="blog-grid reveal rd3"><div class="blog-loading"><div class="spinner"></div><span>Fetching latest posts...</span></div></div>
     </section>
 
     <hr class="divider" />
-
     <section id="links" aria-labelledby="links-heading">
-      <p class="section-label reveal">links</p>
-      <h2 class="section-title reveal rd1" id="links-heading">Find me here</h2>
-      <p class="section-sub reveal rd2">Portfolio, community, and contact.</p>
+      <p class="section-label reveal">links</p><h2 class="section-title reveal rd1" id="links-heading">Find me here</h2><p class="section-sub reveal rd2">Portfolio, community, and contact.</p>
       <div class="link-grid">
         <a href="https://zurai02.is-a.dev/portfolio" target="_blank" rel="noopener noreferrer" class="link-card reveal rd1"><svg class="link-icon" aria-hidden="true"><use href="#icon-portfolio"/></svg><span class="link-name">Scripting Portfolio</span><span class="link-label">DevForum</span></a>
         <a href="https://zurai02.is-a.dev/devforum" target="_blank" rel="noopener noreferrer" class="link-card reveal rd2"><svg class="link-icon" aria-hidden="true"><use href="#icon-roblox"/></svg><span class="link-name">DevForum Profile</span><span class="link-label">@zurai02</span></a>
@@ -298,201 +150,59 @@
     </section>
 
     <hr class="divider" />
-
     <section class="tw-wrap" id="terminal" aria-labelledby="terminal-heading">
-      <p class="section-label reveal">live_script</p>
-      <h2 class="section-title reveal rd1" id="terminal-heading">Code in motion</h2>
-      <p class="section-sub reveal rd2">A live look at the kind of Luau I write every day.</p>
-
-      <figure class="tw-terminal reveal rd3" aria-label="Luau code terminal">
-        <div class="tw-bar">
-          <span class="tw-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57aa" aria-hidden="true"></span>
-          <span class="tw-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2eaa" aria-hidden="true"></span>
-          <span class="tw-dot" style="background:#28c840;box-shadow:0 0 5px #28c840aa" aria-hidden="true"></span>
-          <span class="tw-bar-title">zurai02 — luau session</span>
-        </div>
-        <pre class="tw-body" id="tw-body"><code>
-          <div class="tw-line"><span class="tw-prompt" aria-hidden="true">$</span><span class="tw-code dim">luau -- zurai02 session initialized</span></div>
-          <div class="tw-line"><span class="tw-prompt" aria-hidden="true">~</span><span class="tw-code dim">require(ReplicatedStorage.Modules.NetBatcher) <span class="cm">-- loaded</span></span></div>
-        </code></pre>
-      </figure>
+      <p class="section-label reveal">live_script</p><h2 class="section-title reveal rd1" id="terminal-heading">Code in motion</h2><p class="section-sub reveal rd2">A live look at the kind of Luau I write every day.</p>
+      <figure class="tw-terminal reveal rd3" aria-label="Luau code terminal"><div class="tw-bar"><span class="tw-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57aa" aria-hidden="true"></span><span class="tw-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2eaa" aria-hidden="true"></span><span class="tw-dot" style="background:#28c840;box-shadow:0 0 5px #28c840aa" aria-hidden="true"></span><span class="tw-bar-title">zurai02 — luau session</span></div><pre class="tw-body" id="tw-body"><code><div class="tw-line"><span class="tw-prompt" aria-hidden="true">$</span><span class="tw-code dim">luau -- zurai02 session initialized</span></div><div class="tw-line"><span class="tw-prompt" aria-hidden="true">~</span><span class="tw-code dim">require(ReplicatedStorage.Modules.NetBatcher) <span class="cm">-- loaded</span></span></div></code></pre></figure>
     </section>
 
-    <footer>
-      <span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization
-      <span aria-hidden="true">&nbsp;·&nbsp;</span>
-      <span id="yr"></span>
-      <span aria-hidden="true">&nbsp;·&nbsp;</span>
-      <a href="https://zurai02.is-a.dev">zurai02.is-a.dev</a>
-    </footer>
+    <footer><span class="mono">zurai02</span> — Roblox Scripting &amp; Engine Optimization <span aria-hidden="true">&nbsp;·&nbsp;</span><span id="yr"></span><span aria-hidden="true">&nbsp;·&nbsp;</span><a href="https://zurai02.is-a.dev">zurai02.is-a.dev</a></footer>
   </main>
 
   <div id="copy-toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
   <script>
-    fetch('icons.svg')
-      .then(function(r) {
-        if (!r.ok) throw new Error('SVG sprite not found');
-        return r.text();
-      })
-      .then(function(svg) {
-        var div = document.getElementById('svg-sprite');
-        if (div) div.innerHTML = svg;
-      })
-      .catch(function(err) {
-        console.warn('Icon sprite failed to load:', err);
-      });
-
+    fetch('/icons.svg').then(function(r) { if (!r.ok) throw new Error('SVG sprite not found'); return r.text(); }).then(function(svg) { var div = document.getElementById('svg-sprite'); if (div) div.innerHTML = svg; }).catch(function(err) { console.warn('Icon sprite failed to load:', err); });
     function renderBlogCard(post, defaultUrl) {
       var base = (defaultUrl || '').replace(/\/+$/, '');
       var link = post.link || (base + '/post.html?id=' + encodeURIComponent(post.id));
       var excerpt = post.description || (post.content ? post.content.replace(/```[\s\S]*?```/g, '[code]').replace(/[#*_`~>\[\]]/g, '').replace(/\s+/g, ' ').trim().substring(0, 150) + '...' : '');
-      var tags = post.tags || [];
-      var tagsHtml = tags.map(function(tag) {
-        return '<span class="tag">' + escapeHtml(tag) + '</span>';
-      }).join('');
-
-      return '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer" class="blog-card" data-magnetic>' +
-        '<h3>' + escapeHtml(post.title || 'Untitled Post') + '</h3>' +
-        (excerpt ? '<p>' + escapeHtml(excerpt) + '</p>' : '') +
-        '<div class="blog-meta">' +
-          (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') +
-          tagsHtml +
-          '<span style="margin-left:auto;color:#ff6b35;font-weight:600;">Read →</span>' +
-        '</div>' +
-      '</a>';
+      var tagsHtml = (post.tags || []).map(function(tag) { return '<span class="tag">' + escapeHtml(tag) + '</span>'; }).join('');
+      return '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer" class="blog-card" data-magnetic><h3>' + escapeHtml(post.title || 'Untitled Post') + '</h3>' + (excerpt ? '<p>' + escapeHtml(excerpt) + '</p>' : '') + '<div class="blog-meta">' + (post.date ? '<span>' + escapeHtml(post.date) + '</span>' : '') + tagsHtml + '<span style="margin-left:auto;color:#ff6b35;font-weight:600;">Read →</span></div></a>';
     }
-
     (function loadBlogPosts() {
-      var container = document.getElementById('blog-container');
-      if (!container) return;
-
+      var container = document.getElementById('blog-container'); if (!container) return;
       var blogUrl = 'https://zurai02.is-a.dev/blog';
-      var candidateSources = [
-        'https://zurai02.is-a.dev/blog/posts.json',
-        '/blog/posts.json',
-        'https://raw.githubusercontent.com/zurai02/blog/main/posts.json'
-      ];
-
+      var sources = ['https://zurai02.is-a.dev/blog/posts.json', '/blog/posts.json', 'https://raw.githubusercontent.com/zurai02/blog/main/posts.json'];
       function trySource(index) {
-        if (index >= candidateSources.length) {
-          fallbackHtmlFetch(container, blogUrl);
-          return;
-        }
-
-        var sourceUrl = candidateSources[index];
-        fetch(sourceUrl, {
-          mode: 'cors',
-          headers: { 'Accept': 'application/json' }
-        })
-        .then(function(r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
-        .then(function(posts) {
-          if (!Array.isArray(posts) || posts.length === 0) {
-            throw new Error('No posts found in JSON payload');
-          }
-
-          var validPosts = posts.filter(function(p) {
-            return p && typeof p === 'object' && !p.draft;
-          });
-
-          if (validPosts.length === 0) validPosts = posts;
-
-          validPosts.sort(function(a, b) {
-            return new Date(b.date || 0) - new Date(a.date || 0);
-          });
-
-          container.innerHTML = validPosts.slice(0, 6).map(function(post) {
-            return renderBlogCard(post, blogUrl);
-          }).join('');
-
-          if (typeof window.initMagnetic === 'function') {
-            window.initMagnetic();
-          }
-        })
-        .catch(function(err) {
-          console.warn('Blog source failed (' + sourceUrl + '):', err);
-          trySource(index + 1);
-        });
+        if (index >= sources.length) { fallbackHtmlFetch(container, blogUrl); return; }
+        var source = sources[index];
+        fetch(source, { mode: 'cors', headers: { Accept: 'application/json' } }).then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(posts) {
+          if (!Array.isArray(posts) || !posts.length) throw new Error('No posts found');
+          posts = posts.filter(function(p) { return p && typeof p === 'object' && !p.draft; });
+          posts.sort(function(a,b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+          container.innerHTML = posts.slice(0,6).map(function(post) { return renderBlogCard(post, blogUrl); }).join('');
+          if (typeof window.initMagnetic === 'function') window.initMagnetic();
+        }).catch(function(err) { console.warn('Blog source failed (' + source + '):', err); trySource(index + 1); });
       }
-
       trySource(0);
     })();
-
     function fallbackHtmlFetch(container, blogUrl) {
-      fetch(blogUrl, {
-        mode: 'cors',
-        headers: { 'Accept': 'text/html' }
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('Blog unavailable: HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function(html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
-        var posts = [];
-        var cards = doc.querySelectorAll('.post-card, [class*="post-card"], article');
-
-        if (cards.length > 0) {
-          cards.forEach(function(card, idx) {
-            if (idx >= 6) return;
-
-            var titleEl = card.querySelector('.post-card-title, h1, h2, h3, .title');
-            var linkEl = card.closest('a') || card.querySelector('a');
-            var descEl = card.querySelector('.post-card-excerpt, p, .excerpt');
-            var dateEl = card.querySelector('.post-card-date, time, .date');
-            var tagEls = card.querySelectorAll('.tag');
-
-            posts.push({
-              title: titleEl ? titleEl.textContent.trim() : 'Blog Post',
-              link: linkEl ? linkEl.href : blogUrl,
-              description: descEl ? descEl.textContent.trim().substring(0, 200) + '...' : '',
-              date: dateEl ? dateEl.textContent.trim() : '',
-              tags: Array.from(tagEls).map(function(t) { return t.textContent.trim(); }).filter(Boolean)
-            });
-          });
-        }
-
-        if (posts.length > 0) {
-          container.innerHTML = posts.map(function(post) {
-            return renderBlogCard(post, blogUrl);
-          }).join('');
-
-          if (typeof window.initMagnetic === 'function') {
-            window.initMagnetic();
-          }
-        } else {
-          showBlogFallback(container, blogUrl);
-        }
-      })
-      .catch(function(err) {
-        console.warn('Blog HTML fetch failed:', err);
-        showBlogFallback(container, blogUrl);
-      });
+      fetch(blogUrl, { mode: 'cors', headers: { Accept: 'text/html' } }).then(function(r) { if (!r.ok) throw new Error('Blog unavailable: HTTP ' + r.status); return r.text(); }).then(function(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html'); var posts = [];
+        doc.querySelectorAll('.post-card, [class*="post-card"], article').forEach(function(card,idx) {
+          if (idx >= 6) return;
+          var title = card.querySelector('.post-card-title,h1,h2,h3,.title'), link = card.closest('a') || card.querySelector('a'), desc = card.querySelector('.post-card-excerpt,p,.excerpt'), date = card.querySelector('.post-card-date,time,.date');
+          posts.push({ title: title ? title.textContent.trim() : 'Blog Post', link: link ? link.href : blogUrl, description: desc ? desc.textContent.trim().substring(0,200) + '...' : '', date: date ? date.textContent.trim() : '', tags: Array.from(card.querySelectorAll('.tag')).map(function(t) { return t.textContent.trim(); }).filter(Boolean) });
+        });
+        if (posts.length) container.innerHTML = posts.map(function(post) { return renderBlogCard(post, blogUrl); }).join(''); else showBlogFallback(container, blogUrl);
+        if (typeof window.initMagnetic === 'function') window.initMagnetic();
+      }).catch(function(err) { console.warn('Blog HTML fetch failed:', err); showBlogFallback(container, blogUrl); });
     }
-
-    function showBlogFallback(container, blogUrl) {
-      container.innerHTML =
-        '<div class="blog-error" style="grid-column:1/-1;">' +
-          '<p>Unable to load blog posts directly.</p>' +
-          '<p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer" style="color:#ff6b35;">Visit zurai02.is-a.dev/blog →</a></p>' +
-          '<iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy" style="margin-top:1.5rem;"></iframe>' +
-        '</div>';
-    }
-
-    function escapeHtml(text) {
-      var div = document.createElement('div');
-      div.textContent = text == null ? '' : String(text);
-      return div.innerHTML;
-    }
+    function showBlogFallback(container, blogUrl) { container.innerHTML = '<div class="blog-error"><p>Unable to load blog posts directly.</p><p><a href="' + blogUrl + '" target="_blank" rel="noopener noreferrer">Visit zurai02.is-a.dev/blog →</a></p><iframe src="' + blogUrl + '" class="blog-embed" title="zurai02 Blog" loading="lazy"></iframe></div>'; }
+    function escapeHtml(text) { var div = document.createElement('div'); div.textContent = text == null ? '' : String(text); return div.innerHTML; }
   </script>
-
-  <script src="wasm.js" defer></script>
-  <script src="tapfx.js" defer></script>
-  <script src="site.js" defer></script>
-  <script src="chatbot.js" defer></script>
+  <script src="/wasm.js" defer></script>
+  <script src="/tapfx.js" defer></script>
+  <script src="/site.js" defer></script>
+  <script src="/chatbot.js" defer></script>
 </body>
 </html>
