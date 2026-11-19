@@ -129,7 +129,7 @@ function initWelcome() {
     localStorage.setItem('zurai02_welcomed', '1');
     _showOverlay(greet);
   } else if (visits > 1) {
-    setTimeout(() => showToast(`Welcome back! Visit #${visits} 🔥`), 1200);
+    setTimeout(() => showToast(`Welcome back! Visit #${visits}`), 1200);
   }
 }
 
@@ -371,8 +371,8 @@ function initClipboard() {
 
     const done = () => {
       btn.classList.add('copied');
-      if (txtEl) txtEl.textContent = '✓ Copied!';
-      showToast(`${text} copied to clipboard! 📋`);
+      if (txtEl) txtEl.textContent = 'Copied!';
+      showToast(`${text} copied to clipboard!`);
 
       setTimeout(() => {
         if (txtEl) txtEl.textContent = originalText;
