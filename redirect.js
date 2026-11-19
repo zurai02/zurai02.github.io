@@ -8,7 +8,7 @@
   try {
     const host = window.location.hostname;
     // If host is falsy or already the primary host, do nothing
-    if (!host || host === PRIMARY_HOST) return;
+    if (!host || host === PRIMARY_HOST || host === 'localhost' || host === '127.0.0.1') return;
 
     // Build destination preserving path, query and hash
     const dest = 'https://' + PRIMARY_HOST + window.location.pathname + window.location.search + window.location.hash;
