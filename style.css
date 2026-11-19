@@ -1,7 +1,6 @@
-/* The deployed page uses the original skill-card/nav layout. Load its matching
-   compiled stylesheet; style.min.css contains the responsive rules for that UI. */
-@import url("/style.min.css");
-@import url("/desktop-hover.css");
+/* Keep imports relative so the stylesheet also works when served below a path. */
+@import url("./style.min.css");
+@import url("./desktop-hover.css");
 
 /* Small-screen safety net for narrow phones and embedded browsers. */
 @media (max-width: 640px) {
